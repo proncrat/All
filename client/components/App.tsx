@@ -1,11 +1,17 @@
+import { StrictMode } from 'react'
 import { Outlet } from 'react-router'
+import ProfileHeader from './ProfileHeader'
+import ProfileTopSection from './ProfileTopSection'
 
 function App() {
   return (
-    <div>
-      <h1>App Header</h1>
-      <Outlet />
-    </div>
+    <StrictMode>
+      <div>
+        <ProfileTopSection name="Bob"></ProfileTopSection>
+        <ProfileHeader></ProfileHeader>
+        <Outlet />
+      </div>
+    </StrictMode>
   )
 }
 
