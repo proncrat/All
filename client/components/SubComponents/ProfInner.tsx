@@ -46,8 +46,38 @@ function Videos(props) {
   )
 }
 
-function Posts() {
-  return <p>Posts</p>
+function Posts(props) {
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ['videos', props.name],
+    queryFn: fetchProfileBasic,
+  })
+
+  if (isPending) {
+    return <div>Loading...</div>
+  }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>
+  }
+
+  return (
+    <div>
+      {data.posts.map((item) => (
+        <div
+          key={item.id}
+          style={{
+            border: 'solid 1px white',
+            marginBottom: '15px',
+            padding: '10px',
+          }}
+        >
+          <h2>{item.title}</h2>
+          <p>{item.text}</p>
+          <p>{new Date(item.date).toLocaleDateString()}</p>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 function Live() {
@@ -62,12 +92,52 @@ function Playlist() {
   return <p>playlist</p>
 }
 
-function Picture() {
-  return <p>Picture</p>
+function Picture(props) {
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ['pictures', props.name],
+    queryFn: fetchProfileBasic,
+  })
+
+  if (isPending) {
+    return <div>Loading...</div>
+  }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>
+  }
+
+  return (
+    <div>
+      {data.photos.map((item) => (
+        <div key={item.id}>
+          <p>{item.name}</p>
+          <img alt="Lowkey dont know" src={item.url}></img>
+        </div>
+      ))}
+    </div>
+  )
 }
 
-function About() {
-  return <p>About</p>
+function About(props) {
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ['about', props.name],
+    queryFn: fetchProfileBasic,
+  })
+
+  if (isPending) {
+    return <div>Loading...</div>
+  }
+
+  if (isError) {
+    return <div>Error: {error.message}</div>
+  }
+
+  return (
+    <div>
+      <h2>Describe</h2>
+      <p>{data.About.description}</p>
+    </div>
+  )
 }
 
 export { About, Picture, Playlist, Song, Live, Posts, Videos }
