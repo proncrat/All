@@ -1,0 +1,42 @@
+{
+  "id":1,
+  "name":"Bob",
+  "followers":5,
+  "videos":[
+    {
+      "id":1,
+      "name":"balls itch",
+      "views":1,
+      "author":"bob",
+      "date":"2025-05-20T14:30:00Z"
+    },
+    {
+      "id":2,
+      "name":"Cant think of name",
+      "views":67,
+      "author":"bob",
+      "date":"2026-05-20T14:30:00Z"
+    },
+    {
+      "id":3,
+      "name":"Uh mmhmm",
+      "views":5,
+      "author":"bob",
+      "date":"2024-05-20T14:30:00Z"
+    },
+    {
+      "id":4,
+      "name":"Lorim ipsum dim sum?",
+      "views":642,
+      "author":"bob",
+      "date":"2024-05-20T14:30:00Z"
+    },
+    {
+      "id":5,
+      "name":"balls itch 2",
+      "views":53,
+      "author":"bob",
+      "date":"2024-05-20T14:30:00Z"
+    }
+  ]
+}
