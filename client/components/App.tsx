@@ -19,7 +19,7 @@ function App() {
           <ProfileTopSection name="Bob"></ProfileTopSection>
           <ProfileHeader></ProfileHeader>
           {/*Much wow send props to all outlets so cool*/}
-          <Outlet context={data} />
+          <Outlet context={[data]} />
         </div>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

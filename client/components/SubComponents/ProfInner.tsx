@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import request from 'superagent'
 
+import { useOutletContext } from 'react-router'
+import Viewer from 'viewerjs'
+import { useEffect } from 'react'
+
+import 'viewerjs/dist/viewer.css'
+
 //rethink api structure lil bro
 const fetchProfileBasic = async () => {
   try {
@@ -11,7 +17,8 @@ const fetchProfileBasic = async () => {
   }
 }
 
-function Videos(props) {
+function Videos() {
+  const [props] = useOutletContext()
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['videos', props.name],
     queryFn: fetchProfileBasic,
@@ -93,6 +100,15 @@ function Playlist() {
 }
 
 function Picture(props) {
+  useEffect(() => {
+    // Set a timer to update message after 2000ms
+    const timer = setTimeout(() => {
+      const gallery = new Viewer(document.getElementById('images'))
+    }, 2000)
+    // Clean up to prevent memory leaks
+    return () => clearTimeout(timer)
+  }, []) // Run only once
+
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['pictures', props.name],
     queryFn: fetchProfileBasic,
@@ -108,12 +124,14 @@ function Picture(props) {
 
   return (
     <div>
-      {data.photos.map((item) => (
-        <div key={item.id}>
-          <p>{item.name}</p>
-          <img alt="Lowkey dont know" src={item.url}></img>
-        </div>
-      ))}
+      <div id="images">
+        {data.photos.map((item) => (
+          <div key={item.id}>
+            <p>{item.name}</p>
+            <img alt="Lowkey dont know" src={item.url}></img>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
