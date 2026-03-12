@@ -33,6 +33,7 @@ function ProfileHeader() {
         <SubHeaderLink link="Playlist" text="Playlists"></SubHeaderLink>
         <SubHeaderLink link="picture" text="Photos"></SubHeaderLink>
         <SubHeaderLink link="about" text="About"></SubHeaderLink>
+        <SubHeaderLink link="call" text="Call"></SubHeaderLink>
       </div>
       <hr></hr>
     </div>

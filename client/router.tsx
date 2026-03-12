@@ -14,6 +14,7 @@ import {
   Live,
   Posts,
   Videos,
+  Call,
 } from './components/SubComponents/ProfInner'
 
 const routes = createRoutesFromElements(
@@ -26,6 +27,7 @@ const routes = createRoutesFromElements(
     <Route path="playlist" element={<Playlist />} />
     <Route path="Picture" element={<Picture />} />
     <Route path="About" element={<About />} />
+    <Route path="Call" element={<Call />} />
   </Route>,
 )
 

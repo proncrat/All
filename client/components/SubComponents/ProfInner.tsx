@@ -3,9 +3,11 @@ import request from 'superagent'
 
 import { useOutletContext } from 'react-router'
 import Viewer from 'viewerjs'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import 'viewerjs/dist/viewer.css'
+import Peer from 'peerjs'
+import { NUMBER } from 'sequelize'
 
 //rethink api structure lil bro
 const fetchProfileBasic = async () => {
@@ -174,4 +176,77 @@ function About() {
   )
 }
 
-export { About, Picture, Playlist, Song, Live, Posts, Videos }
+function Call() {
+  const [id2, setInputValue] = useState('')
+  const [id, setId] = useState<number>(0)
+  const peer = useRef()
+  const conn = useRef()
+
+  function start_service() {
+    peer.current = new Peer()
+    peer.current.on('open', function (id) {
+      setId(id)
+      console.log('My peer ID is: ' + id)
+    })
+  }
+
+  useEffect(() => {
+    start_service()
+  }, [])
+
+  function connect(id) {
+    conn.current = peer.current.connect(id)
+  }
+
+  function send(message) {
+    conn.current.on('open', function () {
+      conn.send(message)
+    })
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    connect(id2)
+  }
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value)
+  }
+
+  function debug() {
+    console.log(peer.current)
+    console.log(conn.current)
+  }
+
+  return (
+    <div>
+      <p>Your id : {id}</p>
+      <p>Friend id : {id2}</p>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="simpleInput">Enter text:</label>
+        <input
+          id="simpleInput"
+          type="text"
+          value={id2} // Controlled component: value is tied to state
+          onChange={handleInputChange} // Update state on each change
+        />
+        <button type="submit">Submit</button>
+      </form>
+      <div>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="simpleInput">Enter text:</label>
+          <input
+            id="simpleInput"
+            type="text"
+            value={id2} // Controlled component: value is tied to state
+            onChange={handleInputChange} // Update state on each change
+          />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+      <button onClick={debug}>Debug</button>
+    </div>
+  )
+}
+
+export { Call, About, Picture, Playlist, Song, Live, Posts, Videos }
