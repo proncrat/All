@@ -59,9 +59,33 @@
   "streams":[],
   "songs":[],
   "playlists":[],
-  "photos":[{"name":"Jane goon","url":"https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/cc8d7534-287d-4d35-90eb-d0e52dbfcaa3/di3pyjj-c58e9fbf-5806-4cf0-8255-cd3f145785cb.jpg/v1/fill/w_1280,h_833,q_75,strp/jane_doe___zzz_by_ikariinu_di3pyjj-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODMzIiwicGF0aCI6Ii9mL2NjOGQ3NTM0LTI4N2QtNGQzNS05MGViLWQwZTUyZGJmY2FhMy9kaTNweWpqLWM1OGU5ZmJmLTU4MDYtNGNmMC04MjU1LWNkM2YxNDU3ODVjYi5qcGciLCJ3aWR0aCI6Ijw9MTI4MCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.bgH0cgjy4P7V_9r4TOTo0IOguy1eXQEk4sv0HIMzwRM"},{"name":"Jane goon 2","url":"https://static0.cbrimages.com/wordpress/wp-content/uploads/2025/12/jane_doe_free_zzz_skin.jpg?w=1600&h=900&fit=crop"}],
-  "About":{
-    "description":"Uh yur"
-  }
+  "photos":[
+    {"id":1,
+    "name":"Jane goon",
+    "url":"https://images7.alphacoders.com/138/1380955.jpg",
+    "thumburl":"https://images7.alphacoders.com/138/1380955.jpg"},
+    {
+      "id":2,
+      "name":"No Cap",
+      "url":"https://upload.wikimedia.org/wikipedia/commons/3/34/Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg",
+      "thumburl":"https://upload.wikimedia.org/wikipedia/commons/3/34/Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg"
+    },
+    {
+      "id":3,
+      "name":"Image",
+      "url":"https://www.bigfootdigital.co.uk/wp-content/uploads/2020/07/image-optimisation-scaled.jpg",
+      "thumburl":"https://www.bigfootdigital.co.uk/wp-content/uploads/2020/07/image-optimisation-scaled.jpg"
+    }
+    ],
+    "About":{
+      "description":"Uh yur",
+      "links":[
+        {
+          "id":1,
+          "name":"Twitter",
+          "url":"https://x.com/BublitzJullian"
+        }
+      ]
+    }
 
 }

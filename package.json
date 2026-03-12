@@ -60,6 +60,7 @@
     "@tanstack/react-query-devtools": "^5.91.3",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "music-metadata": "^11.12.2",
     "pg": "^8.20.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",

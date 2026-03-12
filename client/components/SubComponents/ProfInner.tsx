@@ -53,7 +53,8 @@ function Videos() {
   )
 }
 
-function Posts(props) {
+function Posts() {
+  const [props] = useOutletContext()
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['videos', props.name],
     queryFn: fetchProfileBasic,
@@ -99,20 +100,22 @@ function Playlist() {
   return <p>playlist</p>
 }
 
-function Picture(props) {
-  useEffect(() => {
-    // Set a timer to update message after 2000ms
-    const timer = setTimeout(() => {
-      const gallery = new Viewer(document.getElementById('images'))
-    }, 2000)
-    // Clean up to prevent memory leaks
-    return () => clearTimeout(timer)
-  }, []) // Run only once
-
-  const { data, isPending, isError, error } = useQuery({
+function Picture() {
+  const [props] = useOutletContext()
+  const { data, isPending, isError, error, isSuccess } = useQuery({
     queryKey: ['pictures', props.name],
     queryFn: fetchProfileBasic,
   })
+
+  useEffect(() => {
+    if (isSuccess === true && data) {
+      //doesent update gallery on refetches only on reloads
+      const gallery = new Viewer(document.getElementById('images'))
+      gallery.update()
+    }
+  }, [data, isSuccess]) // Add 'data' and 'status' to the dependency array
+
+  console.log(isSuccess)
 
   if (isPending) {
     return <div>Loading...</div>
@@ -128,7 +131,11 @@ function Picture(props) {
         {data.photos.map((item) => (
           <div key={item.id}>
             <p>{item.name}</p>
-            <img alt="Lowkey dont know" src={item.url}></img>
+            <img
+              data-original={item.url}
+              alt="Lowkey dont know"
+              src={item.thumburl}
+            ></img>
           </div>
         ))}
       </div>
@@ -136,7 +143,8 @@ function Picture(props) {
   )
 }
 
-function About(props) {
+function About() {
+  const [props] = useOutletContext()
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['about', props.name],
     queryFn: fetchProfileBasic,
@@ -154,6 +162,14 @@ function About(props) {
     <div>
       <h2>Describe</h2>
       <p>{data.About.description}</p>
+      <h2>Links</h2>
+      {data.About.links.map((item) => (
+        <div key={item.id}>
+          <a href={item.url} target="_blank" rel="noopener noreferrer">
+            {item.name}
+          </a>
+        </div>
+      ))}
     </div>
   )
 }

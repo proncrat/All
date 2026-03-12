@@ -15,7 +15,7 @@ function App() {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <div style={{ width: '1100px', margin: 'auto' }}>
+        <div /*style={{ width: '1400px', margin: 'auto' }}*/>
           <ProfileTopSection name="Bob"></ProfileTopSection>
           <ProfileHeader></ProfileHeader>
           {/*Much wow send props to all outlets so cool*/}
