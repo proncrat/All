@@ -26,3 +26,8 @@ img {
   display: flex;
   gap: 15px;
 }
+
+.THEHEADER {
+  border-bottom: 2px solid white;
+  margin-bottom: 10px;
+}

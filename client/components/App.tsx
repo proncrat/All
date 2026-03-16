@@ -6,6 +6,7 @@ import ProfileTopSection from './ProfileTopSection'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { THEHEADER } from './SubComponents/MainHeader'
 
 function App() {
   const data = { name: 'Bob' }
@@ -15,6 +16,7 @@ function App() {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
+        <THEHEADER />
         <div /*style={{ width: '1400px', margin: 'auto' }}*/>
           <ProfileTopSection name="Bob"></ProfileTopSection>
           <ProfileHeader></ProfileHeader>

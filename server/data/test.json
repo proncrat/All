@@ -2,11 +2,16 @@
   "id":1,
   "name":"Bob",
   "followers":5,
+  "peerID":"",
   "videos":[
     {
       "id":1,
       "name":"balls itch",
-      "views":1,
+      "views":0,
+      "likes":0,
+      "dislikes":0,
+      "reposts":0,
+      "shares":0,
       "author":"bob",
       "date":"2025-05-20T14:30:00Z"
     },
@@ -42,6 +47,11 @@
   "posts":[{
     "title":"I love beans",
     "text":"When i eat beans they get eaten, beans are yummy",
+    "views":0,
+    "likes":0,
+    "dislikes":0,
+    "reposts":0,
+    "shares":0,
     "date":"2026-03-10T14:30:00Z"
   },{
     "title":"I love beans",

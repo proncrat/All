@@ -19,15 +19,17 @@ import {
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
-    <Route index element={<Home />} />
-    <Route path="videos" element={<Videos />} />
-    <Route path="Posts" element={<Posts />} />
-    <Route path="Live" element={<Live />} />
-    <Route path="Song" element={<Song />} />
-    <Route path="playlist" element={<Playlist />} />
-    <Route path="Picture" element={<Picture />} />
-    <Route path="About" element={<About />} />
-    <Route path="Call" element={<Call />} />
+    <Route path="/profile/:id">
+      <Route index element={<Home />} />
+      <Route path="videos" element={<Videos />} />
+      <Route path="Posts" element={<Posts />} />
+      <Route path="Live" element={<Live />} />
+      <Route path="Song" element={<Song />} />
+      <Route path="playlist" element={<Playlist />} />
+      <Route path="Picture" element={<Picture />} />
+      <Route path="About" element={<About />} />
+      <Route path="Call" element={<Call />} />
+    </Route>
   </Route>,
 )
 
