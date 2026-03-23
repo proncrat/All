@@ -15,3 +15,11 @@ export async function getAllVideos() {
 export async function getVideosByUser(userId: string) {
   return await db('videos').where('author_id', userId).select()
 }
+
+export async function getAllPosts() {
+  return await db('posts').select()
+}
+
+export async function getPostsByUser(userId: string) {
+  return await db('posts').where('author_id', userId).select()
+}

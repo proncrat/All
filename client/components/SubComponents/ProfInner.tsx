@@ -73,8 +73,8 @@ function Posts() {
           }}
         >
           <h2>{item.title}</h2>
-          <p>{item.text}</p>
-          <p>{new Date(item.date).toLocaleDateString()}</p>
+          <p>{item.the_post}</p>
+          <p>{new Date(item.post_date).toLocaleDateString()}</p>
         </div>
       ))}
     </div>

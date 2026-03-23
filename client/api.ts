@@ -10,12 +10,10 @@ export async function getVideosByUser(userId: string) {
 }
 
 export async function getPostsByUser(userId: string) {
-  return []
-  /*
   return request
     .get(`http://localhost:3000/api/v1/post/${userId}`)
     .then((res) => res.body)
-    .catch(logError)*/
+    .catch(logError)
 }
 
 //Make usefull
