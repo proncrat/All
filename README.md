@@ -31,4 +31,16 @@ Uh account will have like minimal info on YOU which is the point. Mabye an email
 Who knows, ima give it a good ol try tho
 
 ## PROGRESS REPORT --
-*Profile page - make db LOCAL FOR NOW - front end querys no server side rendering yet.
+* IN PROGRESS -
+  * User profile page -
+    * gets videos,posts from db
+
+* TO DO -
+  * Login with auth tie to local db
+  * Decide good style for everything (Framework??)
+  * Make an upload page to upload stuff to profile
+
+* Backburner -
+  * Make individual pages to view things eg watch video view post and comments
+  * Custom profile settings with changeable css styling
+  * Figure out how to use end to end messaging with js
