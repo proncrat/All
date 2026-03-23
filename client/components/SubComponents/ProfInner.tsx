@@ -7,36 +7,31 @@ import { useEffect, useRef, useState } from 'react'
 
 import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
-import { NUMBER } from 'sequelize'
+
+import { useParams } from 'react-router'
+import { useFruits } from '../../hooks'
 
 //rethink api structure lil bro
-const fetchProfileBasic = async () => {
-  try {
-    const response = await request.get('http://localhost:3000/api/v0.1/profile')
-    return response.body
-  } catch (error) {
-    throw new Error('Network response was not ok')
-  }
-}
 
 function Videos() {
-  const [props] = useOutletContext()
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ['videos', props.name],
-    queryFn: fetchProfileBasic,
-  })
+  const { id } = useParams()
+  const data = useFruits(id)
 
-  if (isPending) {
+  if (data.isPending) {
     return <div>Loading...</div>
   }
 
-  if (isError) {
-    return <div>Error: {error.message}</div>
+  if (data.isError) {
+    return <div>Error: {data.error.message}</div>
+  }
+
+  if (data.data.length == 0) {
+    return 'sub 5 foid (No videos)'
   }
 
   return (
     <div>
-      {data.videos.map((item) => (
+      {data.data.map((item) => (
         <div
           key={item.id}
           style={{
