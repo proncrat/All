@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.2.0",
   "description": "I love slop",
-  "repository": "https://github.com/dev-academy-challenges/react-boilerplate.git",
+  "repository": "https://github.com/proncrat/All",
   "main": "server/index.js",
   "scripts": {
     "start": "node dist/server.js",
@@ -12,7 +12,7 @@
     "dev:server": "tsx watch server/index.ts",
     "build": "vite build",
     "test": "vitest",
-    "knex": "knex",
+    "knex": "knex --knexfile ./server/database/knexfile.js",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "format": "prettier -w '**/*.{js,jsx,ts,tsx}'"
   },
@@ -22,8 +22,7 @@
       "bundle.js"
     ]
   },
-  "author": "Dev Academy Aotearoa",
-  "license": "ISC",
+  "author": "Jullian",
   "devDependencies": {
     "@devacademy/eslint-config": "^1.10.2",
     "@tanstack/eslint-plugin-query": "^5.91.4",

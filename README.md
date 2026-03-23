@@ -29,3 +29,6 @@ Uh account will have like minimal info on YOU which is the point. Mabye an email
 
 ## Achievable?
 Who knows, ima give it a good ol try tho
+
+## PROGRESS REPORT --
+*Profile page - make db LOCAL FOR NOW - front end querys no server side rendering yet.

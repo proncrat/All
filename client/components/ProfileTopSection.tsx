@@ -1,22 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
 import request from 'superagent'
-interface prof {
-  name: string
-}
+import { useParams } from 'react-router'
 
-const fetchProfileBasic = async () => {
+const fetchProfileBasic = async (id) => {
   try {
-    const response = await request.get('http://localhost:3000/api/v0.1/profile')
+    const response = await request.get(
+      `http://localhost:3000/api/v1/profile/${id}`,
+    )
     return response.body
   } catch (error) {
     throw new Error('Network response was not ok')
   }
 }
 
-function ProfileTopSection(props: prof) {
+function ProfileTopSection() {
+  const { id } = useParams()
+
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ['profile', props.name],
-    queryFn: fetchProfileBasic,
+    queryKey: ['profile', id],
+    queryFn: () => fetchProfileBasic(id),
   })
 
   if (isPending) {
@@ -27,15 +29,15 @@ function ProfileTopSection(props: prof) {
     return <div>Error: {error.message}</div>
   }
 
+  console.log(data)
+
   return (
     <div className="flex">
-      <img
-        alt="pfp"
-        src="https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-      />
+      <img alt="pfp" src={data.pfp} />
       <div>
         <h2>{data.name}</h2>
         <p>{`${data.followers} Followers`}</p>
+        <p>{`YAP - ${data.describe}`}</p>
       </div>
     </div>
   )

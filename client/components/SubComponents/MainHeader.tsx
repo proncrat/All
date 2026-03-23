@@ -4,14 +4,15 @@ export function THEHEADER() {
   return (
     <header className="THEHEADER">
       <p>BEANVID</p>
-      <NavLink
+      {/*<NavLink
         to={'/comms'}
         className={({ isActive, isPending }) =>
           isPending ? 'pending' : isActive ? 'active' : ''
         }
       >
         Communication
-      </NavLink>
+      </NavLink>*/}
+      <button>LOGIN</button>
     </header>
   )
 }
