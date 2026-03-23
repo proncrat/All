@@ -15,6 +15,7 @@ export function up(knex) {
     table.integer('dislikes')
     table.integer('shares')
     table.string('video_link')
+    table.string('thumbnail_link')
   })
 }
 

@@ -9,6 +9,15 @@ export async function getVideosByUser(userId: string) {
     .catch(logError)
 }
 
+export async function getPostsByUser(userId: string) {
+  return []
+  /*
+  return request
+    .get(`http://localhost:3000/api/v1/post/${userId}`)
+    .then((res) => res.body)
+    .catch(logError)*/
+}
+
 //Make usefull
 function logError(err: Error) {
   console.log(err)

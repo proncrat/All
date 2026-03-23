@@ -61,3 +61,27 @@ img {
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 10px;
 }
+
+.thumbnailthing p {
+  margin: 0;
+}
+
+.thumbnailthing {
+  width: 250px;
+  padding: 5px;
+  border: solid 1px white;
+}
+
+.thumbnailthing img {
+  all: unset;
+  max-width: 100%;
+  height: auto;
+}
+
+.thumbnailcontainer {
+  display: grid;
+  grid-template-rows: 240px;
+  grid-auto-rows: 100px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}

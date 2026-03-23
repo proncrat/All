@@ -3,17 +3,25 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import * as API from './api.ts'
 
-export function useFruits(id) {
+export function useVideos(id: string) {
   const query = useQuery({
-    queryKey: ['videos'],
+    queryKey: ['videos', id],
     queryFn: () => API.getVideosByUser(id),
   })
 
   return {
     ...query,
-    update: useUpdateFruit(),
-    delete: useDeleteFruit(),
-    add: useAddFruit(),
+  }
+}
+
+export function usePosts(id: string) {
+  const query = useQuery({
+    queryKey: ['posts', id],
+    queryFn: () => API.getPostsByUser(id),
+  })
+
+  return {
+    ...query,
   }
 }
 

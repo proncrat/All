@@ -17,6 +17,7 @@ export async function seed(knex) {
       dislikes: 5,
       shares: 5,
       video_link: '',
+      thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
       id: 2,
@@ -29,6 +30,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link: '',
+      thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
       id: 3,
@@ -41,6 +43,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link: '',
+      thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
       id: 4,
@@ -53,6 +56,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link: '',
+      thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
       id: 5,
@@ -65,6 +69,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link: '',
+      thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
   ])
 }

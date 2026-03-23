@@ -9,13 +9,14 @@ import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
 
 import { useParams } from 'react-router'
-import { useFruits } from '../../hooks'
+import { usePosts, useVideos } from '../../hooks'
 
 //rethink api structure lil bro
 
 function Videos() {
   const { id } = useParams()
-  const data = useFruits(id)
+
+  const data = useVideos(id)
 
   if (data.isPending) {
     return <div>Loading...</div>
@@ -26,24 +27,18 @@ function Videos() {
   }
 
   if (data.data.length == 0) {
-    return 'sub 5 foid (No videos)'
+    return 'True adam error (No videos)'
   }
 
   return (
-    <div>
+    <div className="thumbnailcontainer">
       {data.data.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            border: 'solid 1px white',
-            marginBottom: '15px',
-            padding: '10px',
-          }}
-        >
+        <div className="thumbnailthing" key={item.id}>
+          <img alt="A THUMBNAIL" src={item.thumbnail_link} />
           <p>{item.name}</p>
-          <p>{item.views}</p>
+          <p>{item.views} views</p>
           <p>{item.author}</p>
-          <p>{new Date(item.date).toLocaleDateString()}</p>
+          <p>{new Date(item.post_date).toLocaleDateString()}</p>
         </div>
       ))}
     </div>
@@ -51,23 +46,24 @@ function Videos() {
 }
 
 function Posts() {
-  const [props] = useOutletContext()
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ['videos', props.name],
-    queryFn: fetchProfileBasic,
-  })
+  const { id } = useParams()
+  const data = usePosts(id)
 
-  if (isPending) {
+  if (data.isPending) {
     return <div>Loading...</div>
   }
 
-  if (isError) {
-    return <div>Error: {error.message}</div>
+  if (data.isError) {
+    return <div>Error: {data.error.message}</div>
+  }
+
+  if (data.data.length == 0) {
+    return 'True adam error (No posts)'
   }
 
   return (
     <div>
-      {data.posts.map((item) => (
+      {data.data.map((item) => (
         <div
           key={item.id}
           style={{
