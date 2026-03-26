@@ -3,6 +3,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import * as API from './api.ts'
 
+export function useProfileAll() {
+  const query = useQuery({
+    queryKey: ['profileAll'],
+    queryFn: () => API.getUsers(),
+  })
+
+  return {
+    ...query,
+  }
+}
+
 export function useProfile(id: string) {
   const query = useQuery({
     queryKey: ['profile', id],

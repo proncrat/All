@@ -30,7 +30,7 @@ function ProfileHeader() {
     <div>
       <hr></hr>
       <div style={{ display: 'flex', gap: '10px' }}>
-        <SubHeaderLink link={'profile/' + id} text="Home"></SubHeaderLink>
+        <SubHeaderLink link={'/profile/' + id} text="Home"></SubHeaderLink>
         <SubHeaderLink link={'videos'} text="Videos"></SubHeaderLink>
         <SubHeaderLink link={'posts'} text="Posts"></SubHeaderLink>
         <SubHeaderLink link={'Live'} text="Livestreams"></SubHeaderLink>

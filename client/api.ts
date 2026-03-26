@@ -2,6 +2,13 @@ import request from 'superagent'
 
 const rootURL = new URL(`/api/v1`, document.baseURI)
 
+export async function getUsers() {
+  return request
+    .get(`http://localhost:3000/api/v1/profile/`)
+    .then((res) => res.body)
+    .catch(logError)
+}
+
 export async function getUserById(userId: string) {
   return request
     .get(`http://localhost:3000/api/v1/profile/${userId}`)

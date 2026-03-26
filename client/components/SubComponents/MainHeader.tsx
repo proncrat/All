@@ -1,9 +1,9 @@
-import { NavLink } from 'react-router'
+import { Link, NavLink } from 'react-router'
 
 export function THEHEADER() {
   return (
     <header className="THEHEADER">
-      <p>BEANVID</p>
+      <Link to={'/'}>BEANVID</Link>
       {/*<NavLink
         to={'/comms'}
         className={({ isActive, isPending }) =>

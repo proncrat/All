@@ -5,6 +5,8 @@ import {
 } from 'react-router'
 
 import Profilepage from './components/Profilepage'
+import SearchPage from './components/SearchPage'
+import HomePage from './components/HomePage'
 
 import App from './components/App'
 import Home from './components/SubComponents/Home'
@@ -32,6 +34,8 @@ const routes = createRoutesFromElements(
       <Route path="About" element={<About />} />
       <Route path="Call" element={<Call />} />
     </Route>
+    <Route path="/search/" element={<SearchPage />} />
+    <Route path="/" element={<HomePage />} />
   </Route>,
 )
 

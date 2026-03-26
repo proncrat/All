@@ -112,6 +112,8 @@ function Picture() {
     return <div>Error: {error.message}</div>
   }
 
+  console.log(data)
+
   return (
     <div>
       <div id="images">
