@@ -7,22 +7,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { THEHEADER } from './SubComponents/MainHeader'
+import Profilepage from './Profilepage'
 
 function App() {
-  const data = { name: 'Bob' }
-
   const queryClient = new QueryClient()
-
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <THEHEADER />
-        <div /*style={{ width: '1400px', margin: 'auto' }}*/>
-          <ProfileTopSection name="Bob"></ProfileTopSection>
-          <ProfileHeader></ProfileHeader>
-          {/*Much wow send props to all outlets so cool*/}
-          <Outlet context={[data]} />
-        </div>
+        <Profilepage></Profilepage>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </StrictMode>

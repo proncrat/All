@@ -23,3 +23,11 @@ export async function getAllPosts() {
 export async function getPostsByUser(userId: string) {
   return await db('posts').where('author_id', userId).select()
 }
+
+export async function getAllPhotos() {
+  return await db('photos').select()
+}
+
+export async function getPhotosByUser(userId: string) {
+  return await db('photos').where('author_id', userId).select()
+}

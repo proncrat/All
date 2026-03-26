@@ -1,6 +1,20 @@
 import request from 'superagent'
 
-//const rootURL = new URL(`/api/v1`, document.baseURI)
+const rootURL = new URL(`/api/v1`, document.baseURI)
+
+export async function getUserById(userId: string) {
+  return request
+    .get(`http://localhost:3000/api/v1/profile/${userId}`)
+    .then((res) => res.body)
+    .catch(logError)
+}
+
+export async function getPhotosByUser(userId: string) {
+  return request
+    .get(`http://localhost:3000/api/v1/photo/${userId}`)
+    .then((res) => res.body)
+    .catch(logError)
+}
 
 export async function getVideosByUser(userId: string) {
   return request

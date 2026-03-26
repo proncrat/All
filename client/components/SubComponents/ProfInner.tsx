@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import request from 'superagent'
 
 import { useOutletContext } from 'react-router'
 import Viewer from 'viewerjs'
@@ -9,7 +8,7 @@ import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
 
 import { useParams } from 'react-router'
-import { usePosts, useVideos } from '../../hooks'
+import { usePhotos, usePosts, useProfile, useVideos } from '../../hooks'
 
 //rethink api structure lil bro
 
@@ -94,11 +93,8 @@ function Playlist() {
 }
 
 function Picture() {
-  const [props] = useOutletContext()
-  const { data, isPending, isError, error, isSuccess } = useQuery({
-    queryKey: ['pictures', props.name],
-    queryFn: fetchProfileBasic,
-  })
+  const { id } = useParams()
+  const { data, isPending, isError, error, isSuccess } = usePhotos(id)
 
   useEffect(() => {
     if (isSuccess === true && data) {
@@ -107,8 +103,6 @@ function Picture() {
       gallery.update()
     }
   }, [data, isSuccess]) // Add 'data' and 'status' to the dependency array
-
-  console.log(isSuccess)
 
   if (isPending) {
     return <div>Loading...</div>
@@ -121,12 +115,12 @@ function Picture() {
   return (
     <div>
       <div id="images">
-        {data.photos.map((item) => (
+        {data.map((item) => (
           <div key={item.id}>
             <p>{item.name}</p>
             <img
               data-original={item.url}
-              alt="Lowkey dont know"
+              alt={item.describe}
               src={item.thumburl}
             ></img>
           </div>
@@ -137,11 +131,8 @@ function Picture() {
 }
 
 function About() {
-  const [props] = useOutletContext()
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ['about', props.name],
-    queryFn: fetchProfileBasic,
-  })
+  const { id } = useParams()
+  const { data, isPending, isError, error } = useProfile(id)
 
   if (isPending) {
     return <div>Loading...</div>
@@ -154,15 +145,15 @@ function About() {
   return (
     <div>
       <h2>Describe</h2>
-      <p>{data.About.description}</p>
+      <p>{data.describe}</p>
       <h2>Links</h2>
-      {data.About.links.map((item) => (
+      {/*data.links.map((item) => (
         <div key={item.id}>
           <a href={item.url} target="_blank" rel="noopener noreferrer">
             {item.name}
           </a>
         </div>
-      ))}
+      ))*/}
     </div>
   )
 }
