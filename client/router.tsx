@@ -4,6 +4,8 @@ import {
   Route,
 } from 'react-router'
 
+import Profilepage from './components/Profilepage'
+
 import App from './components/App'
 import Home from './components/SubComponents/Home'
 import {
@@ -19,7 +21,7 @@ import {
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
-    <Route path="/profile/:id">
+    <Route path="/profile/:id" element={<Profilepage />}>
       <Route index element={<Home />} />
       <Route path="videos" element={<Videos />} />
       <Route path="Posts" element={<Posts />} />
