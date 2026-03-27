@@ -58,6 +58,17 @@ export function usePosts(id: string) {
   }
 }
 
+export function useSongs(id: string) {
+  const query = useQuery({
+    queryKey: ['songs', id],
+    queryFn: () => API.getSongsByUser(id),
+  })
+
+  return {
+    ...query,
+  }
+}
+
 //Video
 
 export function useVideo(id: string) {

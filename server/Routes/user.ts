@@ -5,6 +5,7 @@ import {
   getPhotosByUser,
   getPostsByUser,
   getProfile,
+  getSongsByUser,
   getVideosByUser,
 } from '../database'
 const router = express.Router()
@@ -66,6 +67,19 @@ router.get('/:id/videos', async (req, res, next) => {
   try {
     const userId = req.params.id
     const data = await getVideosByUser(userId)
+    if (data == null) {
+      return res.status(404).send('Nothing there')
+    }
+    res.json(data)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/:id/songs', async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const data = await getSongsByUser(userId)
     if (data == null) {
       return res.status(404).send('Nothing there')
     }

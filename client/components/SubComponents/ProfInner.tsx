@@ -5,7 +5,13 @@ import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
 
 import { Link, useParams } from 'react-router'
-import { usePhotos, usePosts, useProfile, useVideos } from '../../hooks'
+import {
+  usePhotos,
+  usePosts,
+  useProfile,
+  useSongs,
+  useVideos,
+} from '../../hooks'
 
 //rethink api structure lil bro
 
@@ -83,8 +89,64 @@ function Live() {
   return <p>Live</p>
 }
 
+function Songplayer({ url, isShowing }) {
+  if (isShowing) {
+    return (
+      <div>
+        <audio key={url} autoPlay controls>
+          <source src={url} type="audio/mpeg" />
+        </audio>
+      </div>
+    )
+  }
+}
+
 function Song() {
-  return <p>Song</p>
+  const [player, setplayer] = useState('')
+  const [playerurl, setplayerurl] = useState('')
+  const { id } = useParams()
+  const data = useSongs(id)
+
+  if (data.isPending) {
+    return <div>Loading...</div>
+  }
+
+  if (data.isError) {
+    return <div>Error: {data.error.message}</div>
+  }
+
+  if (data.data.length == 0) {
+    return 'True adam error (No posts)'
+  }
+
+  function clickHandler(thing) {
+    setplayer('showing')
+    setplayerurl(thing)
+  }
+
+  return (
+    <div>
+      {data.data.map((song) => (
+        <div
+          onClick={() => clickHandler(song.url)}
+          key={song.id}
+          style={{
+            border: 'solid 1px white',
+            marginBottom: '15px',
+            padding: '10px',
+            display: 'flex',
+            gap: '20px',
+            cursor: 'pointer',
+          }}
+        >
+          <p>{song.name}</p>
+          <p>{song.author}</p>
+          <p>{song.runtime}</p>
+        </div>
+      ))}
+      <Songplayer isShowing={player} url={playerurl} />
+    </div>
+  )
 }
 
 function Playlist() {

@@ -38,6 +38,13 @@ export async function getPostsByUser(userId: string) {
     .catch(logError)
 }
 
+export async function getSongsByUser(userId: string) {
+  return request
+    .get(`http://localhost:3000/api/v1/profile/${userId}/songs`)
+    .then((res) => res.body)
+    .catch(logError)
+}
+
 //video api
 export async function getVideosById(Id: string) {
   return request

@@ -24,6 +24,10 @@ export async function getDescriptionByUser(userId: string) {
     .first()
 }
 
+export async function getSongsByUser(userId: string) {
+  return await db('songs').where('author_id', userId).select()
+}
+
 //Video functions
 
 export async function getVideoById(Id: string) {
