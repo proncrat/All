@@ -20,6 +20,7 @@ import {
   Videos,
   Call,
 } from './components/SubComponents/ProfInner'
+import Video from './components/VideoPage'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -35,6 +36,7 @@ const routes = createRoutesFromElements(
       <Route path="Call" element={<Call />} />
     </Route>
     <Route path="/search/" element={<SearchPage />} />
+    <Route path="/video/:id" element={<Video />} />
     <Route path="/" element={<HomePage />} />
   </Route>,
 )

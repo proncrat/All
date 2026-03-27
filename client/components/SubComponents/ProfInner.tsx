@@ -1,13 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-
-import { useOutletContext } from 'react-router'
 import Viewer from 'viewerjs'
 import { useEffect, useRef, useState } from 'react'
 
 import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
 
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import { usePhotos, usePosts, useProfile, useVideos } from '../../hooks'
 
 //rethink api structure lil bro
@@ -32,13 +29,15 @@ function Videos() {
   return (
     <div className="thumbnailcontainer">
       {data.data.map((item) => (
-        <div className="thumbnailthing" key={item.id}>
-          <img alt="A THUMBNAIL" src={item.thumbnail_link} />
-          <p>{item.name}</p>
-          <p>{item.views} views</p>
-          <p>{item.author}</p>
-          <p>{new Date(item.post_date).toLocaleDateString()}</p>
-        </div>
+        <Link key={item.id} to={`/video/${item.id}`}>
+          <div className="thumbnailthing">
+            <img alt="A THUMBNAIL" src={item.thumbnail_link} />
+            <p>{item.name}</p>
+            <p>{item.views} views</p>
+            <p>{item.author}</p>
+            <p>{new Date(item.post_date).toLocaleDateString()}</p>
+          </div>
+        </Link>
       ))}
     </div>
   )
@@ -97,7 +96,7 @@ function Picture() {
   const { data, isPending, isError, error, isSuccess } = usePhotos(id)
 
   useEffect(() => {
-    if (isSuccess === true && data) {
+    if (isSuccess === true && data.length > 0) {
       //doesent update gallery on refetches only on reloads
       const gallery = new Viewer(document.getElementById('images'))
       gallery.update()
@@ -113,6 +112,10 @@ function Picture() {
   }
 
   console.log(data)
+
+  if (data.length == 0) {
+    return 'True adam error (No photos)'
+  }
 
   return (
     <div>
@@ -147,7 +150,7 @@ function About() {
   return (
     <div>
       <h2>Describe</h2>
-      <p>{data.describe}</p>
+      <p>{data.description}</p>
       <h2>Links</h2>
       {/*data.links.map((item) => (
         <div key={item.id}>

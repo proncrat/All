@@ -16,7 +16,8 @@ export async function seed(knex) {
       likes: 5,
       dislikes: 5,
       shares: 5,
-      video_link: '',
+      video_link:
+        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -29,7 +30,8 @@ export async function seed(knex) {
       likes: 0,
       dislikes: 0,
       shares: 0,
-      video_link: '',
+      video_link:
+        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -42,7 +44,8 @@ export async function seed(knex) {
       likes: 0,
       dislikes: 0,
       shares: 0,
-      video_link: '',
+      video_link:
+        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -55,7 +58,8 @@ export async function seed(knex) {
       likes: 0,
       dislikes: 0,
       shares: 0,
-      video_link: '',
+      video_link:
+        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -68,7 +72,8 @@ export async function seed(knex) {
       likes: 0,
       dislikes: 0,
       shares: 0,
-      video_link: '',
+      video_link:
+        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
   ])
