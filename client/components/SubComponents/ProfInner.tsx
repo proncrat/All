@@ -5,69 +5,73 @@ import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
 
 import { Link, useParams } from 'react-router'
-import {
-  usePhotos,
-  usePosts,
-  useProfile,
-  useSongs,
-  useVideos,
-} from '../../hooks'
+import { useUserData } from '../../hooks'
 
 //rethink api structure lil bro
 
 function Videos() {
   const { id } = useParams()
 
-  const data = useVideos(id)
+  const { data, isPending, isError, error, isSuccess } = useUserData(
+    id,
+    'videos',
+  )
 
-  if (data.isPending) {
+  console.log(data)
+
+  if (isPending) {
     return <div>Loading...</div>
   }
 
-  if (data.isError) {
-    return <div>Error: {data.error.message}</div>
+  if (isError) {
+    return <div>Error: {error.message}</div>
   }
 
-  if (data.data.length == 0) {
+  if (data.length == 0) {
     return 'True adam error (No videos)'
   }
 
-  return (
-    <div className="thumbnailcontainer">
-      {data.data.map((item) => (
-        <Link key={item.id} to={`/video/${item.id}`}>
-          <div className="thumbnailthing">
-            <img alt="A THUMBNAIL" src={item.thumbnail_link} />
-            <p>{item.name}</p>
-            <p>{item.views} views</p>
-            <p>{item.author}</p>
-            <p>{new Date(item.post_date).toLocaleDateString()}</p>
-          </div>
-        </Link>
-      ))}
-    </div>
-  )
+  if (isSuccess) {
+    return (
+      <div className="thumbnailcontainer">
+        {data.map((item) => (
+          <Link key={item.id} to={`/video/${item.id}`}>
+            <div className="thumbnailthing">
+              <img alt="A THUMBNAIL" src={item.thumbnail_link} />
+              <p>{item.name}</p>
+              <p>{item.views} views</p>
+              <p>{item.author}</p>
+              <p>{new Date(item.post_date).toLocaleDateString()}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    )
+  }
 }
 
 function Posts() {
   const { id } = useParams()
-  const data = usePosts(id)
+  const { data, isPending, isError, error, isSuccess } = useUserData(
+    id,
+    'posts',
+  )
 
-  if (data.isPending) {
+  if (isPending) {
     return <div>Loading...</div>
   }
 
-  if (data.isError) {
-    return <div>Error: {data.error.message}</div>
+  if (isError) {
+    return <div>Error: {error.message}</div>
   }
 
-  if (data.data.length == 0) {
+  if (data.length == 0) {
     return 'True adam error (No posts)'
   }
 
   return (
     <div>
-      {data.data.map((item) => (
+      {data.map((item) => (
         <div
           key={item.id}
           style={{
@@ -105,18 +109,21 @@ function Song() {
   const [player, setplayer] = useState('')
   const [playerurl, setplayerurl] = useState('')
   const { id } = useParams()
-  const data = useSongs(id)
+  const { data, isPending, isError, error, isSuccess } = useUserData(
+    id,
+    'songs',
+  )
 
-  if (data.isPending) {
+  if (isPending) {
     return <div>Loading...</div>
   }
 
-  if (data.isError) {
-    return <div>Error: {data.error.message}</div>
+  if (isError) {
+    return <div>Error: {error.message}</div>
   }
 
-  if (data.data.length == 0) {
-    return 'True adam error (No posts)'
+  if (data.length == 0) {
+    return 'True adam error (No Songs)'
   }
 
   function clickHandler(thing) {
@@ -126,7 +133,7 @@ function Song() {
 
   return (
     <div>
-      {data.data.map((song) => (
+      {data.map((song) => (
         <div
           onClick={() => clickHandler(song.url)}
           key={song.id}
@@ -155,7 +162,10 @@ function Playlist() {
 
 function Picture() {
   const { id } = useParams()
-  const { data, isPending, isError, error, isSuccess } = usePhotos(id)
+  const { data, isPending, isError, error, isSuccess } = useUserData(
+    id,
+    'photos',
+  )
 
   useEffect(() => {
     if (isSuccess === true && data.length > 0) {
@@ -199,7 +209,10 @@ function Picture() {
 
 function About() {
   const { id } = useParams()
-  const { data, isPending, isError, error } = useProfile(id)
+  const { data, isPending, isError, error, isSuccess } = useUserData(
+    id,
+    'description',
+  )
 
   if (isPending) {
     return <div>Loading...</div>
