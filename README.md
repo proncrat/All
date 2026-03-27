@@ -31,14 +31,21 @@ Uh account will have like minimal info on YOU which is the point. Mabye an email
 Who knows, ima give it a good ol try tho
 
 ## PROGRESS REPORT --
+* Basic implimentation
+  * user profile page (songs,videos,posts,about,photos)
+  * start of video page
+  * home and search routes with test fill rn
+
+* NEED TO DO
+  * Make data models for ts
+  * Actually pre plan layout for everything
+  * Make global css or switch to framework
+  * clear technical debt and refactor
+  * Thing about menus for interactions
+
 * IN PROGRESS -
   * User profile page -
     * gets videos,posts from db
-
-* TO DO -
-  * Login with auth tie to local db
-  * Decide good style for everything (Framework??)
-  * Make an upload page to upload stuff to profile
 
 * Backburner -
   * Make individual pages to view things eg watch video view post and comments
