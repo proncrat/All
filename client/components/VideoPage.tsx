@@ -1,11 +1,11 @@
 //import { useParams } from 'react-router'
 import { Link, useParams } from 'react-router'
-import { useVideos } from '../hooks'
+import { useVideo } from '../hooks'
 
 function Video() {
   const { id } = useParams()
 
-  const { data, isPending, isError, error } = useVideos(id)
+  const { data, isPending, isError, error } = useVideo(id)
 
   if (isPending) {
     return <div>Loading...</div>
@@ -24,7 +24,10 @@ function Video() {
       <video controls>
         <source src={data.video_link} type="video/mp4" />
       </video>
-      <h1>{data.title}</h1>
+      <h1>{data.name}</h1>
+      <p>{data.description}</p>
+      <p>{data.post_date}</p>
+      <p>Views : {data.views}</p>
     </div>
   )
 }

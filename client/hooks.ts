@@ -58,6 +58,19 @@ export function usePosts(id: string) {
   }
 }
 
+//Video
+
+export function useVideo(id: string) {
+  const query = useQuery({
+    queryKey: ['video', id],
+    queryFn: () => API.getVideosById(id),
+  })
+
+  return {
+    ...query,
+  }
+}
+
 export function useFruitMutation<TData = unknown, TVariables = unknown>(
   mutationFn: MutationFunction<TData, TVariables>,
 ) {

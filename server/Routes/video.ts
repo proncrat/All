@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllVideos, getVideosByUser } from '../database'
+import { getAllVideos, getVideoById, getVideosByUser } from '../database'
 const router = express.Router()
 
 //For users obv
@@ -19,7 +19,7 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const videoId = req.params.id
-    const data = await getVideosByUser(videoId)
+    const data = await getVideoById(videoId)
     if (data == null) {
       return res.status(404).send('Nothing there')
     }

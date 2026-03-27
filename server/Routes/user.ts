@@ -1,5 +1,12 @@
 import express from 'express'
-import { getAllUsers, getProfile } from '../database'
+import {
+  getAllUsers,
+  getDescriptionByUser,
+  getPhotosByUser,
+  getPostsByUser,
+  getProfile,
+  getVideosByUser,
+} from '../database'
 const router = express.Router()
 
 //For users obv
@@ -20,6 +27,58 @@ router.get('/:id', async (req, res, next) => {
   try {
     const userId = req.params.id
     const data = await getProfile(userId)
+    if (data == null) {
+      return res.status(404).send('Nothing there')
+    }
+    res.json(data)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/:id/photos', async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const data = await getPhotosByUser(userId)
+    if (data == null) {
+      return res.status(404).send('Nothing there')
+    }
+    res.json(data)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/:id/posts', async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const data = await getPostsByUser(userId)
+    if (data == null) {
+      return res.status(404).send('Nothing there')
+    }
+    res.json(data)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/:id/videos', async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const data = await getVideosByUser(userId)
+    if (data == null) {
+      return res.status(404).send('Nothing there')
+    }
+    res.json(data)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/:id/description', async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const data = await getDescriptionByUser(userId)
     if (data == null) {
       return res.status(404).send('Nothing there')
     }

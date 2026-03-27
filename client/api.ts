@@ -2,9 +2,10 @@ import request from 'superagent'
 
 const rootURL = new URL(`/api/v1`, document.baseURI)
 
+//user apis
 export async function getUsers() {
   return request
-    .get(`http://localhost:3000/api/v1/profile/`)
+    .get(`http://localhost:3000/api/v1/profile`)
     .then((res) => res.body)
     .catch(logError)
 }
@@ -18,21 +19,29 @@ export async function getUserById(userId: string) {
 
 export async function getPhotosByUser(userId: string) {
   return request
-    .get(`http://localhost:3000/api/v1/photo/${userId}`)
+    .get(`http://localhost:3000/api/v1/profile/${userId}/photos`)
     .then((res) => res.body)
     .catch(logError)
 }
 
 export async function getVideosByUser(userId: string) {
   return request
-    .get(`http://localhost:3000/api/v1/video/${userId}`)
+    .get(`http://localhost:3000/api/v1/profile/${userId}/videos`)
     .then((res) => res.body)
     .catch(logError)
 }
 
 export async function getPostsByUser(userId: string) {
   return request
-    .get(`http://localhost:3000/api/v1/post/${userId}`)
+    .get(`http://localhost:3000/api/v1/profile/${userId}/posts`)
+    .then((res) => res.body)
+    .catch(logError)
+}
+
+//video api
+export async function getVideosById(Id: string) {
+  return request
+    .get(`http://localhost:3000/api/v1/video/${Id}`)
     .then((res) => res.body)
     .catch(logError)
 }
