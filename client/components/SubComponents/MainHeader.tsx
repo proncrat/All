@@ -12,6 +12,19 @@ export function THEHEADER() {
       >
         Communication
       </NavLink>*/}
+      <div className="flex">
+        <form action="/search">
+          <input
+            placeholder="search"
+            spellCheck="false"
+            type="text"
+            autoComplete="off"
+            name="query"
+          ></input>
+        </form>
+        <button>SEARCH</button>
+      </div>
+
       <button>LOGIN</button>
     </header>
   )

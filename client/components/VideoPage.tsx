@@ -1,10 +1,9 @@
 //import { useParams } from 'react-router'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { useVideo } from '../hooks'
 
 function Video() {
   const { id } = useParams()
-
   const { data, isPending, isError, error } = useVideo(id)
 
   if (isPending) {

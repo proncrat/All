@@ -102,4 +102,17 @@ router.get('/:id/description', async (req, res, next) => {
   }
 })
 
+router.get('/:id/check', async (req, res, next) => {
+  try {
+    const userId = req.params.id
+    const data = await getDescriptionByUser(userId)
+    if (data == null) {
+      res.json({ valid: false })
+    }
+    res.json({ valid: true })
+  } catch (err) {
+    next(err)
+  }
+})
+
 export default router
