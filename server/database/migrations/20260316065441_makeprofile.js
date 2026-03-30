@@ -8,6 +8,7 @@ export function up(knex) {
     table.string('name')
     table.string('describe')
     table.integer('followers')
+    table.string('peerid')
   })
 }
 

@@ -3,7 +3,10 @@ import { Link, NavLink } from 'react-router'
 export function THEHEADER() {
   return (
     <header className="THEHEADER">
-      <Link to={'/'}>BEANVID</Link>
+      <div className="flex">
+        <p style={{ margin: '0' }}>menu goes here</p>
+        <Link to={'/'}>BEANVID</Link>
+      </div>
       {/*<NavLink
         to={'/comms'}
         className={({ isActive, isPending }) =>
@@ -24,8 +27,10 @@ export function THEHEADER() {
         </form>
         <button>SEARCH</button>
       </div>
-
-      <button>LOGIN</button>
+      <div className="flex">
+        <p style={{ margin: '0' }}>SETTINGS goes here</p>
+        <button>LOGIN(make work)</button>
+      </div>
     </header>
   )
 }

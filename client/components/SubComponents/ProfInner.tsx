@@ -239,32 +239,28 @@ function About() {
 }
 
 function Call() {
-  const [id2, setInputValue] = useState('')
-  const [id, setId] = useState<number>(0)
-  const peer = useRef()
-  const conn = useRef()
+  const { id } = useParams()
+  const { data, isPending, isError, error, isSuccess } = useUserData(id)
 
   function start_service() {
-    peer.current = new Peer()
-    peer.current.on('open', function (id) {
-      setId(id)
-      console.log('My peer ID is: ' + id)
-    })
+    const peer = new Peer([data.peerid])
   }
 
   useEffect(() => {
-    start_service()
-  }, [])
+    if (isSuccess && data) {
+      start_service()
+    }
+  }, [data, isSuccess])
 
-  function connect(id) {
-    conn.current = peer.current.connect(id)
+  if (isPending) {
+    return <div>Loading...</div>
   }
 
-  function send(message) {
-    conn.current.on('open', function () {
-      conn.send(message)
-    })
+  if (isError) {
+    return <div>Error: {error.message}</div>
   }
+
+  console.log(data.peerid)
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -275,21 +271,16 @@ function Call() {
     setInputValue(event.target.value)
   }
 
-  function debug() {
-    console.log(peer.current)
-    console.log(conn.current)
-  }
-
   return (
     <div>
       <p>Your id : {id}</p>
-      <p>Friend id : {id2}</p>
+      <p>Friend id : {}</p>
       <form onSubmit={handleSubmit}>
         <label htmlFor="simpleInput">Enter text:</label>
         <input
           id="simpleInput"
           type="text"
-          value={id2} // Controlled component: value is tied to state
+          value="" // Controlled component: value is tied to state
           onChange={handleInputChange} // Update state on each change
         />
         <button type="submit">Submit</button>
@@ -300,13 +291,12 @@ function Call() {
           <input
             id="simpleInput"
             type="text"
-            value={id2} // Controlled component: value is tied to state
+            value="" // Controlled component: value is tied to state
             onChange={handleInputChange} // Update state on each change
           />
           <button type="submit">Submit</button>
         </form>
       </div>
-      <button onClick={debug}>Debug</button>
     </div>
   )
 }

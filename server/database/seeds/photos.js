@@ -58,5 +58,14 @@ export async function seed(knex) {
       thumburl: 'https://storage.waifuwall.com/image/264.png',
       author_id: 1,
     },
+    {
+      id: 7,
+      name: 'Jane',
+      describe: 'Claude make me a description',
+      url: 'https://blueoceancdn143.blob.core.windows.net/cache/c/b/d/4/1/f/cbd41f897abe97cdb746634d06a9c95e24803996.jpg',
+      thumburl:
+        'https://blueoceancdn143.blob.core.windows.net/cache/c/b/d/4/1/f/cbd41f897abe97cdb746634d06a9c95e24803996.jpg',
+      author_id: 1,
+    },
   ])
 }

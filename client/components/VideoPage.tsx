@@ -19,7 +19,7 @@ function Video() {
   }
 
   return (
-    <div>
+    <div className="center_small">
       <video controls>
         <source src={data.video_link} type="video/mp4" />
       </video>

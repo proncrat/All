@@ -25,7 +25,6 @@ function SubHeaderLink(props: Sublink) {
 
 function ProfileHeader() {
   const { id } = useParams()
-  console.log(id)
   return (
     <div>
       <hr></hr>

@@ -8,7 +8,7 @@ export async function seed(knex) {
   await knex('videos').insert([
     {
       id: 1,
-      name: 'balls ITCHY',
+      name: 'WOrld explodes',
       description: 'Claude make me a description',
       views: 67,
       author_id: 1,
@@ -64,7 +64,7 @@ export async function seed(knex) {
     },
     {
       id: 5,
-      name: 'balls itch 2',
+      name: 'War bad',
       description: 'Insert description here',
       views: 67,
       author_id: 1,
