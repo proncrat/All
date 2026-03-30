@@ -4,12 +4,14 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { THEHEADER } from './SubComponents/MainHeader'
 import { Outlet } from 'react-router'
+import { Toaster } from '../../components/ui/sonner'
 
 function App() {
   const queryClient = new QueryClient()
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
+        <Toaster />
         <THEHEADER />
         <Outlet />
         <ReactQueryDevtools initialIsOpen={false} />

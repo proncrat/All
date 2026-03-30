@@ -21,6 +21,7 @@ import {
   Call,
 } from './components/SubComponents/ProfInner'
 import Video from './components/VideoPage'
+import AuthPage from './components/AuthPage'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -37,6 +38,7 @@ const routes = createRoutesFromElements(
     </Route>
     <Route path="/search/" element={<SearchPage />} />
     <Route path="/video/:id" element={<Video />} />
+    <Route path="/auth/:pathname" element={<AuthPage />} />
     <Route path="/" element={<HomePage />} />
   </Route>,
 )
