@@ -20,7 +20,7 @@ function Video() {
 
   return (
     <div className="center_small">
-      <video controls>
+      <video style={{ width: '80%' }} controls>
         <source src={data.video_link} type="video/mp4" />
       </video>
       <h1>{data.name}</h1>

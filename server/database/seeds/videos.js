@@ -17,7 +17,7 @@ export async function seed(knex) {
       dislikes: 5,
       shares: 5,
       video_link:
-        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        'https://ia601209.us.archive.org/17/items/ElephantsDream/ed_1024_512kb.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -31,7 +31,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link:
-        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        'https://ia601209.us.archive.org/17/items/ElephantsDream/ed_1024_512kb.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -45,7 +45,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link:
-        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        'https://ia601209.us.archive.org/17/items/ElephantsDream/ed_1024_512kb.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -59,7 +59,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link:
-        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        'https://ia601209.us.archive.org/17/items/ElephantsDream/ed_1024_512kb.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
@@ -73,7 +73,7 @@ export async function seed(knex) {
       dislikes: 0,
       shares: 0,
       video_link:
-        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        'https://ia601209.us.archive.org/17/items/ElephantsDream/ed_1024_512kb.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
   ])

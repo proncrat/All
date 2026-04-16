@@ -9,16 +9,22 @@ import video_routes from './Routes/video'
 import post_routes from './Routes/post'
 import photo_routes from './Routes/photo'
 
-server.all('/api/auth/{*any}', toNodeHandler(auth))
-
 import cors from 'cors'
 //DO NOT PUT IN PROD IDIOT
-server.use(cors())
+server.use(
+  cors({
+    origin: 'http://localhost:5173', // Replace with your frontend's origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  }),
+)
+
+server.all('/api/auth/*splat', toNodeHandler(auth))
+
+server.use(express.json())
 
 //everything in public root folder showing fr
 server.use(express.static('public'))
-
-server.use(express.json())
 
 //le routes
 server.use('/api/v1/profile', user_routes)

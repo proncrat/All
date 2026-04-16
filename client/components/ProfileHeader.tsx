@@ -23,11 +23,13 @@ function SubHeaderLink(props: Sublink) {
   )
 }
 
+import { Separator } from '@/components/ui/separator'
+
 function ProfileHeader() {
   const { id } = useParams()
   return (
     <div>
-      <hr></hr>
+      <Separator />
       <div style={{ display: 'flex', gap: '10px' }}>
         <SubHeaderLink link={'/profile/' + id} text="Home"></SubHeaderLink>
         <SubHeaderLink link={'videos'} text="Videos"></SubHeaderLink>
@@ -39,7 +41,7 @@ function ProfileHeader() {
         <SubHeaderLink link={'about'} text="About"></SubHeaderLink>
         <SubHeaderLink link={'call'} text="Call"></SubHeaderLink>
       </div>
-      <hr></hr>
+      <Separator />
     </div>
   )
 }

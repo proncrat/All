@@ -22,9 +22,13 @@ import {
 } from './components/SubComponents/ProfInner'
 import Video from './components/VideoPage'
 import AuthPage from './components/AuthPage'
+import { SignInForm } from './components/SignInPage'
+import { SignUpForm } from './components/SignUpPage'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
+    <Route path="/signin" element={<SignInForm />} />
+    <Route path="/signup" element={<SignUpForm />} />
     <Route path="/profile/:id" element={<Profilepage />}>
       <Route index element={<Home />} />
       <Route path="videos" element={<Videos />} />

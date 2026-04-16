@@ -2,6 +2,7 @@ import { Outlet, useParams } from 'react-router'
 import ProfileHeader from './ProfileHeader'
 import ProfileTopSection from './ProfileTopSection'
 import { useUserData } from '../hooks'
+import { ProfileLost } from './Profile404'
 
 function Profile() {
   const { id } = useParams()
@@ -20,7 +21,7 @@ function Profile() {
   }
 
   if (data.valid == false) {
-    return <p>No one here</p>
+    return <ProfileLost></ProfileLost>
   }
 
   return (

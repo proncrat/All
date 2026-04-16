@@ -33,7 +33,7 @@ function Videos() {
 
   if (isSuccess) {
     return (
-      <div className="thumbnailcontainer">
+      <div className="grid">
         {data.map((item) => (
           <Link key={item.id} to={`/video/${item.id}`}>
             <div className="thumbnailthing">
