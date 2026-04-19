@@ -1,5 +1,5 @@
 import { useParams } from 'react-router'
-import { useProfile, useUserData } from '../hooks'
+import { useProfile, useUserData } from '../../../hooks'
 import { useEffect } from 'react'
 
 import Viewer from 'viewerjs'

@@ -1,6 +1,6 @@
 //import { useParams } from 'react-router'
 import { Link } from 'react-router'
-import { useProfileAll } from '../hooks'
+import { useProfileAll } from '../../hooks'
 
 function Search() {
   //const { id } = useParams()

@@ -1,5 +1,11 @@
 import db from './connection.ts'
 
+//util
+
+export async function generateProfile(name: string, id: string) {
+  return await db('profiledata').insert({ name: name, link_id: id })
+}
+
 //Profile functions
 
 export async function getProfile(userId: string) {

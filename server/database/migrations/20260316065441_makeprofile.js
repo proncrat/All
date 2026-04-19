@@ -5,6 +5,7 @@
 export function up(knex) {
   return knex.schema.createTable('profiledata', (table) => {
     table.increments('id')
+    table.integer('link_id')
     table.string('name')
     table.string('describe')
     table.integer('followers')

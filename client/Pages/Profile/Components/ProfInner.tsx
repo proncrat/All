@@ -5,7 +5,7 @@ import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
 
 import { Link, useParams } from 'react-router'
-import { useUserData } from '../../hooks'
+import { useUserData } from '../../../hooks'
 
 //rethink api structure lil bro
 

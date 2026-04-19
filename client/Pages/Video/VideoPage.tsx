@@ -1,6 +1,6 @@
 //import { useParams } from 'react-router'
 import { useParams } from 'react-router'
-import { useVideo } from '../hooks'
+import { useVideo } from '../../hooks'
 
 function Video() {
   const { id } = useParams()

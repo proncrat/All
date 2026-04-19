@@ -1,7 +1,7 @@
 import { Outlet, useParams } from 'react-router'
-import ProfileHeader from './ProfileHeader'
-import ProfileTopSection from './ProfileTopSection'
-import { useUserData } from '../hooks'
+import ProfileHeader from './Components/ProfileHeader'
+import ProfileTopSection from './Components/ProfileTopSection'
+import { useUserData } from '../../hooks'
 import { ProfileLost } from './Profile404'
 
 function Profile() {

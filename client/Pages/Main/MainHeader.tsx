@@ -54,7 +54,7 @@ export function THEHEADER() {
         </Button>
         {session ? (
           <div>
-            <p>{session.user.name}</p>
+            <p>{session.user.username}</p>
             <button onClick={() => signOut()}>Logout</button>
           </div>
         ) : (

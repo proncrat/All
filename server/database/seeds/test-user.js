@@ -8,6 +8,7 @@ export async function seed(knex) {
   await knex('profiledata').insert([
     {
       id: 1,
+      link_id: null,
       name: 'Bob',
       describe: 'UH that litty fresh yo',
       followers: '69',
@@ -17,6 +18,7 @@ export async function seed(knex) {
     },
     {
       id: 2,
+      link_id: null,
       name: 'Jean',
       describe: 'Jeans',
       followers: '420',
@@ -26,6 +28,7 @@ export async function seed(knex) {
     },
     {
       id: 3,
+      link_id: null,
       name: 'Goth',
       describe: 'Black dress ahhh',
       followers: '52000000',

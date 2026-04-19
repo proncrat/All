@@ -4,12 +4,12 @@ import {
   Route,
 } from 'react-router'
 
-import Profilepage from './components/Profilepage'
-import SearchPage from './components/SearchPage'
-import HomePage from './components/HomePage'
+import Profilepage from './Pages/Profile/Profilepage'
+import SearchPage from './Pages/search/SearchPage'
+import HomePage from './Pages/Home/HomePage'
 
-import App from './components/App'
-import Home from './components/SubComponents/Home'
+import App from './Pages/Util/App'
+import Home from './Pages/Profile/Home'
 import {
   About,
   Picture,
@@ -19,14 +19,15 @@ import {
   Posts,
   Videos,
   Call,
-} from './components/SubComponents/ProfInner'
-import Video from './components/VideoPage'
-import AuthPage from './components/AuthPage'
-import { SignInForm } from './components/SignInPage'
-import { SignUpForm } from './components/SignUpPage'
+} from './Pages/Profile/Components/ProfInner'
+import Video from './Pages/Video/VideoPage'
+import { SignInForm } from './Pages/Auth/SignInPage'
+import { SignUpForm } from './Pages/Auth/SignUpPage'
+import { SettingsPage } from './Pages/Settings/ProfileSettings'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
+    <Route path="/settings" element={<SettingsPage />} />
     <Route path="/signin" element={<SignInForm />} />
     <Route path="/signup" element={<SignUpForm />} />
     <Route path="/profile/:id" element={<Profilepage />}>
@@ -42,7 +43,6 @@ const routes = createRoutesFromElements(
     </Route>
     <Route path="/search/" element={<SearchPage />} />
     <Route path="/video/:id" element={<Video />} />
-    <Route path="/auth/:pathname" element={<AuthPage />} />
     <Route path="/" element={<HomePage />} />
   </Route>,
 )
