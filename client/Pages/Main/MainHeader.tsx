@@ -53,7 +53,7 @@ export function THEHEADER() {
           <IoMdSettings></IoMdSettings>
         </Button>
         {session ? (
-          <div>
+          <div className="flex gap-2">
             <p>{session.user.username}</p>
             <button onClick={() => signOut()}>Logout</button>
           </div>
