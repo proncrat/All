@@ -1,12 +1,12 @@
 import { useParams } from 'react-router'
-import { useProfile, useUserData } from '../../../hooks'
+import { useUserData } from '../../../hooks'
 import { useEffect } from 'react'
 
 import Viewer from 'viewerjs'
 
 function ProfileTopSection() {
   const { id } = useParams()
-  const { data, isPending, isError, error, isSuccess } = useUserData(id)
+  const { data, isPending, isError, error, isSuccess } = useUserData(id ?? '')
 
   useEffect(() => {
     if (isSuccess === true) {

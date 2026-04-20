@@ -14,9 +14,7 @@ export function ProfileLost() {
         <EmptyDescription>There is no profile by that name/id</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <EmptyDescription>
-          Need help? <a href="#">Contact support</a>
-        </EmptyDescription>
+        <EmptyDescription>Need help? Skill issue</EmptyDescription>
       </EmptyContent>
     </Empty>
   )

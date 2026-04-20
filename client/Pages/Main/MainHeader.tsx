@@ -6,31 +6,20 @@ import { Search } from 'lucide-react'
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
-  InputGroupText,
-  InputGroupTextarea,
 } from '@/components/ui/input-group'
 
 import { IoMdSettings } from 'react-icons/io'
 import { Button } from '@/components/ui/button'
 
 export function THEHEADER() {
-  const { data: session, isPending } = useSession()
+  const { data: session } = useSession()
   return (
     <header className="THEHEADER">
       <div className="flex">
         <p style={{ margin: '0' }}>menu goes here</p>
         <Link to={'/'}>BEANVID</Link>
       </div>
-      {/*<NavLink
-        to={'/comms'}
-        className={({ isActive, isPending }) =>
-          isPending ? 'pending' : isActive ? 'active' : ''
-        }
-      >
-        Communication
-      </NavLink>*/}
       <div className="flex">
         <form className="flex" action="/search">
           <InputGroup>

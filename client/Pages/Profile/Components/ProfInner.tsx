@@ -1,5 +1,5 @@
 import Viewer from 'viewerjs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import 'viewerjs/dist/viewer.css'
 import Peer from 'peerjs'
@@ -13,7 +13,7 @@ function Videos() {
   const { id } = useParams()
 
   const { data, isPending, isError, error, isSuccess } = useUserData(
-    id,
+    id ?? '',
     'videos',
   )
 
@@ -52,10 +52,7 @@ function Videos() {
 
 function Posts() {
   const { id } = useParams()
-  const { data, isPending, isError, error, isSuccess } = useUserData(
-    id,
-    'posts',
-  )
+  const { data, isPending, isError, error } = useUserData(id ?? '', 'posts')
 
   if (isPending) {
     return <div>Loading...</div>

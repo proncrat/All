@@ -7,10 +7,7 @@ import { ProfileLost } from './Profile404'
 function Profile() {
   const { id } = useParams()
 
-  const { data, isPending, isError, error, isSuccess } = useUserData(
-    id,
-    'check',
-  )
+  const { data, isPending, isError, error } = useUserData(id ?? '', 'check')
 
   if (isPending) {
     return <div>Loading...</div>
