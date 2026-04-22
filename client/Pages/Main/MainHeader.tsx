@@ -15,28 +15,24 @@ import { Button } from '@/components/ui/button'
 export function THEHEADER() {
   const { data: session } = useSession()
   return (
-    <header className="THEHEADER">
-      <div className="flex">
-        <p style={{ margin: '0' }}>menu goes here</p>
-        <Link to={'/'}>BEANVID</Link>
-      </div>
-      <div className="flex">
-        <form className="flex" action="/search">
-          <InputGroup>
-            <InputGroupInput
-              spellCheck="false"
-              type="text"
-              autoComplete="off"
-              name="query"
-              placeholder="Search..."
-            />
-            <InputGroupAddon>
-              <Search />
-            </InputGroupAddon>
-          </InputGroup>
-          <button>SEARCH</button>
-        </form>
-      </div>
+    <header className="THEHEADER mb-5 flex justify-between p-2 items border-b-2">
+      <Link to={'/'}>BEANVID</Link>
+      <form className="flex gap-3" action="/search">
+        <InputGroup>
+          <InputGroupInput
+            spellCheck="false"
+            type="text"
+            autoComplete="off"
+            name="query"
+            placeholder="Search..."
+          />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+        </InputGroup>
+        <button>SEARCH</button>
+      </form>
+
       <div className="flex">
         <Button variant="outline" size="icon" aria-label="Submit">
           <IoMdSettings></IoMdSettings>

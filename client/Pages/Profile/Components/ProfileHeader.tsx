@@ -29,8 +29,7 @@ function ProfileHeader() {
   const { id } = useParams()
   return (
     <div>
-      <Separator />
-      <div style={{ display: 'flex', gap: '10px' }}>
+      <div className="flex gap-3 mb-2">
         <SubHeaderLink link={'/profile/' + id} text="Home"></SubHeaderLink>
         <SubHeaderLink link={'videos'} text="Videos"></SubHeaderLink>
         <SubHeaderLink link={'posts'} text="Posts"></SubHeaderLink>
@@ -41,7 +40,7 @@ function ProfileHeader() {
         <SubHeaderLink link={'about'} text="About"></SubHeaderLink>
         <SubHeaderLink link={'call'} text="Call"></SubHeaderLink>
       </div>
-      <Separator />
+      <Separator className="mb-2" />
     </div>
   )
 }

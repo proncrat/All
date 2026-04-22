@@ -22,7 +22,15 @@ function Profile() {
   }
 
   return (
-    <div className="center_small">
+    <div
+      className="center_small rounded-xl p-4"
+      style={{ backgroundColor: 'lab(2.75381% 0 0/0.5)' }}
+    >
+      <img
+        className="bg_bshit"
+        alt="bg"
+        src="http://localhost:5173/images/background.jpg"
+      ></img>
       <ProfileTopSection></ProfileTopSection>
       <ProfileHeader></ProfileHeader>
       {/*Much wow send props to all outlets so cool*/}

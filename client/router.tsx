@@ -16,14 +16,14 @@ import {
   Playlist,
   Song,
   Live,
-  Posts,
-  Videos,
   Call,
 } from './Pages/Profile/Components/ProfInner'
 import Video from './Pages/Video/VideoPage'
 import { SignInForm } from './Pages/Auth/SignInPage'
 import { SignUpForm } from './Pages/Auth/SignUpPage'
 import { SettingsPage } from './Pages/Settings/ProfileSettings'
+import { Posts } from './Pages/Profile/pages/posts/Posts'
+import { Videos } from './Pages/Profile/pages/videos/Videos'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
