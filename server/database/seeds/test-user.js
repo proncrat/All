@@ -15,6 +15,8 @@ export async function seed(knex) {
       pfp: 'http://localhost:3000/images/janedoe.jpg',
       description: 'This is a description1',
       peer_id: 'a86e7ef6-1818-49d4-9377-2c0c07902c09',
+      banner: 'http://localhost:3000/images/banner.jpg',
+      bg: 'http://localhost:5173/images/background.jpg',
     },
     {
       id: 2,

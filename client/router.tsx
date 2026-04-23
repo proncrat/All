@@ -21,13 +21,19 @@ import {
 import Video from './Pages/Video/VideoPage'
 import { SignInForm } from './Pages/Auth/SignInPage'
 import { SignUpForm } from './Pages/Auth/SignUpPage'
-import { SettingsPage } from './Pages/Settings/ProfileSettings'
 import { Posts } from './Pages/Profile/pages/posts/Posts'
 import { Videos } from './Pages/Profile/pages/videos/Videos'
+import { SettingsPage } from './Pages/Settings/SettingsPage'
+import { SettingsDebug } from './Pages/Settings/DebugSettings'
+import { SettingsCustomize } from './Pages/Settings/CustomizeSettings'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
-    <Route path="/settings" element={<SettingsPage />} />
+    <Route path="/settings" element={<SettingsPage />}>
+      <Route index element={<SettingsDebug />} />
+      <Route path="customize" element={<SettingsCustomize />} />
+    </Route>
+
     <Route path="/signin" element={<SignInForm />} />
     <Route path="/signup" element={<SignUpForm />} />
     <Route path="/profile/:id" element={<Profilepage />}>

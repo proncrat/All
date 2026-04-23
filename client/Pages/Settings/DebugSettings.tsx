@@ -1,6 +1,6 @@
 import { useSession } from '@/lib/auth'
 
-export function SettingsPage() {
+export function SettingsDebug() {
   const { data: session, isPending } = useSession()
   if (isPending) {
     return <p>Loads</p>
@@ -9,7 +9,7 @@ export function SettingsPage() {
   const userdata = session.user
   return (
     <div className="m-7">
-      <h1 className="text-3xl">Temp DEBUG</h1>
+      <h1 className="text-3xl">Account Info DEBUG</h1>
       <p>id: {userdata.id}</p>
       <p>Creation date: {userdata.createdAt.getFullYear()}</p>
       <p>Updated at: {userdata.updatedAt.getDay()}</p>

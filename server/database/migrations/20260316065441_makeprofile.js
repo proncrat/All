@@ -8,8 +8,12 @@ export function up(knex) {
     table.string('link_id')
     table.string('name')
     table.string('describe')
-    table.integer('followers')
+    table.integer('followers').defaultTo(0)
     table.string('peer_id')
+    table.string('pfp')
+    table.string('banner')
+    table.string('bg')
+    table.string('description').defaultTo('Bro make a description.')
   })
 }
 
