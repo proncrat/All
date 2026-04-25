@@ -14,11 +14,11 @@ function Search() {
       {isError && <div>Something went wrong</div>}
       {isSuccess &&
         data.map((profile: profile) => (
-          <div key={profile.id} className="border mb-4">
+          <div key={profile.id} className="border mb-4 rounded-xl p-2">
             <Link to={`/profile/${profile.id}`}>
               <div className="flex gap-6">
                 <img
-                  className="object-cover aspect-square"
+                  className="rounded-xl aspect-square w-44"
                   alt="A THUMBNAIL"
                   src={profile.pfp}
                 />

@@ -8,18 +8,23 @@ export async function seed(knex) {
   await knex('profiledata').insert([
     {
       id: 1,
+      level: 9999,
       link_id: '8ZVcqNO87geQy0fdJ9pLxdOmPvVrbt1j',
-      name: 'Bob',
+      name: 'GOD',
       describe: 'UH that litty fresh yo',
       followers: '69',
       pfp: 'http://localhost:3000/images/janedoe.jpg',
-      description: 'This is a description1',
+      description:
+        'I love beanvid so much i love beanvid love beanvid yes yes finish beanvid',
       peer_id: 'a86e7ef6-1818-49d4-9377-2c0c07902c09',
       banner: 'http://localhost:3000/images/banner.jpg',
       bg: 'http://localhost:5173/images/background.jpg',
+      links:
+        '[{"name":"Instagram","link":"instagram.com/jullian.bublitz/"},{"name":"Github","link":"github.com/proncrat"}]',
     },
     {
       id: 2,
+      level: 0,
       link_id: null,
       name: 'Jean',
       describe: 'Jeans',
@@ -30,12 +35,13 @@ export async function seed(knex) {
     },
     {
       id: 3,
+      level: 25,
       link_id: null,
       name: 'Goth',
       describe: 'Black dress ahhh',
       followers: '52000000',
       pfp: 'https://i.pinimg.com/736x/fd/c9/5e/fdc95e24e075e75d99aea0f188152454.jpg',
-      description: 'This is a description3',
+      //description: 'This is a description3',
       peer_id: '386c2df7-1959-4b56-bba7-956fcd1b2986',
     },
   ])

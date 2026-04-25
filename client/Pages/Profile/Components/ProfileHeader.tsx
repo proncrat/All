@@ -10,13 +10,7 @@ function SubHeaderLink(props: Sublink) {
   //const currentPathname = location.pathname
   return (
     <div>
-      <NavLink
-        end
-        to={props.link}
-        className={({ isActive, isPending }) =>
-          isPending ? 'pending' : isActive ? 'active' : ''
-        }
-      >
+      <NavLink end to={props.link} className={'text-lg'}>
         {props.text}
       </NavLink>
     </div>
@@ -38,7 +32,6 @@ function ProfileHeader() {
         <SubHeaderLink link={'Playlist'} text="Playlists"></SubHeaderLink>
         <SubHeaderLink link={'picture'} text="Photos"></SubHeaderLink>
         <SubHeaderLink link={'about'} text="About"></SubHeaderLink>
-        <SubHeaderLink link={'call'} text="Call"></SubHeaderLink>
       </div>
       <Separator className="mb-2" />
     </div>

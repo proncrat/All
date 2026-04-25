@@ -16,6 +16,19 @@ export async function getUserData(userId: string, route?: string) {
     .catch(logError)
 }
 
+//comments
+export async function getCommentsByLinkClient(
+  linkId: string,
+  LinkType: string,
+) {
+  return request
+    .get(
+      `http://localhost:3000/api/v1/comments?linkid=${linkId}&linktype=${LinkType}`,
+    )
+    .then((res) => res.body)
+    .catch(logError)
+}
+
 //Test function
 export async function getUsers() {
   return request

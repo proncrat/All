@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router'
 import { useUserData } from '../../../hooks'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSession } from '@/lib/auth'
 
 function ProfileTopSection() {
@@ -43,55 +43,58 @@ function ProfileTopSection() {
           </div>
         )}
       </div>
-      <div id="imagesProfheader" className="flex">
-        <div className="relative">
-          {banner2 && (
-            <div
-              style={{ aspectRatio: '1 / 1' }}
-              className="absolute w-full bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000"
-            />
-          )}
-          {isSuccess && (
-            <img
-              onLoad={() => setbanner2(false)}
-              className="rounded-xl"
-              alt="pfp"
-              src={data.pfp}
-            />
-          )}
-        </div>
-        <div className="ml-4">
-          {isPending && (
-            <div>
-              <div className="w-40 h-7 bg-muted rounded-xl mb-4 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
-              <div className="w-38 h-5 bg-muted rounded-xl mb-2 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
-              <div className="w-38 h-5 bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
-            </div>
-          )}
-          {isSuccess && (
-            <div>
-              <h2 className="text-3xl font-bold">{data.name}</h2>
-              <div className="flex gap-2">
-                <p>{`@${data.id}`}</p>
-                <p>·</p>
-                <p className="text-zinc-400">{`${data.followers} Followers`}</p>
+      <div className="flex justify-between">
+        <div className="flex gap-4">
+          <div className="relative">
+            {banner2 && (
+              <div
+                style={{ aspectRatio: '1 / 1' }}
+                className="absolute w-full bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000"
+              />
+            )}
+            {isSuccess && (
+              <img
+                onLoad={() => setbanner2(false)}
+                className="rounded-xl aspect-square w-44"
+                alt="pfp"
+                src={data.pfp}
+              />
+            )}
+          </div>
+          <div>
+            {isPending && (
+              <div>
+                <div className="w-40 h-7 bg-muted rounded-xl mb-4 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
+                <div className="w-38 h-5 bg-muted rounded-xl mb-2 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
+                <div className="w-38 h-5 bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
               </div>
-              {data.describe && <p>{`${data.describe}`}</p>}
+            )}
+            {isSuccess && (
+              <div>
+                <h2 className="text-3xl font-bold">{data.name}</h2>
+                <div className="flex gap-2">
+                  <p>{`@${data.id}`}</p>
+                  <p>·</p>
+                  <p className="text-zinc-400">{`${data.followers} Followers`}</p>
+                </div>
+                {data.describe && <p>{`${data.describe}`}</p>}
 
-              <div className="flex flex-row gap-2">
-                {session && data.link_id == session.user.id && (
-                  <button
-                    onClick={() => navigate('/settings/customize')}
-                    className="abutton mt-2"
-                  >
-                    Customize
-                  </button>
-                )}
-                <button className="abutton mt-2">Follow</button>
+                <div className="flex flex-row gap-2">
+                  {session && data.link_id == session.user.id && (
+                    <button
+                      onClick={() => navigate('/settings/customize')}
+                      className="abutton mt-2"
+                    >
+                      Customize
+                    </button>
+                  )}
+                  <button className="abutton mt-2">Follow</button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+        {isSuccess && <p className="text-xl">Level {data.level}</p>}
       </div>
     </div>
   )

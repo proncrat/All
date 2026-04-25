@@ -5,6 +5,7 @@
 export function up(knex) {
   return knex.schema.createTable('profiledata', (table) => {
     table.increments('id')
+    table.integer('level')
     table.string('link_id')
     table.string('name')
     table.string('describe')
@@ -14,6 +15,7 @@ export function up(knex) {
     table.string('banner')
     table.string('bg')
     table.string('description').defaultTo('Bro make a description.')
+    table.json('links')
   })
 }
 

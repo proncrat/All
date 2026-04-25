@@ -27,7 +27,7 @@ export async function getPhotosByUser(userId: string) {
 export async function getDescriptionByUser(userId: string) {
   return await db('profiledata')
     .where('id', userId)
-    .select('description')
+    .select('description', 'links')
     .first()
 }
 
@@ -53,4 +53,27 @@ export async function getAllPosts() {
 }
 export async function getAllPhotos() {
   return await db('photos').select()
+}
+
+//comments
+
+const get_comment_schema = [
+  'comments.post_date',
+  'profiledata.pfp',
+  'comments.body_text',
+  'comments.id',
+  'profiledata.name',
+]
+
+export async function getCommentsByLink(linkId: string, LinkType: string) {
+  return await db('comments')
+    .join('profiledata', 'comments.author_id', 'profiledata.id')
+    .where('comments.link_id', linkId)
+    .andWhere('comments.Link_type', LinkType)
+    .select(get_comment_schema)
+    .orderBy([{ column: 'comments.id', order: 'desc' }])
+}
+
+export async function newCommentByLink(data) {
+  return await db('comments').insert({ ...data })
 }

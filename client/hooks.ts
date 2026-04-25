@@ -93,7 +93,20 @@ export function useVideo(id: string) {
   }
 }
 
-export function useFruitMutation<TData = unknown, TVariables = unknown>(
+//comments
+
+export function useComments(linkId: string, LinkType: string) {
+  const query = useQuery({
+    queryKey: ['comments'],
+    queryFn: () => API.getCommentsByLinkClient(linkId, LinkType),
+  })
+
+  return {
+    ...query,
+  }
+}
+
+export function useCommentMutation<TData = unknown, TVariables = unknown>(
   mutationFn: MutationFunction<TData, TVariables>,
 ) {
   const queryClient = useQueryClient()
@@ -109,13 +122,13 @@ export function useFruitMutation<TData = unknown, TVariables = unknown>(
 }
 
 export function useUpdateFruit() {
-  return useFruitMutation(API.updateFruit)
+  return useCommentMutation(API.updateFruit)
 }
 
 export function useDeleteFruit() {
-  return useFruitMutation(API.deleteFruit)
+  return useCommentMutation(API.deleteFruit)
 }
 
-export function useAddFruit() {
-  return useFruitMutation(API.addFruit)
+export function useAddcommeffnt() {
+  return useCommentMutation(API.addComment)
 }

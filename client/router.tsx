@@ -11,12 +11,10 @@ import HomePage from './Pages/Home/HomePage'
 import App from './Pages/Util/App'
 import Home from './Pages/Profile/Home'
 import {
-  About,
   Picture,
   Playlist,
   Song,
   Live,
-  Call,
 } from './Pages/Profile/Components/ProfInner'
 import Video from './Pages/Video/VideoPage'
 import { SignInForm } from './Pages/Auth/SignInPage'
@@ -26,6 +24,8 @@ import { Videos } from './Pages/Profile/pages/videos/Videos'
 import { SettingsPage } from './Pages/Settings/SettingsPage'
 import { SettingsDebug } from './Pages/Settings/DebugSettings'
 import { SettingsCustomize } from './Pages/Settings/CustomizeSettings'
+import { About } from './Pages/Profile/pages/about/About'
+import { PostPage } from './Pages/Post/PostPage'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -33,7 +33,7 @@ const routes = createRoutesFromElements(
       <Route index element={<SettingsDebug />} />
       <Route path="customize" element={<SettingsCustomize />} />
     </Route>
-
+    <Route path="/post" element={<PostPage />} />
     <Route path="/signin" element={<SignInForm />} />
     <Route path="/signup" element={<SignUpForm />} />
     <Route path="/profile/:id" element={<Profilepage />}>
@@ -45,7 +45,6 @@ const routes = createRoutesFromElements(
       <Route path="playlist" element={<Playlist />} />
       <Route path="Picture" element={<Picture />} />
       <Route path="About" element={<About />} />
-      <Route path="Call" element={<Call />} />
     </Route>
     <Route path="/search/" element={<SearchPage />} />
     <Route path="/video/:id" element={<Video />} />

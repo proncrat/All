@@ -8,6 +8,7 @@ import user_routes from './Routes/user'
 import video_routes from './Routes/video'
 import post_routes from './Routes/post'
 import photo_routes from './Routes/photo'
+import comment_routes from './Routes/Comments'
 
 import cors from 'cors'
 //DO NOT PUT IN PROD IDIOT
@@ -31,5 +32,6 @@ server.use('/api/v1/profile', user_routes)
 server.use('/api/v1/video', video_routes)
 server.use('/api/v1/post', post_routes)
 server.use('/api/v1/photo', photo_routes)
+server.use('/api/v1/comments', comment_routes)
 
 export default server
