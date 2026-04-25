@@ -4,6 +4,8 @@ import { useAddComment } from '@/client/hooks/usecomments'
 import { comment } from '@/client/models/comment'
 import { useParams } from 'react-router'
 
+import { ImBin } from 'react-icons/im'
+
 export function ProfileComments() {
   const { id } = useParams()
   const addcomment = useAddComment()
@@ -50,19 +52,26 @@ export function ProfileComments() {
         {data.map((item: comment) => (
           <div
             key={item.id}
-            className="flex gap-4 mb-4 bg-[#00000075] rounded-lg p-2"
+            className="flex justify-between mb-4 bg-[#00000075] rounded-lg p-2"
           >
-            <img
-              className="rounded-lg w-20 aspect-square"
-              alt="some pfp"
-              src={item.pfp}
-            ></img>
-            <div>
-              <div className="flex gap-4 align-baseline">
-                <p className="text-lg">{item.name}</p>
-                <p>{item.post_date.toString()}</p>
+            <div className="flex gap-4">
+              <img
+                className="rounded-lg w-20 aspect-square"
+                alt="some pfp"
+                src={item.pfp}
+              ></img>
+              <div>
+                <div className="flex gap-4 align-baseline">
+                  <p className="text-lg">{item.name}</p>
+                  <p>{item.post_date.toString()}</p>
+                </div>
+                <p>{item.body_text}</p>
               </div>
-              <p>{item.body_text}</p>
+            </div>
+            <div>
+              <button className="cursor-pointer">
+                <ImBin />
+              </button>
             </div>
           </div>
         ))}

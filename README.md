@@ -51,3 +51,20 @@ Who knows, ima give it a good ol try tho
   * Make individual pages to view things eg watch video view post and comments
   * Custom profile settings with changeable css styling
   * Figure out how to use end to end messaging with js
+
+
+
+Current features - 
+profile -
+get videos/posts/songs/about with links
+get, post comments make delete and edit mabye
+
+account creation with auto generate secondary data table
+
+things to doooooo
+
+make settings work
+
+protect api endpoints?
+
+refrence login id with 
