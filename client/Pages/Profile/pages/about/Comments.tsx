@@ -1,14 +1,17 @@
-import { useComments } from '@/client/hooks'
+import { useComments, Usesessionid } from '@/client/hooks'
 import { useAddComment } from '@/client/hooks/usecomments'
 
 import { comment } from '@/client/models/comment'
 import { useParams } from 'react-router'
 
 import { ImBin } from 'react-icons/im'
+import { useSession } from '@/lib/auth'
 
 export function ProfileComments() {
   const { id } = useParams()
   const addcomment = useAddComment()
+  const { data: lesesh } = useSession()
+  const { data: idcheck, isSuccess } = Usesessionid(lesesh?.session.userId)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -69,9 +72,11 @@ export function ProfileComments() {
               </div>
             </div>
             <div>
-              <button className="cursor-pointer">
-                <ImBin />
-              </button>
+              {idcheck && idcheck.id === item.authorId && (
+                <button className="cursor-pointer">
+                  <ImBin />
+                </button>
+              )}
             </div>
           </div>
         ))}

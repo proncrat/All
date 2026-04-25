@@ -51,6 +51,7 @@ export async function getAllVideos() {
 export async function getAllPosts() {
   return await db('posts').select()
 }
+
 export async function getAllPhotos() {
   return await db('photos').select()
 }
@@ -63,6 +64,7 @@ const get_comment_schema = [
   'comments.body_text',
   'comments.id',
   'profiledata.name',
+  'profiledata.id as authorId',
 ]
 
 export async function getCommentsByLink(linkId: string, LinkType: string) {
@@ -76,4 +78,9 @@ export async function getCommentsByLink(linkId: string, LinkType: string) {
 
 export async function newCommentByLink(data) {
   return await db('comments').insert({ ...data })
+}
+
+//Util
+export async function getIdMatch(LinkId) {
+  return await db('profiledata').select('id').where({ link_id: LinkId }).first()
 }

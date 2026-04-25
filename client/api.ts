@@ -45,6 +45,14 @@ export async function getVideosById(Id: string) {
     .catch(logError)
 }
 
+//util
+export async function getprofilematchid(linkId: string) {
+  return request
+    .get(`http://localhost:3000/api/v1/util/id?linkid=${linkId}`)
+    .then((res) => res.body)
+    .catch(logError)
+}
+
 //Make usefull
 function logError(err: Error) {
   console.log(err)

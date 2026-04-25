@@ -4,4 +4,5 @@ export interface comment {
   body_text: string
   id: number
   name: string
+  authorId: number
 }

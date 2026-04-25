@@ -80,6 +80,17 @@ export function useSongs(id: string) {
   }
 }
 
+export function Usesessionid(linkId: string) {
+  const query = useQuery({
+    queryKey: ['match', linkId],
+    queryFn: () => API.getprofilematchid(linkId),
+  })
+
+  return {
+    ...query,
+  }
+}
+
 //Video
 
 export function useVideo(id: string) {
