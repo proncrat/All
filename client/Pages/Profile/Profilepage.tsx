@@ -23,6 +23,7 @@ function Profile() {
       })
       console.log(color)
       document.body.style.backgroundColor = color[0]
+      document.documentElement.style.setProperty('--after-color', color[0])
     }
 
     colorthingy()

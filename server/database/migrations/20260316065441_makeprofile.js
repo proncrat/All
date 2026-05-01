@@ -10,6 +10,7 @@ export function up(knex) {
     table.string('name')
     table.string('describe')
     table.integer('followers').defaultTo(0)
+    table.integer('following').defaultTo(0)
     table.string('peer_id')
     table.string('pfp')
     table.string('banner')

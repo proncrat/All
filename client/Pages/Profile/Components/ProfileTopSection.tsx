@@ -76,6 +76,8 @@ function ProfileTopSection() {
                   <p>{`@${data.id}`}</p>
                   <p>·</p>
                   <p className="text-zinc-400">{`${data.followers} Followers`}</p>
+                  <p>·</p>
+                  <p className="text-zinc-400">{`${data.following} Following`}</p>
                 </div>
                 {data.describe && <p>{`${data.describe}`}</p>}
 
@@ -88,7 +90,9 @@ function ProfileTopSection() {
                       Customize
                     </button>
                   )}
-                  <button className="abutton mt-2">Follow</button>
+                  {session && data.link_id !== session.user.id && (
+                    <button className="abutton mt-2">Follow</button>
+                  )}
                 </div>
               </div>
             )}

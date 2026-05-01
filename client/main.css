@@ -145,6 +145,8 @@ img {
   position: relative;
 }
 
+/*rgba(60, 60, 100, 1) 10%*/
+
 .bginnercont::after {
   z-index: -9;
   content: '';
@@ -153,8 +155,8 @@ img {
   height: 100%;
   background: linear-gradient(
     0deg,
-    rgba(60, 60, 100, 1) 10%,
-    rgba(255, 255, 255, 0) 100%
+    var(--after-color, black),
+    rgba(255, 255, 255, 0) 50%
   );
   pointer-events: none;
   top: 0;

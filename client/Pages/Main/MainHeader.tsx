@@ -16,7 +16,10 @@ import { IoMdSettings } from 'react-icons/io'
 export function THEHEADER() {
   const { data: session } = useSession()
   return (
-    <header className="THEHEADER mb-5 flex justify-between p-2 items border-b-2">
+    <header
+      style={{ backgroundColor: 'lab(3 0 0 / 0.71)' }}
+      className="THEHEADER mb-5 flex justify-between p-2 items border-b-2"
+    >
       <Link to={'/'}>BEANVID</Link>
       <form className="flex gap-3" action="/search">
         <InputGroup>

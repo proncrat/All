@@ -32,7 +32,7 @@ export async function seed(knex) {
       pfp: 'https://dk2dv4ezy246u.cloudfront.net/widgets/sSoFDYe3ZbPQ_large.jpg',
       description: 'This is a description2',
       peer_id: '447ebcf1-3e0f-4738-9b64-c1804a2d21c1',
-      bg: 'http://localhost:5173/images/sigma.jpg',
+      bg: 'http://localhost:5173/images/lock.png',
     },
     {
       id: 3,
@@ -42,7 +42,7 @@ export async function seed(knex) {
       describe: 'Black dress ahhh',
       followers: '52000000',
       pfp: 'https://i.pinimg.com/736x/fd/c9/5e/fdc95e24e075e75d99aea0f188152454.jpg',
-      bg: 'http://localhost:5173/images/GEM.gif',
+      bg: 'http://localhost:3000/images/heres-a-2k-jane-doe-wallpaper-for-you-guys-v0-l0cux9p736md1.webp',
       //description: 'This is a description3',
       peer_id: '386c2df7-1959-4b56-bba7-956fcd1b2986',
     },
