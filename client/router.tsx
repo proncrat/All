@@ -10,12 +10,7 @@ import HomePage from './Pages/Home/HomePage'
 
 import App from './Pages/Util/App'
 import Home from './Pages/Profile/Home'
-import {
-  Picture,
-  Playlist,
-  Song,
-  Live,
-} from './Pages/Profile/Components/ProfInner'
+import { Playlist, Song, Live } from './Pages/Profile/Components/ProfInner'
 import Video from './Pages/Video/VideoPage'
 import { SignInForm } from './Pages/Auth/SignInPage'
 import { SignUpForm } from './Pages/Auth/SignUpPage'
@@ -26,6 +21,7 @@ import { SettingsDebug } from './Pages/Settings/DebugSettings'
 import { SettingsCustomize } from './Pages/Settings/CustomizeSettings'
 import { About } from './Pages/Profile/pages/about/About'
 import { PostPage } from './Pages/Post/PostPage'
+import { Photos } from './Pages/Profile/pages/photos/Photos'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -43,7 +39,7 @@ const routes = createRoutesFromElements(
       <Route path="Live" element={<Live />} />
       <Route path="Song" element={<Song />} />
       <Route path="playlist" element={<Playlist />} />
-      <Route path="Picture" element={<Picture />} />
+      <Route path="Picture" element={<Photos />} />
       <Route path="About" element={<About />} />
     </Route>
     <Route path="/search/" element={<SearchPage />} />

@@ -25,11 +25,10 @@ export async function seed(knex) {
     },
     {
       id: 3,
-      name: 'Jane',
+      name: 'Grace',
       describe: 'Claude make me a description',
-      url: 'https://www.bigfootdigital.co.uk/wp-content/uploads/2020/07/image-optimisation-scaled.jpg',
-      thumburl:
-        'https://www.bigfootdigital.co.uk/wp-content/uploads/2020/07/image-optimisation-scaled.jpg',
+      url: 'http://localhost:3000/images/grace.jpg',
+      thumburl: 'http://localhost:3000/images/grace.jpg',
       author_id: 1,
     },
     {

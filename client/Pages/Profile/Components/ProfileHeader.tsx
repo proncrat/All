@@ -27,7 +27,6 @@ function ProfileHeader() {
         <SubHeaderLink link={'/profile/' + id} text="Home"></SubHeaderLink>
         <SubHeaderLink link={'videos'} text="Videos"></SubHeaderLink>
         <SubHeaderLink link={'posts'} text="Posts"></SubHeaderLink>
-        <SubHeaderLink link={'Live'} text="Livestreams"></SubHeaderLink>
         <SubHeaderLink link={'Song'} text="Songs"></SubHeaderLink>
         <SubHeaderLink link={'Playlist'} text="Playlists"></SubHeaderLink>
         <SubHeaderLink link={'picture'} text="Photos"></SubHeaderLink>
