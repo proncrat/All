@@ -22,6 +22,7 @@ import { SettingsCustomize } from './Pages/Settings/CustomizeSettings'
 import { About } from './Pages/Profile/pages/about/About'
 import { PostPage } from './Pages/Post/PostPage'
 import { Photos } from './Pages/Profile/pages/photos/Photos'
+import { ProfileLost } from './Pages/Profile/Profile404'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -32,6 +33,7 @@ const routes = createRoutesFromElements(
     <Route path="/post" element={<PostPage />} />
     <Route path="/signin" element={<SignInForm />} />
     <Route path="/signup" element={<SignUpForm />} />
+    <Route path="/profile/" element={<ProfileLost />} />
     <Route path="/profile/:id" element={<Profilepage />}>
       <Route index element={<Home />} />
       <Route path="videos" element={<Videos />} />

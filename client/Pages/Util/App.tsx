@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { THEHEADER } from '../Main/MainHeader'
 import { Outlet } from 'react-router'
 import { Toaster } from '@/components/ui/sonner'
+import { SideBar } from '../Main/Sidebar'
 
 function App() {
   const queryClient = new QueryClient()
@@ -13,7 +14,12 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Toaster />
         <THEHEADER />
-        <Outlet />
+        <div>
+          <SideBar />
+          <div className="mt-20 ml-[60px]">
+            <Outlet />
+          </div>
+        </div>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </StrictMode>

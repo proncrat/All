@@ -1,14 +1,10 @@
-import { useNavigate, useParams } from 'react-router'
-import { useUserData } from '../../../hooks'
+import { useNavigate } from 'react-router'
 import { useState } from 'react'
 import { useSession } from '@/lib/auth'
 
-function ProfileTopSection() {
+function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   const [banner, setbanner] = useState(true)
   const [banner2, setbanner2] = useState(true)
-
-  const { id } = useParams()
-  const { data, isPending, isError, error, isSuccess } = useUserData(id ?? '')
 
   const navigate = useNavigate()
 
@@ -33,8 +29,7 @@ function ProfileTopSection() {
                 )}
                 <img
                   onLoad={() => setbanner(false)}
-                  className="w-full rounded-xl mb-5"
-                  style={{ width: '100%', aspectRatio: '10 / 2' }}
+                  className="w-full rounded-xl mb-5 aspect-10/2"
                   alt="le banner"
                   src={data.banner}
                 />

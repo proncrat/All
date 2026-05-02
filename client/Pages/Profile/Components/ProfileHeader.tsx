@@ -10,7 +10,7 @@ function SubHeaderLink(props: Sublink) {
   //const currentPathname = location.pathname
   return (
     <div>
-      <NavLink end to={props.link} className={'text-lg'}>
+      <NavLink end to={props.link} className={'text-lg [&.active]:border-b-2'}>
         {props.text}
       </NavLink>
     </div>

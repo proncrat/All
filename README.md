@@ -1,6 +1,9 @@
 # All
 > A not very good solution to the everything everywhere problem
 
+## NOTE
+Remember add infinte scroll to everything bro
+
 ## Mission Statment
 Im lazy, Everything is everywhere. Everything steals your data. Its kinda mid ngl.
 What if it was all in one place on one account that you controlled, no selling of

@@ -12,19 +12,9 @@ body {
   color: white;
   font-family: 'Poppins', sans-serif;
 }
-/*
-a {
-  all: unset;
-  color: rgb(255, 255, 255);
-  cursor: pointer;
-}
-*/
+
 a:hover {
   color: rgb(141, 141, 141);
-}
-
-a.active {
-  border-bottom: 1px solid rgb(255, 255, 255);
 }
 
 img {
@@ -37,9 +27,6 @@ img {
   gap: 15px;
 }
 */
-.THEHEADER {
-  border-bottom: 2px solid white;
-}
 
 .THEHEADER button {
   all: unset;
@@ -72,15 +59,7 @@ img {
   color: black;
   background-color: white;
 }
-/*
-#images {
-  display: grid;
-  grid-template-rows: 100px;
-  grid-auto-rows: 100px;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 10px;
-}
-*/
+
 .thumbnailthing p {
   margin: 0;
 }
@@ -90,13 +69,7 @@ img {
   padding: 5px;
   border: solid 1px white;
 }
-/*
-.thumbnailthing img {
-  all: unset;
-  max-width: 100%;
-  height: auto;
-}
-*/
+
 .thumbnailcontainer {
   display: grid;
   grid-template-rows: 240px;
@@ -163,23 +136,23 @@ img {
   left: 0;
 }
 
-/*Cool gallery thing?*/
+/*Cool gallery thing*/
 
-ul {
+ul#images {
   display: flex;
   flex-wrap: wrap;
 }
 
-li {
+#images li {
   height: 35vh;
   flex-grow: 1;
 }
 
-li:last-child {
+#images li:last-child {
   flex-grow: 10;
 }
 
-img {
+#images img {
   max-height: 100%;
   min-width: 100%;
   object-fit: cover;
@@ -187,32 +160,34 @@ img {
 }
 
 @media (max-aspect-ratio: 1/1) {
-  li {
+  #images li {
     height: 30vh;
   }
 }
 
 @media (max-height: 480px) {
-  li {
+  #images li {
     height: 80vh;
   }
 }
 
 @media (max-aspect-ratio: 1/1) and (max-width: 480px) {
-  ul {
+  ul#images {
     flex-direction: row;
   }
 
-  li {
+  #images li {
     height: auto;
     width: 100%;
   }
-  img {
+  #images img {
     width: 100%;
     max-height: 75vh;
     min-width: 0;
   }
 }
+
+/*Cool gallery thing end*/
 
 @theme inline {
   --font-heading: var(--font-sans);

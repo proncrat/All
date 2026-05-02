@@ -4,17 +4,13 @@ import ProfileTopSection from './Components/ProfileTopSection'
 import { useUserData } from '../../hooks'
 import { ProfileLost } from './Profile404'
 import { prominent } from 'color.js'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { PfBg } from './Components/Bg'
 
 function Profile() {
-  const [color1, setColor1] = useState('#ff0000')
-  const [color2, setColor2] = useState('#0000ff')
-
   const { id } = useParams()
 
   const { data, isPending, isError, error, isSuccess } = useUserData(id ?? '')
-
-  //const { data, isPending, isError, error } = useUserData(id ?? '', 'check')
 
   useEffect(() => {
     async function colorthingy() {
@@ -33,10 +29,6 @@ function Profile() {
     }
   }, [isSuccess])
 
-  if (isPending) {
-    return <div>Loading...</div>
-  }
-
   if (isError) {
     return <ProfileLost></ProfileLost>
   }
@@ -46,24 +38,14 @@ function Profile() {
       className="center_small rounded-xl p-4"
       style={{ backgroundColor: 'lab(3 0 0 / 0.71)' }}
     >
-      {/*
-      <div className="bg_bs_container">
-        <img
-          className="w-full absolute bg_bshit"
-          alt="bg"
-          src="http://localhost:5173/images/background.jpg"
-        ></img>
-      </div>
-   */}
-      {data.bg && (
-        <div className="bgcontainerthing -z-10">
-          <div className="bginnercont">
-            <img className="w-full relative -z-10" alt="bg" src={data.bg}></img>
-          </div>
-        </div>
-      )}
-
-      <ProfileTopSection></ProfileTopSection>
+      <PfBg src={data} />
+      <ProfileTopSection
+        data={data}
+        isPending={isPending}
+        isError={isError}
+        error={error}
+        isSuccess={isSuccess}
+      />
       <ProfileHeader></ProfileHeader>
       {/*Much wow send props to all outlets so cool*/}
       <Outlet />
