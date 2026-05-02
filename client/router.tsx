@@ -23,6 +23,7 @@ import { About } from './Pages/Profile/pages/about/About'
 import { PostPage } from './Pages/Post/PostPage'
 import { Photos } from './Pages/Profile/pages/photos/Photos'
 import { ProfileLost } from './Pages/Profile/Profile404'
+import { Coms } from './Pages/coms/coms'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -45,7 +46,7 @@ const routes = createRoutesFromElements(
       <Route path="About" element={<About />} />
     </Route>
     <Route path="/search/" element={<SearchPage />} />
-    <Route path="/coms" element={<SearchPage />} />
+    <Route path="/coms" element={<Coms />} />
     <Route path="/video/:id" element={<Video />} />
     <Route path="/" element={<HomePage />} />
   </Route>,

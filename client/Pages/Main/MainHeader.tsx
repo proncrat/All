@@ -17,14 +17,21 @@ import { RxHamburgerMenu } from 'react-icons/rx'
 
 export function THEHEADER({ sidebar }) {
   const { data: session } = useSession()
+
+  function searchHandler(e) {
+    e.preventdefault()
+  }
+
   return (
     <header
       style={{ backgroundColor: 'lab(3 0 0 / 0.91)' }}
       className="THEHEADER mb-5 flex justify-between p-2 items border-b-2 fixed top-0 w-full z-30"
     >
-      <RxHamburgerMenu onClick={sidebar} size={'30px'} />
-      <Link to={'/'}>BEANVID</Link>
-      <form className="flex gap-3" action="/search">
+      <div className="flex gap-4 items-center">
+        <RxHamburgerMenu onClick={sidebar} size={'30px'} />
+        <Link to={'/'}>BEANVID</Link>
+      </div>
+      <form onSubmit={searchHandler} className="flex gap-3">
         <InputGroup>
           <InputGroupInput
             spellCheck="false"

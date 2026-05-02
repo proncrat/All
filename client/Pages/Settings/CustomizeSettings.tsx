@@ -1,50 +1,38 @@
+import { Usesessionid, useUserData } from '@/client/hooks'
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
+import { useSession } from '@/lib/auth'
+import { useState } from 'react'
+import { CustomizeForm } from './components/CustomizeForm'
 
 export function SettingsCustomize() {
-  return (
-    <div className="m-7">
-      <h1 className="text-3xl mb-6">Customize Stuff</h1>
-      <div className="flex flex-col gap-3">
-        <h2 className="text-2xl">Profile</h2>
-        <div>
-          <p className="mb-1">Name</p>
-          <InputGroup>
-            <InputGroupInput
-              spellCheck="false"
-              type="text"
-              autoComplete="off"
-              name="query"
-            />
-          </InputGroup>
-        </div>
-        <div>
-          <p className="mb-1">Describe</p>
-          <InputGroup>
-            <InputGroupInput
-              spellCheck="false"
-              type="text"
-              autoComplete="off"
-              name="query"
-            />
-          </InputGroup>
-        </div>
-        <div>
-          <p className="mb-1">Description</p>
-          <InputGroup>
-            <InputGroupInput
-              spellCheck="false"
-              type="text"
-              autoComplete="off"
-              name="query"
-            />
-          </InputGroup>
-        </div>
+  const { data: lesesh, isPending: seshpend } = useSession()
 
-        <p>Links</p>
-        <p>Pfp</p>
-        <p>Bg</p>
-        <p>Banner</p>
-      </div>
-    </div>
+  const userseshid = lesesh?.session.userId
+
+  const { data: idcheck, isPending: idpend } = Usesessionid(
+    userseshid,
+    !seshpend,
   )
+
+  const userId = idcheck?.id
+
+  const {
+    data: userdata,
+    isPending,
+    isSuccess,
+  } = useUserData(userId, undefined, !idpend)
+
+  console.log(userdata)
+
+  if (lesesh == null) {
+    return <p>Log in you chud</p>
+  }
+
+  if (isPending) {
+    return <p>Loads</p>
+  }
+
+  if (isSuccess) {
+    return <CustomizeForm initialdata={userdata} />
+  }
 }

@@ -10,7 +10,7 @@ export function SideBar({ width }) {
       style={{
         width: `${width}px`,
         height: '100vh',
-        backgroundColor: 'black',
+        backgroundColor: 'lab(3 0 0 / 0.91)',
       }}
     >
       <div className="flex flex-col justify-center pt-4 items-center gap-3">

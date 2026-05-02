@@ -1,6 +1,18 @@
 import { Outlet } from 'react-router'
 import { NavLink } from 'react-router'
 
+function SubHeaderLink(props: Sublink) {
+  //const location = useLocation()
+  //const currentPathname = location.pathname
+  return (
+    <div>
+      <NavLink end to={props.link} className={'text-lg [&.active]:border-b-2'}>
+        {props.text}
+      </NavLink>
+    </div>
+  )
+}
+
 export function SettingsPage() {
   return (
     <div className="center_small">
@@ -8,20 +20,8 @@ export function SettingsPage() {
         <div className="flex gap-30">
           <div className="flex flex-col">
             <h2 className="text-3xl mb-5">Settings</h2>
-            <NavLink
-              end
-              to="/settings"
-              className="text-gray-500 hover:text-blue-500 [&.active]:text-blue-600 [&.active]:font-bold"
-            >
-              Debug
-            </NavLink>
-            <NavLink
-              end
-              to="customize"
-              className="text-gray-500 hover:text-blue-500 [&.active]:text-blue-600 [&.active]:font-bold"
-            >
-              Customize
-            </NavLink>
+            <SubHeaderLink link={'/settings'} text="Debug"></SubHeaderLink>
+            <SubHeaderLink link={'customize'} text="Customize"></SubHeaderLink>
           </div>
           <Outlet />
         </div>

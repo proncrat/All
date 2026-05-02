@@ -71,3 +71,7 @@ make settings work
 protect api endpoints?
 
 refrence login id with 
+
+What even is error mangment :/
+
+WHEN IS TESTING BRUH

@@ -3,10 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import * as API from './api.ts'
 
-export function useUserData(id: string, route?: string) {
+export function useUserData(id: string, route?: string, enable = true) {
   const query = useQuery({
     queryKey: ['profileAll', id, route],
     queryFn: () => API.getUserData(id, route),
+    enabled: enable,
   })
 
   return {
@@ -80,10 +81,11 @@ export function useSongs(id: string) {
   }
 }
 
-export function Usesessionid(linkId: string) {
+export function Usesessionid(linkId: string, thething: boolean) {
   const query = useQuery({
     queryKey: ['match', linkId],
     queryFn: () => API.getprofilematchid(linkId),
+    enabled: thething,
   })
 
   return {
