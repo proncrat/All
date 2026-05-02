@@ -5,6 +5,7 @@ import { useSession } from '@/lib/auth'
 function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   const [banner, setbanner] = useState(true)
   const [banner2, setbanner2] = useState(true)
+  const [text, settext] = useState(true)
 
   const navigate = useNavigate()
 
@@ -17,23 +18,21 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   return (
     <div className="mb-5">
       <div className="relative">
+        {isPending && (
+          <div
+            style={{ aspectRatio: '10 / 2' }}
+            className=" w-full bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000"
+          />
+        )}
         {isSuccess && (
           <div>
             {data.banner && (
-              <div>
-                {banner && (
-                  <div
-                    style={{ aspectRatio: '10 / 2' }}
-                    className="absolute w-full bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000"
-                  />
-                )}
-                <img
-                  onLoad={() => setbanner(false)}
-                  className="w-full rounded-xl mb-5 aspect-10/2"
-                  alt="le banner"
-                  src={data.banner}
-                />
-              </div>
+              <img
+                onLoad={() => setbanner(false)}
+                className="w-full rounded-xl mb-5 aspect-10/2"
+                alt="le banner"
+                src={data.banner}
+              />
             )}
           </div>
         )}
@@ -41,10 +40,10 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
       <div className="flex justify-between">
         <div className="flex gap-4">
           <div className="relative">
-            {banner2 && (
+            {isPending && (
               <div
                 style={{ aspectRatio: '1 / 1' }}
-                className="absolute w-full bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000"
+                className=" w-44 bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000"
               />
             )}
             {isSuccess && (
@@ -60,7 +59,7 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
             {isPending && (
               <div>
                 <div className="w-40 h-7 bg-muted rounded-xl mb-4 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
-                <div className="w-38 h-5 bg-muted rounded-xl mb-2 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
+                <div className="w-60 h-5 bg-muted rounded-xl mb-2 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
                 <div className="w-38 h-5 bg-muted rounded-xl mb-5 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
               </div>
             )}
@@ -93,7 +92,12 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
             )}
           </div>
         </div>
-        {isSuccess && <p className="text-xl">Level {data.level}</p>}
+        <div>
+          {isPending && (
+            <div className="w-40 h-7 bg-muted rounded-xl mb-4 shimmer shimmer-bg shimmer-duration-1500 shimmer-color-neutral-600 shimmer-repeat-delay-1000" />
+          )}
+          {isSuccess && <p className="text-xl">Level {data.level}</p>}
+        </div>
       </div>
     </div>
   )

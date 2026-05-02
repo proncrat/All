@@ -1,17 +1,20 @@
 import { LuMessagesSquare } from 'react-icons/lu'
+import { useNavigate } from 'react-router'
 
-export function SideBar() {
+export function SideBar({ width }) {
+  const navigate = useNavigate()
+
   return (
     <div
-      className="fixed top-[50.2px] left-0 border-r-2"
+      className="fixed top-[50.2px] left-0 border-r-2 transition-all"
       style={{
-        width: '60px',
+        width: `${width}px`,
         height: '100vh',
         backgroundColor: 'black',
       }}
     >
-      <div className="flex justify-center pt-4">
-        <LuMessagesSquare size={'30px'} />
+      <div className="flex flex-col justify-center pt-4 items-center gap-3">
+        <LuMessagesSquare onClick={() => navigate('/coms')} size={'30px'} />
       </div>
     </div>
   )

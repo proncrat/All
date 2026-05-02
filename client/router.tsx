@@ -45,6 +45,7 @@ const routes = createRoutesFromElements(
       <Route path="About" element={<About />} />
     </Route>
     <Route path="/search/" element={<SearchPage />} />
+    <Route path="/coms" element={<SearchPage />} />
     <Route path="/video/:id" element={<Video />} />
     <Route path="/" element={<HomePage />} />
   </Route>,

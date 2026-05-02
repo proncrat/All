@@ -47,7 +47,6 @@ function Profile() {
         isSuccess={isSuccess}
       />
       <ProfileHeader></ProfileHeader>
-      {/*Much wow send props to all outlets so cool*/}
       <Outlet />
     </div>
   )
