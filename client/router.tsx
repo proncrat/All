@@ -24,6 +24,7 @@ import { PostPage } from './Pages/Post/PostPage'
 import { Photos } from './Pages/Profile/pages/photos/Photos'
 import { ProfileLost } from './Pages/Profile/Profile404'
 import { Coms } from './Pages/coms/coms'
+import { Messagebox } from './Pages/coms/components/messagingthing'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -46,7 +47,12 @@ const routes = createRoutesFromElements(
       <Route path="About" element={<About />} />
     </Route>
     <Route path="/search/" element={<SearchPage />} />
-    <Route path="/coms" element={<Coms />} />
+
+    <Route path="/coms" element={<Coms />}>
+      <Route index element={<Home />} />
+      <Route path=":id" element={<Messagebox />} />
+    </Route>
+
     <Route path="/video/:id" element={<Video />} />
     <Route path="/" element={<HomePage />} />
   </Route>,
