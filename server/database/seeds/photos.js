@@ -66,5 +66,21 @@ export async function seed(knex) {
         'https://blueoceancdn143.blob.core.windows.net/cache/c/b/d/4/1/f/cbd41f897abe97cdb746634d06a9c95e24803996.jpg',
       author_id: 1,
     },
+    {
+      id: 8,
+      name: 'Holy',
+      describe: 'Claude make me a description',
+      url: 'http://localhost:3000/images/holy.jfif',
+      thumburl: 'http://localhost:3000/images/holy.jfif',
+      author_id: 1,
+    },
+    {
+      id: 9,
+      name: 'Goat',
+      describe: 'Claude make me a description',
+      url: 'http://localhost:3000/images/goat.jfif',
+      thumburl: 'http://localhost:3000/images/goat.jfif',
+      author_id: 1,
+    },
   ])
 }

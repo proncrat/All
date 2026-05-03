@@ -4,6 +4,7 @@
 @import '@fontsource-variable/geist';
 @import '@daveyplate/better-auth-ui/css';
 @import 'tw-shimmer';
+@plugin 'tailwind-scrollbar';
 
 @custom-variant dark (&:is(.dark *));
 

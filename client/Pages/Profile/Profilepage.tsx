@@ -34,20 +34,22 @@ function Profile() {
   }
 
   return (
-    <div
-      className="center_small rounded-xl p-4"
-      style={{ backgroundColor: 'lab(3 0 0 / 0.71)' }}
-    >
-      <PfBg src={data} />
-      <ProfileTopSection
-        data={data}
-        isPending={isPending}
-        isError={isError}
-        error={error}
-        isSuccess={isSuccess}
-      />
-      <ProfileHeader></ProfileHeader>
-      <Outlet />
+    <div className="pt-4">
+      <div
+        className="center_small rounded-xl p-4"
+        style={{ backgroundColor: 'lab(3 0 0 / 0.71)' }}
+      >
+        <PfBg src={data} />
+        <ProfileTopSection
+          data={data}
+          isPending={isPending}
+          isError={isError}
+          error={error}
+          isSuccess={isSuccess}
+        />
+        <ProfileHeader></ProfileHeader>
+        <Outlet />
+      </div>
     </div>
   )
 }

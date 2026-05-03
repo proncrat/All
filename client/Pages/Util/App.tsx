@@ -23,7 +23,7 @@ function App() {
         <THEHEADER sidebar={handlewidth} />
         <div>
           <SideBar width={width} />
-          <div style={{ marginLeft: `${width}px` }} className="mt-20">
+          <div style={{ marginLeft: `${width}px` }} className="mt-[50.2px]">
             <Outlet />
           </div>
         </div>
