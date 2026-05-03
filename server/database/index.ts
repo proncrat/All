@@ -41,6 +41,26 @@ export async function getVideoById(Id: string) {
   return await db('videos').where('id', Id).select().first()
 }
 
+//messaging shid
+
+const get_messages_schema = [
+  'messages.id',
+  'messages.chatid',
+  'messages.senderid',
+  'messages.type',
+  'messages.text',
+  'messages.send_date as date',
+  'profiledata.name',
+  'profiledata.pfp',
+]
+
+export async function getmessages(chatId: string) {
+  return await db('messages')
+    .where('chatid', chatId)
+    .select(get_messages_schema)
+    .join('profiledata', 'messages.senderid', 'profiledata.id')
+}
+
 //Test functions (Probably wont/shouldent be used)
 export async function getAllUsers() {
   return await db('profiledata').select()

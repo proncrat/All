@@ -53,6 +53,14 @@ export async function getprofilematchid(linkId: string) {
     .catch(logError)
 }
 
+//coms
+export async function getmessagesbyid(chatId: string) {
+  return request
+    .get(`http://localhost:3000/api/v1/coms/${chatId}`)
+    .then((res) => res.body)
+    .catch(logError)
+}
+
 //Make usefull
 function logError(err: Error) {
   console.log(err)

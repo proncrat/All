@@ -1,6 +1,8 @@
 import { NavLink, Outlet } from 'react-router'
 
 export function Coms() {
+  const userId = 1
+
   const lelist = [
     {
       chatid: 1,

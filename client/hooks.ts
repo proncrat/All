@@ -106,6 +106,19 @@ export function useVideo(id: string) {
   }
 }
 
+//coms
+
+export function useMessages(chatId: string) {
+  const query = useQuery({
+    queryKey: ['messages', chatId],
+    queryFn: () => API.getmessagesbyid(chatId),
+  })
+
+  return {
+    ...query,
+  }
+}
+
 //comments
 
 export function useComments(linkId: string, LinkType: string) {
