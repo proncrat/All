@@ -61,6 +61,13 @@ export async function getmessagesbyid(chatId: string) {
     .catch(logError)
 }
 
+export async function getchatsbyid(userId: string) {
+  return request
+    .get(`http://localhost:3000/api/v1/coms/chats/${userId}`)
+    .then((res) => res.body)
+    .catch(logError)
+}
+
 //Make usefull
 function logError(err: Error) {
   console.log(err)

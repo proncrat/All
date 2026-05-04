@@ -43,6 +43,15 @@ export async function getVideoById(Id: string) {
 
 //messaging shid
 
+const get_chats_schema = ['chats.chatid', 'profiledata.name', 'profiledata.pfp']
+
+export async function getchats(ownerid: string) {
+  return await db('chats')
+    .where('ownerid', ownerid)
+    .select(get_chats_schema)
+    .join('profiledata', 'chats.recieverid', 'profiledata.id')
+}
+
 const get_messages_schema = [
   'messages.id',
   'messages.chatid',
@@ -59,6 +68,11 @@ export async function getmessages(chatId: string) {
     .where('chatid', chatId)
     .select(get_messages_schema)
     .join('profiledata', 'messages.senderid', 'profiledata.id')
+    .orderBy([{ column: 'messages.id', order: 'desc' }])
+}
+
+export async function newmessage(data) {
+  return await db('messages').insert({ ...data })
 }
 
 //Test functions (Probably wont/shouldent be used)

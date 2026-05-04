@@ -25,7 +25,7 @@ export async function seed(knex) {
     {
       id: 2,
       level: 0,
-      link_id: null,
+      link_id: '7t5tsLklaSRZP9wjfUXsZCZjmiFOOeHD',
       name: 'Jean',
       describe: 'Jeans',
       followers: '420',

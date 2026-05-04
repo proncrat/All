@@ -119,6 +119,18 @@ export function useMessages(chatId: string) {
   }
 }
 
+export function useChats(userId: string, enable = true) {
+  const query = useQuery({
+    queryKey: ['chats', userId],
+    queryFn: () => API.getchatsbyid(userId),
+    enabled: enable,
+  })
+
+  return {
+    ...query,
+  }
+}
+
 //comments
 
 export function useComments(linkId: string, LinkType: string) {

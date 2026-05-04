@@ -1,11 +1,13 @@
 import { useMessages } from '@/client/hooks'
-import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
 import { Link, useParams } from 'react-router'
+import { Sendbox } from './SENDBOX'
 
 export function Messagebox() {
   const { id } = useParams()
 
   const { data, isPending, isError, error, isSuccess } = useMessages(id)
+
+  //console.log(data)
 
   if (isPending) {
     return <p>beans</p>
@@ -26,7 +28,9 @@ export function Messagebox() {
                 <Link to={'/profile/' + message.senderid}>
                   <p>{message.name}</p>
                 </Link>
-                <p className="text-xs text-zinc-400">{message.date}</p>
+                <p className="text-xs text-zinc-400">
+                  {new Date(message.date).toLocaleString()}
+                </p>
               </div>
               {message.type == 'text' && <p>{message.text}</p>}
               {message.type == 'img' && (
@@ -37,14 +41,7 @@ export function Messagebox() {
         ))}
       </div>
       <div>
-        <InputGroup>
-          <InputGroupInput
-            spellCheck="false"
-            type="text"
-            autoComplete="off"
-            name={'name'}
-          />
-        </InputGroup>
+        <Sendbox />
       </div>
     </div>
   )
