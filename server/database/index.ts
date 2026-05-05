@@ -1,3 +1,4 @@
+import { sendDataToAllClients } from '../Routes/test.ts'
 import db from './connection.ts'
 
 //util
@@ -37,8 +38,30 @@ export async function getSongsByUser(userId: string) {
 
 //Video functions
 
+const get_video_schema = [
+  'profiledata.name as username',
+  'profiledata.pfp',
+  'profiledata.followers',
+  'profiledata.id as userid',
+  'videos.id',
+  'videos.name',
+  'videos.description',
+  'videos.views',
+  'videos.author_id',
+  'videos.post_date',
+  'videos.likes',
+  'videos.dislikes',
+  'videos.shares',
+  'videos.video_link',
+  'videos.thumbnail_link',
+]
+
 export async function getVideoById(Id: string) {
-  return await db('videos').where('id', Id).select().first()
+  return await db('videos')
+    .where('videos.id', Id)
+    .join('profiledata', 'videos.author_id', 'profiledata.id')
+    .select(get_video_schema)
+    .first()
 }
 
 //messaging shid
@@ -72,6 +95,7 @@ export async function getmessages(chatId: string) {
 }
 
 export async function newmessage(data) {
+  sendDataToAllClients('newmessage')
   return await db('messages').insert({ ...data })
 }
 

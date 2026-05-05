@@ -15,7 +15,7 @@ function SubHeaderLink(props: Sublink) {
 
 export function SettingsPage() {
   return (
-    <div className="center_small">
+    <div className="center_small pt-2">
       <div className="m-7 ">
         <div className="flex gap-30">
           <div className="flex flex-col">

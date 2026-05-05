@@ -73,33 +73,37 @@ export function CustomizeForm({ initialdata }) {
         </div>
 
         <p>Links</p>
-        {links.map((link, index) => (
-          <div key={index}>
-            <p className="mb-2">Link {index + 1}</p>
-            <p className="mb-1">Name</p>
-            <InputGroup>
-              <InputGroupInput
-                onChange={linkHandler}
-                value={link.name}
-                spellCheck="false"
-                type="text"
-                autoComplete="off"
-                name={'name' + index}
-              />
-            </InputGroup>
-            <p className="mb-1 mt-4">Link</p>
-            <InputGroup>
-              <InputGroupInput
-                onChange={linkHandler}
-                value={link.link}
-                spellCheck="false"
-                type="text"
-                autoComplete="off"
-                name={'link' + index}
-              />
-            </InputGroup>
+        {links && (
+          <div>
+            {links.map((link, index) => (
+              <div key={index}>
+                <p className="mb-2">Link {index + 1}</p>
+                <p className="mb-1">Name</p>
+                <InputGroup>
+                  <InputGroupInput
+                    onChange={linkHandler}
+                    value={link.name}
+                    spellCheck="false"
+                    type="text"
+                    autoComplete="off"
+                    name={'name' + index}
+                  />
+                </InputGroup>
+                <p className="mb-1 mt-4">Link</p>
+                <InputGroup>
+                  <InputGroupInput
+                    onChange={linkHandler}
+                    value={link.link}
+                    spellCheck="false"
+                    type="text"
+                    autoComplete="off"
+                    name={'link' + index}
+                  />
+                </InputGroup>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
 
         <p>Pfp</p>
         <img

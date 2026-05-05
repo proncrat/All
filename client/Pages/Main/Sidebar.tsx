@@ -1,5 +1,5 @@
 import { LuMessagesSquare } from 'react-icons/lu'
-import { useNavigate } from 'react-router'
+import { NavLink, useNavigate } from 'react-router'
 
 export function SideBar({ width }) {
   const navigate = useNavigate()
@@ -14,7 +14,12 @@ export function SideBar({ width }) {
       }}
     >
       <div className="flex flex-col justify-center pt-4 items-center gap-3">
-        <LuMessagesSquare onClick={() => navigate('/coms')} size={'30px'} />
+        <NavLink
+          to={'/coms'}
+          className={'[&.active]:bg-mist-800 p-2 rounded-sm'}
+        >
+          <LuMessagesSquare onClick={() => navigate('/coms')} size={'30px'} />
+        </NavLink>
       </div>
     </div>
   )
