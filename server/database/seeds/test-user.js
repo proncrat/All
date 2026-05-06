@@ -17,7 +17,7 @@ export async function seed(knex) {
       description:
         'I love beanvid so much i love beanvid love beanvid yes yes finish beanvid',
       peer_id: 'a86e7ef6-1818-49d4-9377-2c0c07902c09',
-      banner: 'images/banner.jpg',
+      banner: '/images/banner.jpg',
       bg: '/images/background.jpg',
       links:
         '[{"name":"Instagram","link":"instagram.com/jullian.bublitz/"},{"name":"Github","link":"github.com/proncrat"}]',
