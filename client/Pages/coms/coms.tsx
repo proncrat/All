@@ -14,14 +14,14 @@ export function Coms() {
 
   const userid = idcheck?.id
 
-  console.log(userid)
+  //console.log(userid)
 
   const { data, isPending, isError, error, isSuccess } = useChats(
     userid,
     !idpend,
   )
 
-  console.log(data)
+  //console.log(data)
 
   if (isPending) {
     return <p>beans</p>
@@ -31,7 +31,7 @@ export function Coms() {
     <div className="flex h-full">
       <div
         style={{ width: '250px', height: '94vh' }}
-        className=" border-r-2 p-4 gap-4 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
+        className=" shrink-0 border-r-2 p-4 gap-4 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
       >
         {data.map((person, index) => (
           <NavLink

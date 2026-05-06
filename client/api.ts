@@ -1,6 +1,8 @@
 import request from 'superagent'
 
-const rootURL = new URL(`/api/v1`, document.baseURI)
+//const rootURL = new URL(`/api/v1`, document.baseURI)
+
+const rootURL = 'http://localhost:3000/api/v1'
 
 //user apis
 
@@ -11,7 +13,7 @@ export async function getUserData(userId: string, route?: string) {
   }
 
   return request
-    .get(`http://localhost:3000/api/v1/profile/${userId}${theRoute}`)
+    .get(`${rootURL}/profile/${userId}${theRoute}`)
     .then((res) => res.body)
     .catch(logError)
 }
@@ -22,9 +24,7 @@ export async function getCommentsByLinkClient(
   LinkType: string,
 ) {
   return request
-    .get(
-      `http://localhost:3000/api/v1/comments?linkid=${linkId}&linktype=${LinkType}`,
-    )
+    .get(`${rootURL}/comments?linkid=${linkId}&linktype=${LinkType}`)
     .then((res) => res.body)
     .catch(logError)
 }
@@ -32,7 +32,7 @@ export async function getCommentsByLinkClient(
 //Test function
 export async function getUsers() {
   return request
-    .get(`http://localhost:3000/api/v1/profile`)
+    .get(`${rootURL}/profile`)
     .then((res) => res.body)
     .catch(logError)
 }
@@ -40,7 +40,7 @@ export async function getUsers() {
 //video api
 export async function getVideosById(Id: string) {
   return request
-    .get(`http://localhost:3000/api/v1/video/${Id}`)
+    .get(`${rootURL}/video/${Id}`)
     .then((res) => res.body)
     .catch(logError)
 }
@@ -48,7 +48,7 @@ export async function getVideosById(Id: string) {
 //util
 export async function getprofilematchid(linkId: string) {
   return request
-    .get(`http://localhost:3000/api/v1/util/id?linkid=${linkId}`)
+    .get(`${rootURL}/util/id?linkid=${linkId}`)
     .then((res) => res.body)
     .catch(logError)
 }
@@ -56,14 +56,14 @@ export async function getprofilematchid(linkId: string) {
 //coms
 export async function getmessagesbyid(chatId: string) {
   return request
-    .get(`http://localhost:3000/api/v1/coms/${chatId}`)
+    .get(`${rootURL}/coms/${chatId}`)
     .then((res) => res.body)
     .catch(logError)
 }
 
 export async function getchatsbyid(userId: string) {
   return request
-    .get(`http://localhost:3000/api/v1/coms/chats/${userId}`)
+    .get(`${rootURL}/coms/chats/${userId}`)
     .then((res) => res.body)
     .catch(logError)
 }

@@ -40,7 +40,7 @@ export function Sendbox() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <InputGroup>
+      <InputGroup className="m-2 w-full">
         <InputGroupInput
           value={text}
           onChange={handler}

@@ -1,3 +1,5 @@
+import * as Path from 'node:path'
+
 import express from 'express'
 const server = express()
 
@@ -39,5 +41,13 @@ server.use('/api/v1/comments', comment_routes)
 server.use('/api/v1/util', util_routes)
 server.use('/api/v1/coms', coms_routes)
 server.use('/api/v1/test', test_routes)
+
+if (process.env.NODE_ENV === 'production') {
+  server.use(express.static(Path.resolve('public')))
+  server.use('/assets', express.static(Path.resolve('./dist/assets')))
+  server.get('*', (req, res) => {
+    res.sendFile(Path.resolve('./dist/index.html'))
+  })
+}
 
 export default server

@@ -26,6 +26,14 @@ export function Messagebox() {
     }
   }, [])
 
+  const showNotification = () => {
+    if (Notification.permission === 'granted') {
+      new Notification('GOD', {
+        body: 'Bro what',
+      })
+    }
+  }
+
   if (isPending) {
     return <p>beans</p>
   }
