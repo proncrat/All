@@ -75,3 +75,7 @@ refrence login id with
 What even is error mangment :/
 
 WHEN IS TESTING BRUH
+ 
+npx auth@latest migrate --config ./server/lib/auth.ts -y
+
+migates auth db dont forget lul

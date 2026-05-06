@@ -1,4 +1,5 @@
 import { signIn } from '@/lib/auth'
+import { Link } from 'react-router'
 
 export function SignInForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -13,10 +14,13 @@ export function SignInForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input name="username" type="email" placeholder="Email" />
-      <input name="password" type="password" placeholder="Password" />
-      <button type="submit">Sign In</button>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input name="username" type="email" placeholder="Email" />
+        <input name="password" type="password" placeholder="Password" />
+        <button type="submit">Sign In</button>
+      </form>
+      <Link to={'/signup'}>Signup page?</Link>
+    </div>
   )
 }

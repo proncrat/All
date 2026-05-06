@@ -27,6 +27,10 @@ export function Coms() {
     return <p>beans</p>
   }
 
+  if (isError) {
+    return <p>Something exploded</p>
+  }
+
   return (
     <div className="flex h-full">
       <div

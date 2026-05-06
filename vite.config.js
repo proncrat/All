@@ -13,4 +13,9 @@ export default defineConfig({
     },
   },
   plugins: [react(), tailwindcss() /*tsconfigPaths()*/],
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3000',
+    },
+  },
 })

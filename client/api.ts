@@ -1,8 +1,6 @@
 import request from 'superagent'
 
-//const rootURL = new URL(`/api/v1`, document.baseURI)
-
-const rootURL = 'http://localhost:3000/api/v1'
+const rootURL = new URL(`/api/v1`, document.baseURI)
 
 //user apis
 

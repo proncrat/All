@@ -73,6 +73,8 @@ function Search() {
         {isPending && <div>Loading...</div>}
         {isError && <div>Something went wrong</div>}
 
+        {data == null && <div>Something went wrong</div>}
+
         {isSuccess &&
           data.map((profile: profile) => (
             <div key={profile.id} className="border mb-4 rounded-xl p-2">
