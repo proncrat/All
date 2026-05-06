@@ -9,7 +9,7 @@ export async function seed(knex) {
     {
       id: 1,
       name: 'Star Shopping',
-      url: 'http://localhost:3000/audio/StarShopping.m4a',
+      url: '/audio/StarShopping.m4a',
       runtime: '2:22',
       author: 'Lil Peep',
       author_id: 1,
@@ -17,7 +17,7 @@ export async function seed(knex) {
     {
       id: 2,
       name: 'Shes so nice',
-      url: 'http://localhost:3000/audio/shessonice.m4a',
+      url: '/audio/shessonice.m4a',
       runtime: '2:43',
       author: 'Pink Guy',
       author_id: 1,
