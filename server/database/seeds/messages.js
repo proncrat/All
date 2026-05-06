@@ -29,7 +29,7 @@ export async function seed(knex) {
       senderid: 2,
       send_date: '2026-05-04T01:01:24.336Z',
       type: 'img',
-      text: 'images/grace.jpg',
+      text: '/images/grace.jpg',
     },
   ])
 }

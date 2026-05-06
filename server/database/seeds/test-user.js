@@ -13,12 +13,12 @@ export async function seed(knex) {
       name: 'GOD',
       describe: 'UH that litty fresh yo',
       followers: '69',
-      pfp: 'images/janedoe2.jpg',
+      pfp: '/images/janedoe2.jpg',
       description:
         'I love beanvid so much i love beanvid love beanvid yes yes finish beanvid',
       peer_id: 'a86e7ef6-1818-49d4-9377-2c0c07902c09',
       banner: 'images/banner.jpg',
-      bg: 'images/background.jpg',
+      bg: '/images/background.jpg',
       links:
         '[{"name":"Instagram","link":"instagram.com/jullian.bublitz/"},{"name":"Github","link":"github.com/proncrat"}]',
     },
@@ -32,7 +32,7 @@ export async function seed(knex) {
       pfp: 'https://dk2dv4ezy246u.cloudfront.net/widgets/sSoFDYe3ZbPQ_large.jpg',
       description: 'This is a description2',
       peer_id: '447ebcf1-3e0f-4738-9b64-c1804a2d21c1',
-      bg: 'images/lock.png',
+      bg: '/images/lock.png',
     },
     {
       id: 3,
@@ -42,7 +42,7 @@ export async function seed(knex) {
       describe: 'Black dress ahhh',
       followers: '52000000',
       pfp: 'https://i.pinimg.com/736x/fd/c9/5e/fdc95e24e075e75d99aea0f188152454.jpg',
-      bg: 'images/heres-a-2k-jane-doe-wallpaper-for-you-guys-v0-l0cux9p736md1.webp',
+      bg: '/images/heres-a-2k-jane-doe-wallpaper-for-you-guys-v0-l0cux9p736md1.webp',
       //description: 'This is a description3',
       peer_id: '386c2df7-1959-4b56-bba7-956fcd1b2986',
     },
