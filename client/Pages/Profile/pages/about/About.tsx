@@ -18,6 +18,8 @@ export function About() {
     return <div>Error: {error.message}</div>
   }
 
+  console.log(data.links)
+
   if (isSuccess) {
     return (
       <div>
@@ -31,7 +33,7 @@ export function About() {
         {data.links && (
           <div className="mb-8">
             <h2 className="text-2xl mb-2">Links</h2>
-            {JSON.parse(data.links).map((item, index) => (
+            {data.links.map((item, index) => (
               <div key={index}>
                 <Link
                   to={`https://${item.link}`}

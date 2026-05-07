@@ -96,7 +96,14 @@ router.get('/:id/description', async (req, res, next) => {
     if (data == null) {
       return res.status(404).send('Nothing there')
     }
-    res.json(data)
+
+    if (process.env.NODE_ENV === 'production') {
+      res.json(data)
+    } else {
+      const links = JSON.parse(data.links)
+      const return_data = { ...data, links }
+      res.json(return_data)
+    }
   } catch (err) {
     next(err)
   }
