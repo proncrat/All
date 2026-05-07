@@ -39,8 +39,8 @@ export function Sendbox() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <InputGroup className="m-2 w-full">
+    <form className="p-2" onSubmit={handleSubmit}>
+      <InputGroup className="w-full">
         <InputGroupInput
           value={text}
           onChange={handler}

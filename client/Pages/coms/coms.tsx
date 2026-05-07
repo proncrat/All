@@ -1,8 +1,12 @@
-import { useChats, Usesessionid } from '@/client/hooks'
+import { useChats, Usesessionid, useUserData } from '@/client/hooks'
 import { useSession } from '@/lib/auth'
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet, useParams } from 'react-router'
+import { FaPhone } from 'react-icons/fa6'
+import { answerCall, init_calls, startCall } from './components/call'
 
 export function Coms() {
+  const { id } = useParams()
+
   const { data: lesesh, isPending: seshpend } = useSession()
 
   const userseshid = lesesh?.session.userId
@@ -16,12 +20,24 @@ export function Coms() {
 
   //console.log(userid)
 
+  const { data: userdata, isSuccess: userdataload } = useUserData(
+    userid,
+    '',
+    !idpend,
+  )
+
   const { data, isPending, isError, error, isSuccess } = useChats(
     userid,
     !idpend,
   )
 
   //console.log(data)
+  let peer = null
+
+  if (userdataload) {
+    peer = init_calls(userdata.peer_id)
+    answerCall(peer)
+  }
 
   if (isPending) {
     return <p>beans</p>
@@ -54,7 +70,17 @@ export function Coms() {
           </NavLink>
         ))}
       </div>
-      <Outlet />
+      <div className="h-full w-full">
+        <div className="w-full h-10 border-b-2">
+          <button
+            onClick={() => startCall(peer, data[id - 1].peer_id)}
+            className="cursor-pointer"
+          >
+            <FaPhone className="hover:fill-gray-500" size={'25px'} />
+          </button>
+        </div>
+        <Outlet />
+      </div>
     </div>
   )
 }

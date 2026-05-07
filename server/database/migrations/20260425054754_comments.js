@@ -6,8 +6,8 @@ export function up(knex) {
   return knex.schema.createTable('comments', (table) => {
     table.increments('id')
     table.string('link_type')
-    table.string('link_id')
-    table.string('author_id')
+    table.integer('link_id')
+    table.integer('author_id')
     table.string('body_text')
     table.date('post_date')
   })

@@ -66,7 +66,12 @@ export async function getVideoById(Id: string) {
 
 //messaging shid
 
-const get_chats_schema = ['chats.chatid', 'profiledata.name', 'profiledata.pfp']
+const get_chats_schema = [
+  'chats.chatid',
+  'profiledata.name',
+  'profiledata.pfp',
+  'profiledata.peer_id',
+]
 
 export async function getchats(ownerid: string) {
   return await db('chats')

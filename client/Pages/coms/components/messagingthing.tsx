@@ -39,8 +39,8 @@ export function Messagebox() {
   }
 
   return (
-    <div className="w-[90%] h-[94vh]">
-      <div className="h-[95%] p-5 flex flex-col-reverse gap-8 overflow-auto scrollbar hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]">
+    <div className="w-full h-full">
+      <div className=" max-h-[85vh] h-[95%] w-full p-5 flex flex-col-reverse gap-8 overflow-auto scrollbar hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]">
         {data.map((message, index) => (
           <div key={index} className="flex gap-4">
             <img
@@ -59,7 +59,11 @@ export function Messagebox() {
               </div>
               {message.type == 'text' && <p>{message.text}</p>}
               {message.type == 'img' && (
-                <img className="max-w-200" alt="idk vro" src={message.text} />
+                <img
+                  className="max-w-200 w-full"
+                  alt="idk vro"
+                  src={message.text}
+                />
               )}
             </div>
           </div>
