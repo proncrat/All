@@ -48,3 +48,9 @@ export async function answerCall(peer, constraints = testConstraints) {
     console.log('answerCall broke?')
   }
 }
+
+export function answercall2(peer) {
+  peer.on('call', function (call) {
+    console.log('answereeds')
+  })
+}
