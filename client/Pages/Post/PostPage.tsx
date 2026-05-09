@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PhotoUpload } from './components/Photo'
 
 function Headerbutton({ text, activething, click }) {
   let classes =
@@ -20,8 +21,6 @@ export function PostPage() {
 
   const [searchoption, setsearchoption] = useState('Photo')
 
-  const rootURL = new URL(`/api/v1`, document.baseURI)
-
   function clickhandler(e) {
     setsearchoption(e.target.textContent)
   }
@@ -32,18 +31,26 @@ export function PostPage() {
         <Headerbutton
           click={clickhandler}
           activething={searchoption}
+          text={'Video'}
+        />
+        <Headerbutton
+          click={clickhandler}
+          activething={searchoption}
+          text={'Post'}
+        />
+        <Headerbutton
+          click={clickhandler}
+          activething={searchoption}
+          text={'Song'}
+        />
+        <Headerbutton
+          click={clickhandler}
+          activething={searchoption}
           text={'Photo'}
         />
       </div>
       <div className=" max-w-7xl m-auto p-4">
-        <form
-          action={rootURL + '/imgupload'}
-          method="POST"
-          encType="multipart/form-data"
-        >
-          <input type="file" name="image" />
-          <button type="submit">Upload</button>
-        </form>
+        <PhotoUpload />
       </div>
     </div>
   )
