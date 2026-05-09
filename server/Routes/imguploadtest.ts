@@ -3,6 +3,7 @@ const router = express.Router()
 
 import multer from 'multer'
 import path from 'path'
+import { newPhoto } from '../database'
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -17,9 +18,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
-router.post('/', upload.single('image'), (req, res) => {
-  // The file information is available in req.file
-  res.send('File uploaded successfully')
+router.post('/', upload.single('image'), async (req, res) => {
+  try {
+    const photoData = req.body
+    photoData.url = `/images/${req.file.filename}`
+    photoData.thumburl = `/images/${req.file.filename}`
+    await newPhoto(photoData)
+    return res.status(204).send('Success')
+    //}
+    //res.json(data)
+  } catch (err) {
+    return res.status(500).send('Lowkey dont know')
+  }
 })
 
 export default router

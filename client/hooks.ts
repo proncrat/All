@@ -1,5 +1,4 @@
-import { MutationFunction, useQuery } from '@tanstack/react-query'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import * as API from './api.ts'
 
@@ -26,61 +25,6 @@ export function useProfileAll() {
   }
 }
 
-export function useProfile(id: string) {
-  const query = useQuery({
-    queryKey: ['profile', id],
-    queryFn: () => API.getUserById(id),
-  })
-
-  return {
-    ...query,
-  }
-}
-
-export function usePhotos(id: string) {
-  const query = useQuery({
-    queryKey: ['photos', id],
-    queryFn: () => API.getPhotosByUser(id),
-  })
-
-  return {
-    ...query,
-  }
-}
-
-export function useVideos(id: string) {
-  const query = useQuery({
-    queryKey: ['videos', id],
-    queryFn: () => API.getVideosByUser(id),
-  })
-
-  return {
-    ...query,
-  }
-}
-
-export function usePosts(id: string) {
-  const query = useQuery({
-    queryKey: ['posts', id],
-    queryFn: () => API.getPostsByUser(id),
-  })
-
-  return {
-    ...query,
-  }
-}
-
-export function useSongs(id: string) {
-  const query = useQuery({
-    queryKey: ['songs', id],
-    queryFn: () => API.getSongsByUser(id),
-  })
-
-  return {
-    ...query,
-  }
-}
-
 export function Usesessionid(linkId: string, thething: boolean) {
   const query = useQuery({
     queryKey: ['match', linkId],
@@ -95,7 +39,7 @@ export function Usesessionid(linkId: string, thething: boolean) {
 
 //Video
 
-export function useVideo(id: string) {
+export function useVideo(id: string = '0') {
   const query = useQuery({
     queryKey: ['video', id],
     queryFn: () => API.getVideosById(id),
@@ -144,6 +88,7 @@ export function useComments(linkId: string, LinkType: string) {
   }
 }
 
+/*
 export function useCommentMutation<TData = unknown, TVariables = unknown>(
   mutationFn: MutationFunction<TData, TVariables>,
 ) {
@@ -170,3 +115,4 @@ export function useDeleteFruit() {
 export function useAddcommeffnt() {
   return useCommentMutation(API.addComment)
 }
+*/

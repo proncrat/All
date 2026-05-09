@@ -4,7 +4,13 @@ import { useProfileAll } from '../../hooks'
 import { profile } from '@/client/models/profile'
 import { useState } from 'react'
 
-function Headerbutton({ text, activething, click }) {
+interface sublinks {
+  text: string
+  activething: string
+  click: (e: React.MouseEvent<HTMLElement>) => void
+}
+
+function Headerbutton({ text, activething, click }: sublinks) {
   let classes =
     'pl-2 pr-2 rounded-sm cursor-pointer hover:text-[#8d8d8d] border-2-transparent [&.active]:border-2 '
 
@@ -26,8 +32,8 @@ function Search() {
 
   const { data, isPending, isError, isSuccess } = useProfileAll()
 
-  function clickhandler(e) {
-    setsearchoption(e.target.textContent)
+  function clickhandler(e: React.MouseEvent<HTMLElement>) {
+    setsearchoption(e.currentTarget.textContent)
   }
 
   return (

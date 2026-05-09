@@ -1,6 +1,7 @@
 import { useUserData } from '@/client/hooks'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { VideoCard } from './components/VideoCard'
+import { videos } from '@/client/models/video'
 
 export function Videos() {
   const { id } = useParams()
@@ -27,7 +28,7 @@ export function Videos() {
   if (isSuccess) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {data.map((video) => (
+        {data.map((video: videos) => (
           <VideoCard data={video} key={video.id} />
         ))}
       </div>

@@ -1,13 +1,27 @@
+import { useAddPhoto } from '@/client/hooks/useuploadphoto'
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
+import { describe } from 'node:test'
 
 export function PhotoUpload() {
   const rootURL = new URL(`/api/v1`, document.baseURI)
+
+  const addPhoto = useAddPhoto()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const formData = new FormData()
+    formData.append('image', e.target.image.files[0])
+    formData.append('name', e.target.name.value)
+    formData.append('describe', e.target.describe.value)
+    formData.append('author_id', '1')
+
+    //console.log(data)
+    await addPhoto.mutateAsync(formData)
+  }
+
   return (
-    <form
-      action={rootURL + '/imgupload'}
-      method="POST"
-      encType="multipart/form-data"
-    >
+    <form onSubmit={handleSubmit}>
       <input
         name="image"
         type="file"
@@ -27,7 +41,7 @@ export function PhotoUpload() {
           spellCheck="false"
           type="text"
           autoComplete="off"
-          name="describe"
+          name="name"
         />
       </InputGroup>
       <p className="mb-1">Describe</p>
@@ -41,7 +55,12 @@ export function PhotoUpload() {
           name="describe"
         />
       </InputGroup>
-      <button type="submit">Upload</button>
+      <button
+        type="submit"
+        className="border pl-5 pr-5 rounded-lg cursor-pointer hover:bg-white hover:text-black"
+      >
+        Post
+      </button>
     </form>
   )
 }

@@ -1,6 +1,11 @@
 import { Outlet } from 'react-router'
 import { NavLink } from 'react-router'
 
+interface Sublink {
+  link: string
+  text: string
+}
+
 function SubHeaderLink(props: Sublink) {
   //const location = useLocation()
   //const currentPathname = location.pathname

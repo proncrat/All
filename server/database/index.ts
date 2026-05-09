@@ -1,13 +1,13 @@
 import { sendDataToAllClients } from '../Routes/test.ts'
 import db from './connection.ts'
 
-//util
+//auth utilitys
 
 export async function generateProfile(name: string, id: string) {
   return await db('profiledata').insert({ name: name, link_id: id })
 }
 
-//Profile functions
+//profile get
 
 export async function getProfile(userId: string) {
   return await db('profiledata').where('id', userId).select().first()
@@ -36,7 +36,7 @@ export async function getSongsByUser(userId: string) {
   return await db('songs').where('author_id', userId).select()
 }
 
-//Video functions
+//video get
 
 const get_video_schema = [
   'profiledata.name as username',
@@ -64,7 +64,7 @@ export async function getVideoById(Id: string) {
     .first()
 }
 
-//messaging shid
+//messaging get
 
 const get_chats_schema = [
   'chats.chatid',
@@ -99,12 +99,14 @@ export async function getmessages(chatId: string) {
     .orderBy([{ column: 'messages.id', order: 'desc' }])
 }
 
+//messaging post
+
 export async function newmessage(data) {
   sendDataToAllClients('newmessage')
   return await db('messages').insert({ ...data })
 }
 
-//Test functions (Probably wont/shouldent be used)
+//Test get all (Probably wont/shouldent be used)
 export async function getAllUsers() {
   return await db('profiledata').select()
 }
@@ -119,7 +121,7 @@ export async function getAllPhotos() {
   return await db('photos').select()
 }
 
-//comments
+//comments get
 
 const get_comment_schema = [
   'comments.post_date',
@@ -139,11 +141,19 @@ export async function getCommentsByLink(linkId: string, LinkType: string) {
     .orderBy([{ column: 'comments.id', order: 'desc' }])
 }
 
+//comments post
+
 export async function newCommentByLink(data) {
   return await db('comments').insert({ ...data })
 }
 
-//Util
+//Util to be replaced with auth usesession join?
 export async function getIdMatch(LinkId) {
   return await db('profiledata').select('id').where({ link_id: LinkId }).first()
+}
+
+//photo post
+
+export async function newPhoto(data) {
+  return await db('photos').insert({ ...data })
 }
