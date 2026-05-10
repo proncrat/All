@@ -1,6 +1,7 @@
 import { useUserData } from '@/client/hooks'
 import { useParams } from 'react-router'
 import { PostCard } from './components/Post'
+import { post } from '@/client/models/post'
 
 export function Posts() {
   const { id } = useParams()
@@ -20,7 +21,7 @@ export function Posts() {
 
   return (
     <div className="flex flex-col gap-4">
-      {data.map((item) => (
+      {data.map((item: post) => (
         <PostCard
           key={item.id}
           title={item.title}
