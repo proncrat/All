@@ -12,7 +12,6 @@ export async function seed(knex) {
       link_id: '8ZVcqNO87geQy0fdJ9pLxdOmPvVrbt1j',
       name: 'GOD',
       describe: 'UH that litty fresh yo',
-      followers: '69',
       pfp: '/images/janedoe2.jpg',
       description:
         'I love beanvid so much i love beanvid love beanvid yes yes finish beanvid',
@@ -28,7 +27,6 @@ export async function seed(knex) {
       link_id: '7t5tsLklaSRZP9wjfUXsZCZjmiFOOeHD',
       name: 'Jean',
       describe: 'Jeans',
-      followers: '420',
       pfp: 'https://dk2dv4ezy246u.cloudfront.net/widgets/sSoFDYe3ZbPQ_large.jpg',
       description: 'This is a description2',
       peer_id: '447ebcf1-3e0f-4738-9b64-c1804a2d21c1',
@@ -40,7 +38,6 @@ export async function seed(knex) {
       link_id: null,
       name: 'Goth',
       describe: 'Black dress ahhh',
-      followers: '52000000',
       pfp: 'https://i.pinimg.com/736x/fd/c9/5e/fdc95e24e075e75d99aea0f188152454.jpg',
       bg: '/images/heres-a-2k-jane-doe-wallpaper-for-you-guys-v0-l0cux9p736md1.webp',
       //description: 'This is a description3',
