@@ -65,12 +65,12 @@ export function Miniplayer({ width }) {
         onPlay={() => setIsPlaying(true)}
         onTimeUpdate={trackHandler}
         ref={audioRef}
-        src="http://localhost:5173/audio/shessonice.m4a"
+        src="/audio/shessonice.m4a"
       />
       <div ref={detailref}>
         <img
           className="rounded-sm mb-2"
-          src="http://localhost:5173/images/b51d4a51-5c16-4e8c-99ff-a957fadb02c3.png"
+          src="/images/b51d4a51-5c16-4e8c-99ff-a957fadb02c3.png"
           alt="thumbnail?"
         ></img>
       </div>
