@@ -25,12 +25,14 @@ import { Photos } from './Pages/Profile/pages/photos/Photos'
 import { ProfileLost } from './Pages/Profile/Profile404'
 import { Coms } from './Pages/coms/coms'
 import { Messagebox } from './Pages/coms/components/messagingthing'
+import { Theme } from './Pages/Settings/components/Theme'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
     <Route path="/settings" element={<SettingsPage />}>
       <Route index element={<SettingsDebug />} />
       <Route path="customize" element={<SettingsCustomize />} />
+      <Route path="theme" element={<Theme />} />
     </Route>
     <Route path="/post" element={<PostPage />} />
     <Route path="/signin" element={<SignInForm />} />

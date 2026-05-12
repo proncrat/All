@@ -3,6 +3,8 @@ import { IoPlaySkipBackSharp } from 'react-icons/io5'
 import { IoPlaySharp } from 'react-icons/io5'
 import { IoPauseSharp } from 'react-icons/io5'
 import { Link } from 'react-router'
+import { IoVolumeHighSharp } from 'react-icons/io5'
+import { IoShuffle } from 'react-icons/io5'
 
 import { useEffect, useRef, useState } from 'react'
 
@@ -92,6 +94,9 @@ export function Miniplayer({ width }) {
           </div>
           <div className="flex gap-3 items-center ">
             <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
+              <IoShuffle size={'20px'} />
+            </button>
+            <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
               <IoPlaySkipBackSharp size={'20px'} />
             </button>
             <button
@@ -107,6 +112,18 @@ export function Miniplayer({ width }) {
             <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
               <IoPlaySkipForward size={'20px'} />
             </button>
+            <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
+              <IoVolumeHighSharp size={'20px'} />
+            </button>
+
+            <div className="w-4 hidden">
+              <input
+                id="default-range"
+                type="range"
+                value="50"
+                className="w-full h-2 bg-neutral-quaternary rounded-full appearance-none cursor-pointer"
+              ></input>
+            </div>
           </div>
         </div>
       </div>
