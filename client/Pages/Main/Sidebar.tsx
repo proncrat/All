@@ -20,7 +20,9 @@ export function SideBar({ width }) {
 
         <NavLink
           to={'/coms'}
-          className={'[&.active]:bg-mist-800 p-2 rounded-sm w-full'}
+          className={
+            '[&.active]:bg-mist-800 p-2 rounded-sm w-full overflow-hidden'
+          }
         >
           <div className="flex items-center gap-5">
             <LuMessagesSquare

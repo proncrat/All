@@ -59,7 +59,7 @@ export function Miniplayer({ width }) {
   }
 
   return (
-    <div ref={miniplayer} className=" rounded-sm w-full overflow-auto">
+    <div ref={miniplayer} className=" rounded-sm w-full overflow-hidden">
       <audio
         onPause={() => setIsPlaying(false)}
         onPlay={() => setIsPlaying(true)}
