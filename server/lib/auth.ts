@@ -1,6 +1,3 @@
-import dotenv from 'dotenv'
-dotenv.config()
-
 import { betterAuth } from 'better-auth'
 import Database from 'better-sqlite3'
 import { username } from 'better-auth/plugins'
@@ -8,6 +5,8 @@ import { generateProfile } from '../database'
 import { Pool } from 'pg'
 
 const isProd = process.env.NODE_ENV === 'production'
+
+console.log(isProd)
 
 const getAdapter = () => {
   if (isProd) {
