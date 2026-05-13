@@ -16,6 +16,9 @@ function App() {
     setWidth(width === 60 ? 300 : 60)
   }
 
+  //oneday fix this lul
+  document.documentElement.classList.add('dark')
+
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>

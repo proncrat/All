@@ -5,9 +5,27 @@ import { betterAuth } from 'better-auth'
 import Database from 'better-sqlite3'
 import { username } from 'better-auth/plugins'
 import { generateProfile } from '../database'
+import { Pool } from 'pg'
+
+const isProd = process.env.NODE_ENV === 'production'
+
+const getAdapter = () => {
+  if (isProd) {
+    return new Pool({
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT || 5432,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      ssl: { rejectUnauthorized: false },
+    })
+  } else {
+    return new Database('./server/lib/sqlite.db')
+  }
+}
 
 export const auth = betterAuth({
-  database: new Database('./server/lib/sqlite.db'),
+  database: getAdapter(),
   emailAndPassword: {
     enabled: true,
   },
