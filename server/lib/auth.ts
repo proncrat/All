@@ -10,14 +10,18 @@ console.log(isProd)
 
 const getAdapter = () => {
   if (isProd) {
-    return new Pool({
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT || 5432,
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      ssl: { rejectUnauthorized: false },
-    })
+    try {
+      return new Pool({
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT || 5432,
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        ssl: { rejectUnauthorized: false },
+      })
+    } catch (err) {
+      console.error('Caught error:', err)
+    }
   } else {
     return new Database('./server/lib/sqlite.db')
   }
