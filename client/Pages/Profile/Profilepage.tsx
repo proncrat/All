@@ -35,10 +35,7 @@ function Profile() {
 
   return (
     <div className="pt-4">
-      <div
-        className="center_small rounded-xl p-4"
-        style={{ backgroundColor: 'lab(3 0 0 / 0.71)' }}
-      >
+      <div className="center_small rounded-xl p-4 bg-tpbgprofile">
         <PfBg src={data} />
         <ProfileTopSection
           data={data}

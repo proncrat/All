@@ -8,11 +8,10 @@ export function SideBar({ width }) {
 
   return (
     <div
-      className="fixed top-[50.2px] left-0 border-r-2 transition-all"
+      className=" bg-tpbackground fixed top-[50.2px] left-0 border-r-2 transition-all"
       style={{
         width: `${width}px`,
         height: '100vh',
-        backgroundColor: 'lab(3 0 0 / 0.91)',
       }}
     >
       <div className="flex flex-col items-baseline p-2 justify-center gap-3 overflow-auto">

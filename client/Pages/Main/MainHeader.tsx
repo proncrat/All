@@ -23,10 +23,7 @@ export function THEHEADER({ sidebar }) {
   }
 
   return (
-    <header
-      style={{ backgroundColor: 'lab(3 0 0 / 0.91)' }}
-      className="THEHEADER mb-5 flex justify-between p-2 items border-b-2 fixed top-0 w-full z-30"
-    >
+    <header className="bg-tpbackground THEHEADER mb-5 flex justify-between p-2 items border-b-2 fixed top-0 w-full z-30">
       <div className="flex gap-4 items-center">
         <RxHamburgerMenu onClick={sidebar} size={'30px'} />
         <Link to={'/'}>BEANVID</Link>
