@@ -14,7 +14,7 @@ export function PhotoUpload() {
     formData.append('image', e.target.image.files[0])
     formData.append('name', e.target.name.value)
     formData.append('describe', e.target.describe.value)
-    formData.append('author_id', '1')
+    formData.append('author_id', 1)
 
     //console.log(data)
     await addPhoto.mutateAsync(formData)
