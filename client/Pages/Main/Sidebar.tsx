@@ -1,7 +1,8 @@
 import { LuMessagesSquare } from 'react-icons/lu'
 import { NavLink, useNavigate } from 'react-router'
-import { FaPlayCircle } from 'react-icons/fa'
 import { Miniplayer } from './Miniplayer'
+import { IoAlbumsOutline } from 'react-icons/io5'
+import { IoInformationCircleOutline } from 'react-icons/io5'
 
 export function SideBar({ width }) {
   const navigate = useNavigate()
@@ -30,6 +31,36 @@ export function SideBar({ width }) {
               size={'30px'}
             />
             <p className="text-lg">Comunication</p>
+          </div>
+        </NavLink>
+        <NavLink
+          to={'/comss'}
+          className={
+            '[&.active]:bg-mist-800 p-2 rounded-sm w-full overflow-hidden'
+          }
+        >
+          <div className="flex items-center gap-5">
+            <IoAlbumsOutline
+              className="shrink-0"
+              onClick={() => navigate('/coms')}
+              size={'30px'}
+            />
+            <p className="text-lg">Library</p>
+          </div>
+        </NavLink>
+        <NavLink
+          to={'/Info'}
+          className={
+            '[&.active]:bg-mist-800 p-2 rounded-sm w-full overflow-hidden'
+          }
+        >
+          <div className="flex items-center gap-5">
+            <IoInformationCircleOutline
+              className="shrink-0"
+              onClick={() => navigate('/coms')}
+              size={'30px'}
+            />
+            <p className="text-lg">Information</p>
           </div>
         </NavLink>
       </div>

@@ -4,7 +4,7 @@ import ProfileTopSection from './Components/ProfileTopSection'
 import { useUserData } from '../../hooks'
 import { ProfileLost } from './Profile404'
 import { prominent } from 'color.js'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { PfBg } from './Components/Bg'
 
 function Profile() {
@@ -12,12 +12,13 @@ function Profile() {
 
   const { data, isPending, isError, error, isSuccess } = useUserData(id ?? '')
 
+  const bgRef = useRef(null)
+
   useEffect(() => {
     async function colorthingy() {
       const color = await prominent(data.bg, {
         format: 'hex',
       })
-      console.log(color)
       document.body.style.backgroundColor = color[0]
       document.documentElement.style.setProperty('--after-color', color[0])
     }

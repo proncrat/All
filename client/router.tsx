@@ -26,6 +26,8 @@ import { ProfileLost } from './Pages/Profile/Profile404'
 import { Coms } from './Pages/coms/coms'
 import { Messagebox } from './Pages/coms/components/messagingthing'
 import { Theme } from './Pages/Settings/components/Theme'
+import { AboutHome } from './Pages/About/AboutHome'
+import { People } from './Pages/coms/components/People'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -34,6 +36,7 @@ const routes = createRoutesFromElements(
       <Route path="customize" element={<SettingsCustomize />} />
       <Route path="theme" element={<Theme />} />
     </Route>
+    <Route path="/Info" element={<AboutHome />} />
     <Route path="/post" element={<PostPage />} />
     <Route path="/signin" element={<SignInForm />} />
     <Route path="/signup" element={<SignUpForm />} />
@@ -51,7 +54,7 @@ const routes = createRoutesFromElements(
     <Route path="/search/" element={<SearchPage />} />
 
     <Route path="/coms" element={<Coms />}>
-      <Route index element={<Home />} />
+      <Route index element={<People />} />
       <Route path=":id" element={<Messagebox />} />
     </Route>
 

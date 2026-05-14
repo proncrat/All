@@ -157,3 +157,35 @@ export async function getIdMatch(LinkId) {
 export async function newPhoto(data) {
   return await db('photos').insert({ ...data })
 }
+
+//Follows
+//Move this somewhere else one day
+interface Follow {
+  following_user_id: number
+  followed_user_id: number
+  created_at: Date
+}
+
+//Actually works lol
+
+export async function updateUserfollows(data: Follow) {
+  await db('profiledata')
+    .where({ id: data.followed_user_id })
+    .increment({ following: 1 })
+  await db('profiledata')
+    .where({ id: data.following_user_id })
+    .increment({ followers: 1 })
+}
+
+export async function newFollowById(data: Follow) {
+  await db('follows').insert({ ...data })
+  updateUserfollows(data)
+}
+
+export async function getFollowingById(userId: number) {
+  return await db('follows').where({ followed_user_id: userId })
+}
+
+export async function getFollowedById(userId: number) {
+  return await db('follows').where({ following_user_id: userId })
+}

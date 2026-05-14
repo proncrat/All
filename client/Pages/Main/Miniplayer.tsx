@@ -101,7 +101,7 @@ export function Miniplayer({ width }) {
             </button>
             <button
               onClick={togglePlay}
-              className="cursor-pointer p-2 text-gray-400 hover:text-white"
+              className="cursor-pointer p-2 hover:text-gray-400"
             >
               {!isPlaying ? (
                 <IoPlaySharp size={'25px'} />

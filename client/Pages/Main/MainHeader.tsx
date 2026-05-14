@@ -25,7 +25,11 @@ export function THEHEADER({ sidebar }) {
   return (
     <header className="bg-tpbackground THEHEADER mb-5 flex justify-between p-2 items border-b-2 fixed top-0 w-full z-30">
       <div className="flex gap-4 items-center">
-        <RxHamburgerMenu onClick={sidebar} size={'30px'} />
+        <RxHamburgerMenu
+          className="cursor-pointer"
+          onClick={sidebar}
+          size={'30px'}
+        />
         <Link to={'/'}>BEANVID</Link>
       </div>
       <form onSubmit={searchHandler} className="flex gap-3">

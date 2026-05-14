@@ -15,6 +15,7 @@ import util_routes from './Routes/Util'
 import coms_routes from './Routes/Coms'
 import test_routes from './Routes/test'
 import test_routes_img from './Routes/imguploadtest'
+import follow_route from './Routes/Follow'
 
 import cors from 'cors'
 //DO NOT PUT IN PROD IDIOT
@@ -41,6 +42,7 @@ server.use('/api/v1/photo', photo_routes)
 server.use('/api/v1/comments', comment_routes)
 server.use('/api/v1/util', util_routes)
 server.use('/api/v1/coms', coms_routes)
+server.use('/api/v1/follow', follow_route)
 server.use('/api/v1/test', test_routes)
 server.use('/api/v1/imgupload', test_routes_img)
 

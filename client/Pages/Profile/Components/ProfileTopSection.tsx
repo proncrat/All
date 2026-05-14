@@ -1,11 +1,20 @@
 import { useNavigate } from 'react-router'
-import { useState } from 'react'
 import { useSession } from '@/lib/auth'
+import { useCookies } from 'react-cookie'
 
 function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
-  const [banner, setbanner] = useState(true)
-  const [banner2, setbanner2] = useState(true)
-  const [text, settext] = useState(true)
+  //const [banner, setbanner] = useState(true)
+  //const [banner2, setbanner2] = useState(true)
+  //const [text, settext] = useState(true)
+
+  const [cookies, setCookie, removeCookie] = useCookies(['id'])
+  try {
+    console.log(cookies.id)
+  } catch {
+    console.log('Hmmm')
+  }
+  //sets cookie test
+  //setCookie('id', 1, { path: '/' })
 
   const navigate = useNavigate()
 
@@ -28,7 +37,6 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
           <div>
             {data.banner && (
               <img
-                onLoad={() => setbanner(false)}
                 className="w-full rounded-xl mb-5 aspect-10/2"
                 alt="le banner"
                 src={data.banner}
@@ -48,7 +56,6 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
             )}
             {isSuccess && (
               <img
-                onLoad={() => setbanner2(false)}
                 className="rounded-xl aspect-square w-44"
                 alt="pfp"
                 src={data.pfp}
@@ -66,11 +73,9 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
             {isSuccess && (
               <div>
                 <h2 className="text-3xl font-bold">{data.name}</h2>
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   <p>{`@${data.id}`}</p>
-                  <p>·</p>
                   <p className="text-zinc-400">{`${data.followers} Followers`}</p>
-                  <p>·</p>
                   <p className="text-zinc-400">{`${data.following} Following`}</p>
                 </div>
                 {data.describe && <p>{`${data.describe}`}</p>}
