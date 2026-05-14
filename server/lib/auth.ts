@@ -2,12 +2,14 @@ import { betterAuth } from 'better-auth'
 import Database from 'better-sqlite3'
 import { username } from 'better-auth/plugins'
 import { generateProfile } from '../database'
+
+/*
 import { Pool } from 'pg'
 
 const isProd = process.env.NODE_ENV === 'production'
 
 console.log(isProd)
-/*
+
 const getAdapter = () => {
   if (isProd) {
     try {
@@ -28,6 +30,7 @@ const getAdapter = () => {
 }
 getAdapter()
 */
+
 export const auth = betterAuth({
   database: new Database('./server/lib/sqlite.db'),
   emailAndPassword: {
