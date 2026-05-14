@@ -1,3 +1,6 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 import { betterAuth } from 'better-auth'
 import Database from 'better-sqlite3'
 import { username } from 'better-auth/plugins'
