@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 export function VideoCard({ data }) {
   return (
     <Link to={`/video/${data.id}`}>
-      <div className="thumbnailthing rounded-xl ">
+      <div className="w-62.5 p-1.25 border rounded-xl ">
         <img
           style={{ aspectRatio: '16/9', width: '100%' }}
           alt="A THUMBNAIL"

@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router'
 import { Miniplayer } from './Miniplayer'
 import { IoAlbumsOutline } from 'react-icons/io5'
 import { IoInformationCircleOutline } from 'react-icons/io5'
+import { IoAddCircleOutline } from 'react-icons/io5'
 
 export function SideBar({ width }) {
   const navigate = useNavigate()
@@ -46,6 +47,21 @@ export function SideBar({ width }) {
               size={'30px'}
             />
             <p className="text-lg">Library</p>
+          </div>
+        </NavLink>
+        <NavLink
+          to={'/post'}
+          className={
+            '[&.active]:bg-mist-800 p-2 rounded-sm w-full overflow-hidden'
+          }
+        >
+          <div className="flex items-center gap-5">
+            <IoAddCircleOutline
+              className="shrink-0"
+              onClick={() => navigate('/coms')}
+              size={'30px'}
+            />
+            <p className="text-lg">Information</p>
           </div>
         </NavLink>
         <NavLink

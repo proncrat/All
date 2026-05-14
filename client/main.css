@@ -20,13 +20,8 @@ img {
   object-fit: cover;
   object-position: top;
 }
-/*
-.flex {
-  display: flex;
-  gap: 15px;
-}
-*/
 
+/*
 .THEHEADER button {
   all: unset;
   padding: 2px 10px;
@@ -42,7 +37,7 @@ img {
   color: black;
   background-color: white;
 }
-
+*/
 .abutton {
   padding: 2px 10px;
   border: 1px solid white;
@@ -59,81 +54,7 @@ img {
   background-color: white;
 }
 
-.thumbnailthing p {
-  margin: 0;
-}
-
-.thumbnailthing {
-  width: 250px;
-  padding: 5px;
-  border: solid 1px white;
-}
-
-.thumbnailcontainer {
-  display: grid;
-  grid-template-rows: 240px;
-  grid-auto-rows: 100px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
-}
-
-.center_small {
-  max-width: 1500px;
-  margin: auto;
-}
-
-.bg_bshit {
-  width: 100%;
-  top: 0px;
-  left: 0;
-  z-index: -10;
-  /*filter: opacity(0.2);*/
-}
-
-.bg_bs_container::after {
-  z-index: -9;
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    0deg,
-    rgba(60, 60, 100, 1) 10%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  pointer-events: none;
-  top: 0;
-  left: 0;
-}
-
-.bgcontainerthing {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-.bginnercont {
-  position: relative;
-}
-
 /*rgba(60, 60, 100, 1) 10%*/
-
-.bginnercont::after {
-  z-index: -9;
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    0deg,
-    var(--after-color, black),
-    rgba(255, 255, 255, 0) 50%
-  );
-  pointer-events: none;
-  top: 0;
-  left: 0;
-}
 
 /*Cool gallery thing*/
 

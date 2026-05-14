@@ -7,7 +7,7 @@ import { Pool } from 'pg'
 const isProd = process.env.NODE_ENV === 'production'
 
 console.log(isProd)
-
+/*
 const getAdapter = () => {
   if (isProd) {
     try {
@@ -26,9 +26,10 @@ const getAdapter = () => {
     return new Database('./server/lib/sqlite.db')
   }
 }
-
+getAdapter()
+*/
 export const auth = betterAuth({
-  database: getAdapter(),
+  database: new Database('./server/lib/sqlite.db'),
   emailAndPassword: {
     enabled: true,
   },

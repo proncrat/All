@@ -2,8 +2,6 @@ import { Link } from 'react-router'
 
 import { useSession, signOut } from '@/lib/auth'
 
-import { CiCirclePlus } from 'react-icons/ci'
-
 import { Search } from 'lucide-react'
 import {
   InputGroup,
@@ -13,13 +11,40 @@ import {
 
 import { IoMdSettings } from 'react-icons/io'
 
+import { IoSearch } from 'react-icons/io5'
+
 import { RxHamburgerMenu } from 'react-icons/rx'
+import { Usesessionid, useUserData } from '@/client/hooks'
+import { useRef } from 'react'
 
 export function THEHEADER({ sidebar }) {
-  const { data: session } = useSession()
+  const { data: session, isPending: seshpend } = useSession()
+
+  const userseshid = session?.session.userId
+
+  const { data: idcheck, isPending: idpend } = Usesessionid(
+    userseshid,
+    !seshpend,
+  )
+
+  const userId = idcheck?.id
+
+  const {
+    data: userdata,
+    isPending,
+    isSuccess,
+  } = useUserData(userId, undefined, !idpend)
+
+  console.log(userdata)
 
   function searchHandler(e) {
     e.preventdefault()
+  }
+
+  const profiledrop = useRef(null)
+
+  function profclick() {
+    profiledrop.current.classList.toggle('hidden')
   }
 
   return (
@@ -45,24 +70,59 @@ export function THEHEADER({ sidebar }) {
             <Search />
           </InputGroupAddon>
         </InputGroup>
-        <button>SEARCH</button>
+        <button>
+          <IoSearch />
+        </button>
       </form>
 
       <div className="flex">
-        <Link to={'/post'}>
-          <CiCirclePlus size={'32'} />
-        </Link>
-        <Link to={'/settings'} className="mr-4">
-          <IoMdSettings size={'32'} />
-        </Link>
         {session ? (
           <div className="flex gap-2">
-            <p>{session.user.username}</p>
-            <button onClick={() => signOut()}>Logout</button>
+            {!isPending && (
+              <button onClick={profclick} className="cursor-pointer">
+                <img
+                  alt="a pfp"
+                  className="rounded-full aspect-square w-8"
+                  src={userdata.pfp}
+                />
+              </button>
+            )}
           </div>
+        ) : (
+          <div className="flex gap-2">
+            <button onClick={profclick} className="cursor-pointer">
+              <img
+                alt="a pfp"
+                className="rounded-full aspect-square w-8"
+                src="/images/stock.jpg"
+              />
+            </button>
+          </div>
+        )}
+      </div>
+      <div
+        ref={profiledrop}
+        className="hidden bg-tpbackground border absolute w-50 h-50 top-15 right-3 rounded-xl"
+      >
+        {session && <p>{session.user.username}</p>}
+
+        {session ? (
+          <button className="cursor-pointer" onClick={() => signOut()}>
+            Logout
+          </button>
         ) : (
           <Link to={'signin'}>LOGIN</Link>
         )}
+
+        <Link
+          to={'/settings'}
+          className={'p-2 rounded-sm w-full overflow-hidden'}
+        >
+          <div className="flex items-center gap-5">
+            <IoMdSettings className="shrink-0" size={'30px'} />
+            <p className="text-lg">Settings</p>
+          </div>
+        </Link>
       </div>
     </header>
   )

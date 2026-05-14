@@ -36,7 +36,7 @@ function Profile() {
 
   return (
     <div className="pt-4">
-      <div className="center_small rounded-xl p-4 bg-tpbgprofile">
+      <div className="max-w-375 m-auto rounded-xl p-4 bg-tpbgprofile">
         <PfBg src={data} />
         <ProfileTopSection
           data={data}
