@@ -9,7 +9,7 @@ export async function seed(knex) {
     {
       id: 1,
       level: 9999,
-      link_id: '8ZVcqNO87geQy0fdJ9pLxdOmPvVrbt1j',
+      link_id: 'oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS',
       name: 'GOD',
       describe: 'UH that litty fresh yo',
       pfp: '/images/janedoe2.jpg',

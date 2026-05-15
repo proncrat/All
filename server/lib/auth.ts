@@ -26,7 +26,8 @@ const getAdapter = () => {
       console.error('Caught error:', err)
     }
   } else {
-    return new Database('./server/lib/sqlite.db')
+    return new Database('./server/database/dev.sqlite3')
+    //return new Database('./server/lib/sqlite.db')
   }
 }
 
