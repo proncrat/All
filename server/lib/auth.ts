@@ -1,18 +1,14 @@
-import dotenv from 'dotenv'
-dotenv.config()
-
 import { betterAuth } from 'better-auth'
 import Database from 'better-sqlite3'
 import { username } from 'better-auth/plugins'
 import { generateProfile } from '../database'
 import { Pool } from 'pg'
+import 'dotenv/config'
 
-const isProd = process.env.NODE_ENV === 'production'
-
-console.log(isProd)
+const env = process.env.NODE_ENV
 
 const getAdapter = () => {
-  if (isProd) {
+  if (env === 'production') {
     try {
       return new Pool({
         host: process.env.DB_HOST,
@@ -25,7 +21,7 @@ const getAdapter = () => {
     } catch (err) {
       console.error('Caught error:', err)
     }
-  } else {
+  } else if (env === 'development') {
     return new Database('./server/database/dev.sqlite3')
     //return new Database('./server/lib/sqlite.db')
   }
