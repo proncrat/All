@@ -80,3 +80,5 @@ npx auth@latest migrate --config ./server/lib/auth.ts -y
 
 migrates auth db dont forget lul
 
+Milestone:
+Login doesent have cors errors anymore yippeeeee 16/5/2026

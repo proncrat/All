@@ -80,11 +80,19 @@ export function THEHEADER({ sidebar }) {
           <div className="flex gap-2">
             {!isPending && (
               <button onClick={profclick} className="cursor-pointer">
-                <img
-                  alt="a pfp"
-                  className="rounded-full aspect-square w-8"
-                  src={userdata.pfp}
-                />
+                {userdata.pfp ? (
+                  <img
+                    alt="a pfp"
+                    className="rounded-full aspect-square w-8"
+                    src={userdata.pfp}
+                  />
+                ) : (
+                  <img
+                    alt="a pfp"
+                    className="rounded-full aspect-square w-8"
+                    src="/images/stock.jpg"
+                  />
+                )}
               </button>
             )}
           </div>
