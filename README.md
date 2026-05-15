@@ -78,4 +78,5 @@ WHEN IS TESTING BRUH
  
 npx auth@latest migrate --config ./server/lib/auth.ts -y
 
-migates auth db dont forget lul
+migrates auth db dont forget lul
+

@@ -21,7 +21,11 @@ import cors from 'cors'
 //DO NOT PUT IN PROD IDIOT
 server.use(
   cors({
-    origin: 'http://localhost:5173', // Replace with your frontend's origin
+    origin: [
+      'http://localhost:5173',
+      'https://beanvid.com',
+      'https://all-ligr.onrender.com/',
+    ], // Replace with your frontend's origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   }),
