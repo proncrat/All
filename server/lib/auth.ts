@@ -33,7 +33,11 @@ export const auth = betterAuth({
     enabled: true,
   },
   plugins: [username()],
-  trustedOrigins: ['http://localhost:5173', 'https://beanvid.com'],
+  trustedOrigins: [
+    'http://localhost:5173',
+    'https://beanvid.com',
+    'https://all-ligr.onrender.com/',
+  ],
   databaseHooks: {
     user: {
       create: {
