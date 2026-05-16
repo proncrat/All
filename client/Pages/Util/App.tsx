@@ -1,4 +1,4 @@
-import { StrictMode, useState } from 'react'
+import { StrictMode, useEffect, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { CookiesProvider } from 'react-cookie'
@@ -17,8 +17,17 @@ function App() {
     setWidth(width === 60 ? 300 : 60)
   }
 
-  //oneday fix this lul
-  document.documentElement.classList.add('dark')
+  //document.documentElement.classList.add('dark')
+
+  useEffect(() => {
+    const theme = localStorage.getItem('theme')
+
+    if (theme == 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [])
 
   return (
     <StrictMode>

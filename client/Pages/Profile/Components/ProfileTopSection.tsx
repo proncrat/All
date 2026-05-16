@@ -1,24 +1,65 @@
 import { useNavigate } from 'react-router'
 import { useSession } from '@/lib/auth'
-import { useCookies } from 'react-cookie'
+//import { useCookies } from 'react-cookie'
+import { Usesessionid } from '@/client/hooks'
+import { useAddFollow, useGetFollowing } from '@/client/hooks/useFollow'
 
 function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   //const [banner, setbanner] = useState(true)
   //const [banner2, setbanner2] = useState(true)
   //const [text, settext] = useState(true)
-
+  /*
   const [cookies, setCookie, removeCookie] = useCookies(['id'])
   try {
     console.log(cookies.id)
   } catch {
     console.log('Hmmm')
   }
+    */
   //sets cookie test
   //setCookie('id', 1, { path: '/' })
 
+  const addFollow = useAddFollow()
+
   const navigate = useNavigate()
 
-  const { data: session } = useSession()
+  const { data: session, isPending: seshpend } = useSession()
+
+  const userseshid = session?.session.userId
+
+  const { data: idcheck, isPending: idpend } = Usesessionid(
+    userseshid,
+    !seshpend,
+  )
+
+  const userId = idcheck?.id
+
+  const { data: followersthing, isPending: followpending } = useGetFollowing(
+    userId,
+    !idpend,
+  )
+
+  console.log(userId)
+  console.log(followersthing)
+
+  let followstatus = false
+
+  if (!followpending && !isPending) {
+    followstatus = followersthing.some(
+      (follow) => follow.following_user_id === data.id,
+    )
+    console.log(followstatus)
+  }
+
+  async function follow() {
+    const thedata = {
+      following_user_id: data.id,
+      followed_user_id: userId,
+      created_at: new Date(),
+    }
+
+    await addFollow.mutateAsync(thedata)
+  }
 
   if (isError) {
     return <div>Error: {error.message}</div>
@@ -90,7 +131,13 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
                     </button>
                   )}
                   {session && data.link_id !== session.user.id && (
-                    <button className="abutton mt-2">Follow</button>
+                    <div>
+                      {!followstatus && (
+                        <button onClick={follow} className="abutton mt-2">
+                          Follow
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

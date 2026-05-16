@@ -1,18 +1,38 @@
 import { useEffect, useState } from 'react'
 
 export function Theme() {
-  function toggleDarkMode() {
-    document.documentElement.classList.toggle('dark')
+  //refactor this mess bro
 
-    // Optional: Save preference to localStorage
-    const isDark = document.documentElement.classList.contains('dark')
-    localStorage.setItem('theme', isDark ? 'dark' : 'light')
+  const theme = localStorage.getItem('theme')
+
+  let initialPosition = ''
+
+  if (theme == 'light') {
+    initialPosition = 'center'
+  } else {
+    initialPosition = 'left'
   }
 
-  const [state, setState] = useState('left') // options: 'left', 'center', 'right'
+  const [state, setState] = useState(initialPosition) // options: 'left', 'center', 'right'
+
+  function themehandler() {
+    if (state == 'left') {
+      localStorage.setItem('theme', 'dark')
+    } else if (state == 'center') {
+      localStorage.setItem('theme', 'light')
+    }
+
+    const theme2 = localStorage.getItem('theme')
+
+    if (theme2 == 'light') {
+      document.documentElement.classList.remove('dark')
+    } else {
+      document.documentElement.classList.add('dark')
+    }
+  }
 
   useEffect(() => {
-    toggleDarkMode()
+    themehandler()
   }, [state])
 
   const positions = {

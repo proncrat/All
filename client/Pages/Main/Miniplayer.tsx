@@ -17,8 +17,6 @@ export function Miniplayer({ width }) {
   const miniplayer = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
-  console.log(width)
-
   useEffect(() => {
     if (width == '60') {
       detailref.current.style.display = 'none'

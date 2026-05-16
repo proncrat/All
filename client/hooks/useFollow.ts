@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { addFollow } from '../apis/followclient'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { addFollow, getfollowers, getfollowing } from '../apis/followclient'
 
 export function useAddFollow() {
   const queryClient = useQueryClient()
@@ -8,6 +8,30 @@ export function useAddFollow() {
     mutationFn: async (data) => {
       return addFollow(data)
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['follows'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['follow'] }),
   })
+}
+
+export function useGetFollowing(id, enable = true) {
+  const query = useQuery({
+    queryKey: ['follow', 'following'],
+    queryFn: () => getfollowing(id),
+    enabled: enable,
+  })
+
+  return {
+    ...query,
+  }
+}
+
+export function useGetFollower(id, enable = true) {
+  const query = useQuery({
+    queryKey: ['follow', 'followers'],
+    queryFn: () => getfollowers(id),
+    enabled: enable,
+  })
+
+  return {
+    ...query,
+  }
 }

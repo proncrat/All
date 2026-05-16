@@ -166,7 +166,7 @@ interface Follow {
   created_at: Date
 }
 
-//Actually works lol
+//Actually works lol kindoff make function to factcheck this
 
 export async function updateUserfollows(data: Follow) {
   await db('profiledata')
@@ -181,11 +181,25 @@ export async function newFollowById(data: Follow) {
   await db('follows').insert({ ...data })
   updateUserfollows(data)
 }
-
+/*
 export async function getFollowingById(userId: number) {
   return await db('follows').where({ followed_user_id: userId })
 }
 
+
 export async function getFollowedById(userId: number) {
   return await db('follows').where({ following_user_id: userId })
+}
+*/
+
+export async function getFollowingById(userId: number) {
+  return await db('follows')
+    .where('follows.followed_user_id', userId)
+    .join('profiledata', 'follows.following_user_id', 'profiledata.id')
+}
+
+export async function getFollowedById(userId: number) {
+  return await db('follows')
+    .where('follows.following_user_id', userId)
+    .join('profiledata', 'follows.followed_user_id', 'profiledata.id')
 }
