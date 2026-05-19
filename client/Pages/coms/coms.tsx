@@ -8,6 +8,7 @@ import {
   init_calls,
   startCall,
 } from './components/call'
+import { Spinner } from '../Util/Spinner'
 
 export function Coms() {
   const { id } = useParams()
@@ -45,7 +46,7 @@ export function Coms() {
   }
 
   if (isPending) {
-    return <p>beans</p>
+    return <Spinner></Spinner>
   }
 
   if (isError) {

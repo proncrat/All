@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 
-import { useSession, signOut } from '@/lib/auth'
+import { useSession } from '@/lib/auth'
 
 import { Search } from 'lucide-react'
 import {
@@ -9,13 +9,12 @@ import {
   InputGroupInput,
 } from '@/components/ui/input-group'
 
-import { IoMdSettings } from 'react-icons/io'
-
 import { IoSearch } from 'react-icons/io5'
 
 import { RxHamburgerMenu } from 'react-icons/rx'
 import { Usesessionid, useUserData } from '@/client/hooks'
 import { useRef } from 'react'
+import { Headerpfp } from './components/headerpfp'
 
 export function THEHEADER({ sidebar }) {
   const { data: session, isPending: seshpend } = useSession()
@@ -76,61 +75,7 @@ export function THEHEADER({ sidebar }) {
       </form>
 
       <div className="flex">
-        {session ? (
-          <div className="flex gap-2">
-            {!isPending && (
-              <button onClick={profclick} className="cursor-pointer">
-                {userdata.pfp ? (
-                  <img
-                    alt="a pfp"
-                    className="rounded-full aspect-square w-8"
-                    src={userdata.pfp}
-                  />
-                ) : (
-                  <img
-                    alt="a pfp"
-                    className="rounded-full aspect-square w-8"
-                    src="/images/stock.jpg"
-                  />
-                )}
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="flex gap-2">
-            <button onClick={profclick} className="cursor-pointer">
-              <img
-                alt="a pfp"
-                className="rounded-full aspect-square w-8"
-                src="/images/stock.jpg"
-              />
-            </button>
-          </div>
-        )}
-      </div>
-      <div
-        ref={profiledrop}
-        className="hidden bg-tpbackground border absolute w-50 h-50 top-15 right-3 rounded-xl"
-      >
-        {session && <p>{session.user.username}</p>}
-
-        {session ? (
-          <button className="cursor-pointer" onClick={() => signOut()}>
-            Logout
-          </button>
-        ) : (
-          <Link to={'signin'}>LOGIN</Link>
-        )}
-
-        <Link
-          to={'/settings'}
-          className={'p-2 rounded-sm w-full overflow-hidden'}
-        >
-          <div className="flex items-center gap-5">
-            <IoMdSettings className="shrink-0" size={'30px'} />
-            <p className="text-lg">Settings</p>
-          </div>
-        </Link>
+        <Headerpfp />
       </div>
     </header>
   )
