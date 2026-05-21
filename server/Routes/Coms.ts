@@ -1,5 +1,5 @@
 import express from 'express'
-import { getchats, getmessages, newmessage } from '../database'
+import { getchats, getmessages, newChat, newmessage } from '../database'
 
 const router = express.Router()
 
@@ -14,6 +14,16 @@ router.get('/chats/:id', async (req, res, next) => {
       return res.status(404).send('Nothing there')
     }
     res.json(data)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.post('/chats', async (req, res, next) => {
+  try {
+    const data = req.body
+    await newChat(data)
+    return res.status(204).send('Nothing there')
   } catch (err) {
     next(err)
   }

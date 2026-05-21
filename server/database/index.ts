@@ -203,3 +203,7 @@ export async function getFollowedById(userId: number) {
     .where('follows.following_user_id', userId)
     .join('profiledata', 'follows.followed_user_id', 'profiledata.id')
 }
+
+export async function newChat(data) {
+  return await db('chats').insert({ ...data })
+}
