@@ -1,5 +1,5 @@
 import express from 'express'
-import { getAllVideos, getVideoById, getVideosByUser } from '../database'
+import { getAllVideos, getVideoById } from '../database'
 const router = express.Router()
 
 //For users obv
@@ -8,7 +8,7 @@ router.get('/', async (req, res, next) => {
   try {
     const data = await getAllVideos()
     if (data == null) {
-      return res.status(404).send('Nothing there')
+      return res.status(204).send('Nothing there')
     }
     res.json(data)
   } catch (err) {
@@ -21,7 +21,7 @@ router.get('/:id', async (req, res, next) => {
     const videoId = req.params.id
     const data = await getVideoById(videoId)
     if (data == null) {
-      return res.status(404).send('Nothing there')
+      return res.status(204).send('Nothing there')
     }
     res.json(data)
   } catch (err) {

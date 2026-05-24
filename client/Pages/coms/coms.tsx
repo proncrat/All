@@ -59,13 +59,23 @@ export function Coms() {
         style={{ width: '250px', height: '94vh' }}
         className=" shrink-0 border-r-2 p-4 gap-4 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
       >
+        <NavLink
+          className={'[&.active]:bg-mist-800 rounded-lg hover:bg-mist-800'}
+          to={'/coms'}
+          end
+        >
+          <div className="flex items-center gap-4  rounded-lg cursor-pointer p-1 pl-3">
+            <p className="text-lg">Friends</p>
+          </div>
+        </NavLink>
+        <p>Chats -</p>
         {data.map((person, index) => (
           <NavLink
             className={'[&.active]:bg-mist-800 rounded-lg hover:bg-mist-800'}
             to={'/coms/' + person.chatid}
             key={index}
           >
-            <div className="flex items-center gap-4  rounded-lg cursor-pointer ">
+            <div className="flex items-center gap-4  rounded-lg cursor-pointer p-1 ">
               <img
                 className="rounded-full w-12 aspect-square"
                 alt="some pfp"

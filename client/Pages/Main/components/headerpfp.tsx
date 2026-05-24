@@ -49,7 +49,7 @@ export function Headerpfp() {
           <img
             alt="a pfp"
             className="rounded-full aspect-square w-8"
-            src={data.pfp}
+            src={session?.user.image}
           />
         ) : (
           <div className="flex items-center gap-2 border rounded-lg pl-1 pr-2 box-border w-25">
@@ -65,7 +65,7 @@ export function Headerpfp() {
               <img
                 alt="a pfp"
                 className="rounded-full aspect-square w-12"
-                src={data.pfp}
+                src={session?.user.image}
               />
               <div>
                 <p>{session.user.username}</p>

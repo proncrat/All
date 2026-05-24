@@ -27,21 +27,25 @@ export function People() {
   }
 
   return (
-    <div className="pl-8 pt-5">
+    <div className="pl-8 pr-8 pt-5">
       <p className="mb-4 text-lg ">People</p>
       <div className="flex flex-col gap-4">
         {followersthing.map((person) => (
-          <button
-            className={'[&.active]:bg-mist-800 rounded-lg hover:bg-mist-800'}
-            key={person.id}
-          >
-            <div className="flex items-center gap-4  rounded-lg cursor-pointer ">
-              <img
-                className="rounded-full w-12 aspect-square"
-                alt="some pfp"
-                src={person.pfp}
-              />
-              <p className="text-lg">{person.name}</p>
+          <button className={' rounded-lg  p-1 '} key={person.id}>
+            <div className="flex justify-between">
+              <div className="flex items-center gap-4  rounded-lg  ">
+                <img
+                  className="rounded-full w-12 aspect-square"
+                  alt="some pfp"
+                  src={person.pfp}
+                />
+                <p className="text-lg">{person.name}</p>
+              </div>
+              <div className="flex items-center mr-2">
+                <button className="border pl-3 pr-3 p-1 rounded-sm cursor-pointer   transition-all  hover:[box-shadow:0px_0px_4px_1px_rgba(255,255,255,0.74)_inset]">
+                  View chat
+                </button>
+              </div>
             </div>
           </button>
         ))}

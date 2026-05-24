@@ -1,7 +1,16 @@
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
 import { useState } from 'react'
+import { updateUser } from '@/lib/auth'
 
 export function CustomizeForm({ initialdata }) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const form = e.currentTarget
+    await updateUser({
+      image: form.image.value,
+    })
+  }
+
   const [form, setform] = useState(initialdata)
 
   function formHandler(e: React.ChangeEvent<HTMLInputElement>) {
@@ -27,6 +36,22 @@ export function CustomizeForm({ initialdata }) {
 
   return (
     <div className="m-7 w-full">
+      <h1 className="text-3xl mb-6">Auth Image Test</h1>
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+        <input
+          className="p-2 border-b"
+          name="image"
+          type="text"
+          placeholder="imgurl"
+        />
+
+        <button
+          className="transition-all cursor-pointer hover:[box-shadow:0px_0px_4px_1px_rgba(255,255,255,0.74)_inset] rounded-sm p-1"
+          type="submit"
+        >
+          Submit
+        </button>
+      </form>
       <h1 className="text-3xl mb-6">Customize Stuff</h1>
       <div className="flex flex-col gap-3">
         <h2 className="text-2xl">Profile</h2>

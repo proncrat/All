@@ -16,6 +16,10 @@ export function Messagebox() {
     // Handle incoming messages
     eventSource.onmessage = (event) => {
       console.log(event.data)
+      new Notification('GOD', {
+        body: 'Bro what',
+        icon: 'http://localhost:5173/images/janedoe2.jpg',
+      })
       queryClient.invalidateQueries({ queryKey: ['messages', id] })
     }
 
@@ -25,14 +29,6 @@ export function Messagebox() {
       console.log('SSE Connection Closed')
     }
   }, [])
-
-  const showNotification = () => {
-    if (Notification.permission === 'granted') {
-      new Notification('GOD', {
-        body: 'Bro what',
-      })
-    }
-  }
 
   if (isPending) {
     return <p>beans</p>

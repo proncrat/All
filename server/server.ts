@@ -30,13 +30,12 @@ server.use(
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   }),
 )
+//everything in public root folder showing fr
+server.use(express.static('public'))
 
 server.all('/api/auth/*splat', toNodeHandler(auth))
 
 server.use(express.json())
-
-//everything in public root folder showing fr
-server.use(express.static('public'))
 
 //le routes
 server.use('/api/v1/profile', user_routes)
