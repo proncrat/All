@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth'
 import Database from 'better-sqlite3'
 import { username } from 'better-auth/plugins'
-import { generateProfile } from '../database'
+import { deleteProfile, generateProfile } from '../database'
 import { Pool } from 'pg'
 import 'dotenv/config'
 
@@ -32,6 +32,9 @@ export const auth = betterAuth({
   user: {
     deleteUser: {
       enabled: true,
+      afterDelete: async (user) => {
+        await deleteProfile()
+      },
     },
   },
   emailAndPassword: {

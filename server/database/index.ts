@@ -7,6 +7,14 @@ export async function generateProfile(name: string, id: string) {
   return await db('profiledata').insert({ name: name, link_id: id })
 }
 
+export async function deleteProfile() {
+  return await db('profiledata')
+    .where({
+      link_id: 'XhSQyjyVutL1sK1qIaqPC4yojygwVM4W',
+    })
+    .del()
+}
+
 //profile get
 
 export async function getProfile(userId: string) {
