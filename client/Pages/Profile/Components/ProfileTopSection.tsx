@@ -2,7 +2,11 @@ import { useNavigate } from 'react-router'
 import { useSession } from '@/lib/auth'
 //import { useCookies } from 'react-cookie'
 import { Usesessionid } from '@/client/hooks'
-import { useAddFollow, useGetFollowing } from '@/client/hooks/useFollow'
+import {
+  useAddFollow,
+  useDeleteFollow,
+  useGetFollowing,
+} from '@/client/hooks/useFollow'
 
 function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   //const [banner, setbanner] = useState(true)
@@ -20,6 +24,7 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   //setCookie('id', 1, { path: '/' })
 
   const addFollow = useAddFollow()
+  const unFollow = useDeleteFollow()
 
   const navigate = useNavigate()
 
@@ -39,8 +44,8 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
     !idpend,
   )
 
-  console.log(userId)
-  console.log(followersthing)
+  //console.log(userId)
+  //console.log(followersthing)
 
   let followstatus = false
 
@@ -48,7 +53,7 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
     followstatus = followersthing.some(
       (follow) => follow.following_user_id === data.id,
     )
-    console.log(followstatus)
+    //console.log(followstatus)
   }
 
   async function follow() {
@@ -59,6 +64,15 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
     }
 
     await addFollow.mutateAsync(thedata)
+  }
+
+  async function unfollow() {
+    const thedata = {
+      following_user_id: data.id,
+      followed_user_id: userId,
+    }
+
+    await unFollow.mutateAsync(thedata)
   }
 
   if (isError) {
@@ -135,6 +149,11 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
                       {!followstatus && (
                         <button onClick={follow} className="abutton mt-2">
                           Follow
+                        </button>
+                      )}
+                      {followstatus && (
+                        <button onClick={unfollow} className="abutton mt-2">
+                          Unfollow
                         </button>
                       )}
                     </div>

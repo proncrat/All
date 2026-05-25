@@ -169,16 +169,44 @@ interface Follow {
 //Actually works lol kindoff make function to factcheck this
 
 export async function updateUserfollows(data: Follow) {
+  //the follower?
+  const numbers = await db('follows')
+    .where({
+      following_user_id: data.following_user_id,
+    })
+    .select()
+
+  console.log(numbers.length)
+
+  //the current one following
+  const numbers1 = await db('follows')
+    .where({
+      followed_user_id: data.followed_user_id,
+    })
+    .select()
+
+  console.log(numbers1.length)
+
   await db('profiledata')
     .where({ id: data.followed_user_id })
-    .increment({ following: 1 })
+    .update({ following: numbers1.length })
   await db('profiledata')
     .where({ id: data.following_user_id })
-    .increment({ followers: 1 })
+    .update({ followers: numbers.length })
 }
 
 export async function newFollowById(data: Follow) {
   await db('follows').insert({ ...data })
+  updateUserfollows(data)
+}
+
+export async function unFollowById(data: Follow) {
+  await db('follows')
+    .where({
+      following_user_id: data.following_user_id,
+      followed_user_id: data.followed_user_id,
+    })
+    .del()
   updateUserfollows(data)
 }
 /*

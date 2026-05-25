@@ -7,6 +7,12 @@ export async function addFollow(data) {
   return response.body
 }
 
+export async function removeFollow(data) {
+  const requestURL = request.post(`${rootURL}/follow/un`)
+  const response = await requestURL.send(data)
+  return response.body
+}
+
 export async function getfollowing(id) {
   return request.get(`${rootURL}/follow/follower/${id}`).then((res) => res.body)
 }

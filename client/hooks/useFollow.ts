@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { addFollow, getfollowers, getfollowing } from '../apis/followclient'
+import {
+  addFollow,
+  getfollowers,
+  getfollowing,
+  removeFollow,
+} from '../apis/followclient'
 
 export function useAddFollow() {
   const queryClient = useQueryClient()
@@ -7,6 +12,17 @@ export function useAddFollow() {
   return useMutation({
     mutationFn: async (data) => {
       return addFollow(data)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['follow'] }),
+  })
+}
+
+export function useDeleteFollow() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data) => {
+      return removeFollow(data)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['follow'] }),
   })
