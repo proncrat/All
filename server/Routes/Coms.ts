@@ -1,12 +1,16 @@
 import express from 'express'
 import { getchats, getmessages, newChat, newmessage } from '../database'
+import { authMiddleware } from '../middleware/enpointauth'
 
 const router = express.Router()
 
 //For users obv
 //Test function would it ever be usefull?? who knows
 
+router.use(authMiddleware)
+
 router.get('/chats/:id', async (req, res, next) => {
+  //console.log(res.locals.session)
   try {
     const userid = req.params.id
     const data = await getchats(userid)

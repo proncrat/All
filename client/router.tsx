@@ -28,6 +28,7 @@ import { Messagebox } from './Pages/coms/components/messagingthing'
 import { Theme } from './Pages/Settings/components/Theme'
 import { AboutHome } from './Pages/About/AboutHome'
 import { People } from './Pages/coms/components/People'
+import { Authsett } from './Pages/Settings/components/Authsettform'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -35,6 +36,7 @@ const routes = createRoutesFromElements(
       <Route index element={<SettingsDebug />} />
       <Route path="customize" element={<SettingsCustomize />} />
       <Route path="theme" element={<Theme />} />
+      <Route path="authsett" element={<Authsett />} />
     </Route>
     <Route path="/Info" element={<AboutHome />} />
     <Route path="/post" element={<PostPage />} />

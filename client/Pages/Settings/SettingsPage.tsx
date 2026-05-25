@@ -27,6 +27,10 @@ export function SettingsPage() {
             <h2 className="text-3xl mb-5">Settings</h2>
             <SubHeaderLink link={'/settings'} text="Debug"></SubHeaderLink>
             <SubHeaderLink link={'customize'} text="Customize"></SubHeaderLink>
+            <SubHeaderLink
+              link={'authsett'}
+              text="Auth testing"
+            ></SubHeaderLink>
             <SubHeaderLink link={'theme'} text="Theme"></SubHeaderLink>
           </div>
           <Outlet />

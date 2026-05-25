@@ -29,6 +29,11 @@ const getAdapter = () => {
 
 export const auth = betterAuth({
   database: getAdapter(),
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
