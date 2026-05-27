@@ -14,7 +14,7 @@ export function SignUpForm() {
         password: form.password.value,
         name: form.name.value,
         username: form.username.value,
-        callbackURL: '/dashboard',
+        callbackURL: '/',
       },
       {
         onError: (error) => {
