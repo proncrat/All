@@ -11,7 +11,7 @@ export function Videos() {
     'videos',
   )
 
-  console.log(data)
+  //console.log(data)
 
   if (isPending) {
     return <div>Loading...</div>

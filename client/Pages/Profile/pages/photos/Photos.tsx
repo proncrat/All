@@ -26,7 +26,7 @@ export function Photos() {
     return <div>Error: {error.message}</div>
   }
 
-  console.log(data)
+  //console.log(data)
 
   if (data.length == 0) {
     return 'True adam error (No photos)'

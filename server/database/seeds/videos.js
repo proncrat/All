@@ -7,7 +7,6 @@ export async function seed(knex) {
   await knex('videos').del()
   await knex('videos').insert([
     {
-      id: 1,
       name: 'WOrld explodes',
       description: 'Claude make me a description',
       views: 67,
@@ -21,7 +20,6 @@ export async function seed(knex) {
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
-      id: 2,
       name: 'Cant think of name',
       description: 'Gok make me a descrioption',
       views: 67,
@@ -35,7 +33,6 @@ export async function seed(knex) {
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
-      id: 3,
       name: 'Uh mmhmm',
       description: 'Insert description here',
       views: 67,
@@ -49,7 +46,6 @@ export async function seed(knex) {
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
-      id: 4,
       name: 'Lorim ipsum dim sum?',
       description: 'Insert description here',
       views: 67,
@@ -63,7 +59,6 @@ export async function seed(knex) {
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
-      id: 5,
       name: 'War bad',
       description: 'Insert description here',
       views: 67,

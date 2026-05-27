@@ -8,7 +8,6 @@ export async function seed(knex) {
   await knex('messages').del()
   await knex('messages').insert([
     {
-      id: 1,
       chatid: 1,
       senderid: 2,
       send_date: '2026-05-04T01:01:24.336Z',
@@ -16,7 +15,6 @@ export async function seed(knex) {
       text: 'Bro what are you even on about cuh',
     },
     {
-      id: 2,
       chatid: 1,
       senderid: 1,
       send_date: '2026-05-04T01:01:24.336Z',
@@ -24,7 +22,6 @@ export async function seed(knex) {
       text: 'Lowkey the fault of some external force wallahi',
     },
     {
-      id: 3,
       chatid: 1,
       senderid: 2,
       send_date: '2026-05-04T01:01:24.336Z',

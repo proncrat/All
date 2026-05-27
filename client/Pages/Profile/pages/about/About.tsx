@@ -18,7 +18,7 @@ export function About() {
     return <div>Error: {error.message}</div>
   }
 
-  console.log(data.links)
+  //console.log(data.links)
 
   if (isSuccess) {
     return (

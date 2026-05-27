@@ -22,7 +22,7 @@ export function SettingsCustomize() {
     isSuccess,
   } = useUserData(userId, undefined, !idpend)
 
-  console.log(userdata)
+  //console.log(userdata)
 
   if (lesesh == null) {
     return <p>Log in you chud</p>

@@ -7,7 +7,6 @@ export async function seed(knex) {
   await knex('songs').del()
   await knex('songs').insert([
     {
-      id: 1,
       name: 'Star Shopping',
       url: '/audio/StarShopping.m4a',
       runtime: '2:22',
@@ -15,7 +14,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 2,
       name: 'Shes so nice',
       url: '/audio/shessonice.m4a',
       runtime: '2:43',

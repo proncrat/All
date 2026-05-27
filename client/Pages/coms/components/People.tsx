@@ -26,7 +26,7 @@ export function People() {
   const newChat = useNewChat()
 
   async function makeNewChat(data) {
-    console.log(data)
+    //console.log(data)
     await newChat.mutateAsync(data)
   }
 

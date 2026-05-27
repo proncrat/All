@@ -7,7 +7,6 @@ export async function seed(knex) {
   await knex('photos').del()
   await knex('photos').insert([
     {
-      id: 1,
       name: 'Jane',
       describe: 'Claude make me a description',
       url: 'https://images7.alphacoders.com/138/1380955.jpg',
@@ -15,7 +14,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 2,
       name: 'Jane',
       describe: 'Claude make me a description',
       url: 'https://upload.wikimedia.org/wikipedia/commons/3/34/Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg',
@@ -24,7 +22,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 3,
       name: 'Grace',
       describe: 'Claude make me a description',
       url: '/images/grace.jpg',
@@ -32,7 +29,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 4,
       name: 'Jane',
       describe: 'Claude make me a description',
       url: '/images/heres-a-2k-jane-doe-wallpaper-for-you-guys-v0-l0cux9p736md1.webp',
@@ -41,7 +37,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 5,
       name: 'Jane',
       describe: 'Claude make me a description',
       url: 'https://upload-os-bbs.hoyolab.com/upload/2024/08/16/369285726/77b9ccb657ebb10143e7cace873b4a3a_5603297584631518023.jpg',
@@ -50,7 +45,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 6,
       name: 'Jane',
       describe: 'Claude make me a description',
       url: 'https://storage.waifuwall.com/image/264.png',
@@ -58,7 +52,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 7,
       name: 'Jane',
       describe: 'Claude make me a description',
       url: 'https://blueoceancdn143.blob.core.windows.net/cache/c/b/d/4/1/f/cbd41f897abe97cdb746634d06a9c95e24803996.jpg',
@@ -67,7 +60,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 8,
       name: 'Holy',
       describe: 'Claude make me a description',
       url: '/images/holy.jfif',
@@ -75,7 +67,6 @@ export async function seed(knex) {
       author_id: 1,
     },
     {
-      id: 9,
       name: 'Goat',
       describe: 'Claude make me a description',
       url: '/images/goat.jfif',

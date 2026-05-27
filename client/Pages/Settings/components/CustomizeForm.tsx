@@ -26,7 +26,7 @@ export function CustomizeForm({ initialdata }) {
   }
 
   const links = JSON.parse(form.links)
-  console.log(links)
+  //console.log(links)
 
   function imgHandler(e) {
     const value = URL.createObjectURL(e.target.files[0])

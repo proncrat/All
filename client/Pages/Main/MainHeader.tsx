@@ -34,7 +34,7 @@ export function THEHEADER({ sidebar }) {
     isSuccess,
   } = useUserData(userId, undefined, !idpend)
 
-  console.log(userdata)
+  //console.log(userdata)
 
   function searchHandler(e) {
     e.preventdefault()

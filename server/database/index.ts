@@ -208,7 +208,7 @@ export async function updateUserfollows(data: Follow) {
     })
     .select()
 
-  console.log(numbers.length)
+  //console.log(numbers.length)
 
   //the current one following
   const numbers1 = await db('follows')
@@ -217,7 +217,7 @@ export async function updateUserfollows(data: Follow) {
     })
     .select()
 
-  console.log(numbers1.length)
+  //console.log(numbers1.length)
 
   await db('profiledata')
     .where({ id: data.followed_user_id })
