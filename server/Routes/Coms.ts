@@ -1,12 +1,16 @@
 import express from 'express'
-import { getchats, getmessages, newChat, newmessage } from '../database'
+import {
+  getchats,
+  getmessages,
+  newchat,
+  newChat,
+  newmessage,
+} from '../database'
 import { authMiddleware } from '../middleware/enpointauth'
 
 const router = express.Router()
 
-//For users obv
-//Test function would it ever be usefull?? who knows
-
+// make this refrence ids so message and chat endpoints are secure, probably
 router.use(authMiddleware)
 
 router.get('/chats/:id', async (req, res, next) => {
@@ -23,10 +27,10 @@ router.get('/chats/:id', async (req, res, next) => {
   }
 })
 
-router.post('/chats', async (req, res, next) => {
+router.post('/chat', async (req, res, next) => {
   try {
     const data = req.body
-    await newChat(data)
+    await newchat(data)
     return res.status(204).send('Nothing there')
   } catch (err) {
     next(err)

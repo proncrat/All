@@ -6,3 +6,9 @@ export async function sendMessage(message) {
   const response = await requestURL.send(message)
   return response.body
 }
+
+export async function newChat(data) {
+  const requestURL = request.post(`${rootURL}/coms/chat`)
+  const response = await requestURL.send(data)
+  return response.body
+}

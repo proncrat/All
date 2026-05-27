@@ -88,6 +88,30 @@ export async function getchats(ownerid: string) {
     .join('profiledata', 'chats.recieverid', 'profiledata.id')
 }
 
+export async function newchat(data) {
+  const result = await db('chats').max('chatid as number').first()
+  const newId = result.number + 1
+
+  const { ownerid, recieverid } = data
+
+  const chat1 = {
+    chatid: newId,
+    ownerid: ownerid,
+    recieverid: recieverid,
+    start_date: new Date(),
+  }
+
+  const chat2 = {
+    chatid: newId,
+    ownerid: recieverid,
+    recieverid: ownerid,
+    start_date: new Date(),
+  }
+
+  await db('chats').insert({ ...chat1 })
+  await db('chats').insert({ ...chat2 })
+}
+
 const get_messages_schema = [
   'messages.id',
   'messages.chatid',
@@ -238,8 +262,4 @@ export async function getFollowedById(userId: number) {
   return await db('follows')
     .where('follows.following_user_id', userId)
     .join('profiledata', 'follows.followed_user_id', 'profiledata.id')
-}
-
-export async function newChat(data) {
-  return await db('chats').insert({ ...data })
 }
