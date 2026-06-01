@@ -1,12 +1,15 @@
 import { useMessages } from '@/client/hooks'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { Sendbox } from './SENDBOX'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { ShownMessage } from './messages'
 
 export function Messagebox() {
   const { id } = useParams()
   const queryClient = useQueryClient()
+
+  const [mutationstate, setmessageload] = useState(false)
 
   const { data, isPending, isError, error, isSuccess } = useMessages(id)
 
@@ -38,35 +41,11 @@ export function Messagebox() {
     <div className="w-full h-full">
       <div className=" min-h-[80vh] max-h-[85vh] h-[95%] w-full p-5 flex flex-col-reverse gap-8 overflow-auto scrollbar hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]">
         {data.map((message, index) => (
-          <div key={index} className="flex gap-4">
-            <img
-              className="rounded-full w-12 aspect-square h-12"
-              alt="some pfp"
-              src={message.pfp}
-            />
-            <div>
-              <div className="flex gap-4 items-center">
-                <Link to={'/profile/' + message.senderid}>
-                  <p>{message.name}</p>
-                </Link>
-                <p className="text-xs text-zinc-400">
-                  {new Date(message.date).toLocaleString()}
-                </p>
-              </div>
-              {message.type == 'text' && <p>{message.text}</p>}
-              {message.type == 'img' && (
-                <img
-                  className="max-w-200 w-full"
-                  alt="idk vro"
-                  src={message.text}
-                />
-              )}
-            </div>
-          </div>
+          <ShownMessage key={index} data={message} />
         ))}
       </div>
       <div>
-        <Sendbox />
+        <Sendbox statecontrol={setmessageload} />
       </div>
     </div>
   )
