@@ -1,20 +1,21 @@
 import express from 'express'
-import {
-  getchats,
-  getmessages,
-  newchat,
-  newChat,
-  newmessage,
-} from '../database'
+import { getchats, getIdMatch, getmessages, newchat } from '../database'
 import { authMiddleware } from '../middleware/enpointauth'
 
 const router = express.Router()
 
-// make this refrence ids so message and chat endpoints are secure, probably
+async function getLinkId(authUserId: string) {
+  try {
+    const userId = await getIdMatch(authUserId)
+    return userId
+  } catch (error) {
+    throw new Error('link id error')
+  }
+}
+
 router.use(authMiddleware)
 
 router.get('/chats/:id', async (req, res, next) => {
-  //console.log(res.locals.session)
   try {
     const userid = req.params.id
     const data = await getchats(userid)
@@ -50,13 +51,17 @@ router.get('/:id', async (req, res, next) => {
   }
 })
 
+//pretty alright
 router.post('/', async (req, res, next) => {
+  const linkmatch = res.locals.session.session.userId
   try {
+    const userId = await getLinkId(linkmatch)
     const message = req.body
-    await newmessage(message)
-    return res.status(204).send('Nothing there')
-    //}
-    //res.json(data)
+    message.senderid = userId.id
+    message.send_date = new Date()
+    console.log(message)
+    //await newmessage(message)
+    return res.status(200).send('Nothing there')
   } catch (err) {
     next(err)
   }

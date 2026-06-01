@@ -12,31 +12,22 @@ export function Sendbox() {
   const { id } = useParams()
   const sendmessage = useSendMessage()
 
-  const [mutationstate, statecontrol] = useState(null)
-
-  const { data: lesesh, isPending: seshpend } = useSession()
-
-  const userseshid = lesesh?.session.userId
-
-  const { data: idcheck, isPending: idpend } = Usesessionid(
-    userseshid,
-    !seshpend,
-  )
+  const [mutationstate, statecontrol] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     const data = {
       chatid: id,
-      senderid: idcheck.id,
+      senderid: null,
       type: 'text',
       text: e.target.text.value,
-      send_date: new Date(),
+      send_date: null,
     }
 
     try {
       statecontrol('pending')
-      const redata = await sendmessage.mutateAsync(data)
+      await sendmessage.mutateAsync(data)
       statecontrol('success')
       setText('')
     } catch (error) {
