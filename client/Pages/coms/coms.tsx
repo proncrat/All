@@ -2,12 +2,7 @@ import { useChats, Usesessionid, useUserData } from '@/client/hooks'
 import { useSession } from '@/lib/auth'
 import { NavLink, Outlet, useParams } from 'react-router'
 import { FaPhone } from 'react-icons/fa6'
-import {
-  answerCall,
-  answercall2,
-  init_calls,
-  startCall,
-} from './components/call'
+
 import { Spinner } from '../Util/Spinner'
 
 export function Coms() {
@@ -36,14 +31,6 @@ export function Coms() {
     userid,
     !idpend,
   )
-
-  //console.log(data)
-  let peer = null
-
-  if (userdataload) {
-    peer = init_calls(userdata.peer_id)
-    answercall2(peer)
-  }
 
   if (isPending) {
     return <Spinner></Spinner>
