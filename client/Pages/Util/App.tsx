@@ -34,12 +34,12 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <CookiesProvider>
           <Toaster />
-          <THEHEADER sidebar={handlewidth} />
-          <div>
+          <div className="w-full h-screen">
+            <THEHEADER sidebar={handlewidth} />
             <SideBar width={width} />
             <div
               style={{ marginLeft: `${width}px` }}
-              className="mt-[50.2px] transition-all"
+              className=" transition-all pt-12 h-full"
             >
               <Outlet />
             </div>

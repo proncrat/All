@@ -1,7 +1,6 @@
 import { useChats, Usesessionid, useUserData } from '@/client/hooks'
 import { useSession } from '@/lib/auth'
 import { NavLink, Outlet, useParams } from 'react-router'
-import { FaPhone } from 'react-icons/fa6'
 
 import { Spinner } from '../Util/Spinner'
 
@@ -43,7 +42,7 @@ export function Coms() {
   return (
     <div className="flex h-full">
       <div
-        style={{ width: '250px', height: '94vh' }}
+        style={{ width: '250px' }}
         className=" shrink-0 border-r-2 p-4 gap-4 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
       >
         <NavLink
@@ -73,15 +72,7 @@ export function Coms() {
           </NavLink>
         ))}
       </div>
-      <div className="h-full w-full">
-        <div className="w-full h-10 border-b-2">
-          <button
-            onClick={() => startCall(peer, data[id - 1].peer_id)}
-            className="cursor-pointer"
-          >
-            <FaPhone className="hover:fill-gray-500" size={'25px'} />
-          </button>
-        </div>
+      <div className="w-full">
         <Outlet />
       </div>
     </div>

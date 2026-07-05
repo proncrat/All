@@ -1,5 +1,11 @@
 import express from 'express'
-import { getchats, getIdMatch, getmessages, newchat } from '../database'
+import {
+  getchats,
+  getIdMatch,
+  getmessages,
+  newchat,
+  newmessage,
+} from '../database'
 import { authMiddleware } from '../middleware/enpointauth'
 
 const router = express.Router()
@@ -56,11 +62,14 @@ router.post('/', async (req, res, next) => {
   const linkmatch = res.locals.session.session.userId
   try {
     const userId = await getLinkId(linkmatch)
+    if (!userId) {
+      return res.status(400).send('Invalid login credentials')
+    }
     const message = req.body
     message.senderid = userId.id
     message.send_date = new Date()
     console.log(message)
-    //await newmessage(message)
+    await newmessage(message)
     return res.status(200).send('Nothing there')
   } catch (err) {
     next(err)

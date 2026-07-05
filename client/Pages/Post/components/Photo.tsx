@@ -1,9 +1,8 @@
 import { useAddPhoto } from '@/client/hooks/useuploadphoto'
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
-import { describe } from 'node:test'
 
 export function PhotoUpload() {
-  const rootURL = new URL(`/api/v1`, document.baseURI)
+  //const rootURL = new URL(`/api/v1`, document.baseURI)
 
   const addPhoto = useAddPhoto()
 

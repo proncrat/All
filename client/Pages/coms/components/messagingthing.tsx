@@ -4,7 +4,9 @@ import { Sendbox } from './SENDBOX'
 import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { ShownMessage } from './messages'
-import WebRTCCall from './claude'
+import { FaPhone } from 'react-icons/fa6'
+
+//import WebRTCCall from './claude'
 
 export function Messagebox() {
   const { id } = useParams()
@@ -39,14 +41,24 @@ export function Messagebox() {
   }
 
   return (
-    <div className="w-full h-full">
-      <WebRTCCall />
-      <div className=" min-h-[80vh] max-h-[85vh] h-[95%] w-full p-5 flex flex-col-reverse gap-8 overflow-auto scrollbar hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]">
-        {data.map((message, index) => (
-          <ShownMessage key={index} data={message} />
-        ))}
+    <div className="flex flex-col h-full">
+      {/*<WebRTCCall />*/}
+      <div className="w-full h-10 border-b-2">
+        <button
+          onClick={() => startCall(peer, data[id - 1].peer_id)}
+          className="cursor-pointer"
+        >
+          <FaPhone className="hover:fill-gray-500" size={'25px'} />
+        </button>
       </div>
-      <div>
+      <div className="h-full">
+        <div className=" min-h-[80vh] max-h-[87vh] h-full w-full p-5 flex flex-col-reverse gap-8 overflow-auto scrollbar hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]">
+          {data.map((message, index) => (
+            <ShownMessage key={index} data={message} />
+          ))}
+        </div>
+      </div>
+      <div className="h-12">
         <Sendbox statecontrol={setmessageload} />
       </div>
     </div>
