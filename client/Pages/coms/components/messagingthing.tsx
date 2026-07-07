@@ -22,11 +22,14 @@ export function Messagebox() {
     // Handle incoming messages
     eventSource.onmessage = (event) => {
       console.log(event.data)
-      new Notification('GOD', {
-        body: 'Bro what',
-        icon: 'http://localhost:5173/images/janedoe2.jpg',
-      })
       queryClient.invalidateQueries({ queryKey: ['messages', id] })
+      setTimeout(() => {
+        console.log(data.at(0))
+        new Notification('GOD', {
+          body: data.at(0).text,
+          icon: data.at(0).pfp,
+        })
+      }, 1000)
     }
 
     // Cleanup: This function runs when the component unmounts
