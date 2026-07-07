@@ -138,6 +138,13 @@ export async function newmessage(data) {
   return await db('messages').insert({ ...data })
 }
 
+export async function deleteMessage(messageId: number, requesterId: number) {
+  return await db('messages')
+    .where('id', messageId)
+    .andWhere('senderid', requesterId)
+    .del()
+}
+
 //Test get all (Probably wont/shouldent be used)
 export async function getAllUsers() {
   return await db('profiledata').select()

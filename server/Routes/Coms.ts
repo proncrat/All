@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+  deleteMessage,
   getchats,
   getIdMatch,
   getmessages,
@@ -71,6 +72,19 @@ router.post('/', async (req, res, next) => {
     console.log(message)
     await newmessage(message)
     return res.status(200).send('Nothing there')
+  } catch (err) {
+    next(err)
+  }
+})
+
+//wow deletion
+router.delete('/', async (req, res, next) => {
+  try {
+    const linkmatch = res.locals.session.session.userId
+    const userId = await getLinkId(linkmatch)
+    const data = req.body
+    const lerespones = await deleteMessage(data.id, userId.id)
+    return res.status(200).send(lerespones)
   } catch (err) {
     next(err)
   }

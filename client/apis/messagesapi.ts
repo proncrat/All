@@ -7,6 +7,12 @@ export async function sendMessage(message) {
   return response.body
 }
 
+export async function deleteMessage(data) {
+  const requestURL = request.delete(`${rootURL}/coms`)
+  const response = await requestURL.send(data)
+  return response.body
+}
+
 export async function newChat(data) {
   const requestURL = request.post(`${rootURL}/coms/chat`)
   const response = await requestURL.send(data)
