@@ -53,23 +53,23 @@ export function ShownMessage(data) {
       </div>
       {temp == message.senderid && (
         <div className="flex h-min">
-          {other && (
-            <div className="bg-amber-800 px-2 py-1 rounded-sm flex flex-col ">
-              <button
-                onClick={() => deleteMessageReq({ id: message.id })}
-                className="cursor-pointer"
-              >
-                Delete
-              </button>
-              <button className="cursor-pointer">Edit</button>
-            </div>
-          )}
-          <button
+          <div
             onClick={stateHandler}
-            className="hover:bg-mist-800 p-1 rounded-sm cursor-pointer"
+            className="hover:bg-mist-800 p-1 rounded-sm cursor-pointer relative"
           >
             <IoEllipsisVerticalOutline />
-          </button>
+            {other && (
+              <div className="bg-amber-800 px-2 py-1 rounded-sm flex flex-col absolute right-0 top-7">
+                <button
+                  onClick={() => deleteMessageReq({ id: message.id })}
+                  className="cursor-pointer"
+                >
+                  Delete
+                </button>
+                <button className="cursor-pointer">Edit</button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -7,6 +7,7 @@ import { THEHEADER } from '../Main/MainHeader'
 import { Outlet } from 'react-router'
 import { Toaster } from '@/components/ui/sonner'
 import { SideBar } from '../Main/Sidebar'
+import { useSession } from '@/lib/auth'
 
 function App() {
   const queryClient = new QueryClient()
@@ -28,6 +29,34 @@ function App() {
       document.documentElement.classList.remove('dark')
     }
   }, [])
+
+  const { data: session, isPending: seshpend } = useSession()
+
+  useEffect(() => {
+    const myClientId = session?.user.id
+
+    console.log(myClientId)
+
+    // Pass the identifier as a query parameter when opening the SSE connection
+    const eventSource = new EventSource(
+      `http://localhost:3000/api/v1/test/events?clientId=${myClientId}`,
+    )
+
+    // Listen for incoming messages targeting this client
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      console.log('Received targeted message:', data)
+      new Notification(data.user, {
+        body: data.text,
+        icon: data.icon,
+      })
+    }
+
+    // Handle connection errors
+    eventSource.onerror = (err) => {
+      console.error('SSE Connection failed:', err)
+    }
+  }, [seshpend])
 
   return (
     <StrictMode>

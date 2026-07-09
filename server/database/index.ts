@@ -1,4 +1,4 @@
-import { sendDataToAllClients } from '../Routes/test.ts'
+import { sendDataToClient } from '../Routes/test.ts'
 import db from './connection.ts'
 
 //auth utilitys
@@ -134,8 +134,14 @@ export async function getmessages(chatId: string) {
 //messaging post
 
 export async function newmessage(data) {
-  sendDataToAllClients('newmessage')
-  return await db('messages').insert({ ...data })
+  console.log(data)
+  const userid = await getUnIdMatch(data.senderid)
+  sendDataToClient(userid.link_id, {
+    text: data.text,
+    icon: '',
+    user: 'person',
+  })
+  //return await db('messages').insert({ ...data })
 }
 
 export async function deleteMessage(messageId: number, requesterId: number) {
@@ -160,7 +166,7 @@ export async function getAllPhotos() {
   return await db('photos').select()
 }
 
-//comments get
+//comments
 
 const get_comment_schema = [
   'comments.post_date',
@@ -180,15 +186,21 @@ export async function getCommentsByLink(linkId: string, LinkType: string) {
     .orderBy([{ column: 'comments.id', order: 'desc' }])
 }
 
-//comments post
-
 export async function newCommentByLink(data) {
   return await db('comments').insert({ ...data })
+}
+
+export async function deleteCommentById(id: number) {
+  return await db('comments').where('id', id).del()
 }
 
 //Util to be replaced with auth usesession join?
 export async function getIdMatch(LinkId) {
   return await db('profiledata').select('id').where({ link_id: LinkId }).first()
+}
+
+export async function getUnIdMatch(LinkId) {
+  return await db('profiledata').select('link_id').where({ id: LinkId }).first()
 }
 
 //photo post

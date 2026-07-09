@@ -1,5 +1,5 @@
 import { useComments, Usesessionid } from '@/client/hooks'
-import { useAddComment } from '@/client/hooks/usecomments'
+import { useAddComment, useDeleteComment } from '@/client/hooks/usecomments'
 
 import { comment } from '@/client/models/comment'
 import { useParams } from 'react-router'
@@ -10,6 +10,7 @@ import { useSession } from '@/lib/auth'
 export function ProfileComments() {
   const { id } = useParams()
   const addcomment = useAddComment()
+  const deletecomment = useDeleteComment()
   const { data: lesesh } = useSession()
   const { data: idcheck, isSuccess } = Usesessionid(lesesh?.session.userId)
 
@@ -25,6 +26,11 @@ export function ProfileComments() {
     }
 
     await addcomment.mutateAsync(data)
+  }
+
+  async function handleDelete(Id: number) {
+    const data = { id: Id }
+    await deletecomment.mutateAsync(data)
   }
 
   const { data, isPending, isError, error } = useComments(id, 'profile')
@@ -73,7 +79,10 @@ export function ProfileComments() {
             </div>
             <div>
               {idcheck && idcheck.id === item.authorId && (
-                <button className="cursor-pointer">
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="cursor-pointer"
+                >
                   <ImBin />
                 </button>
               )}

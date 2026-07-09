@@ -1,5 +1,9 @@
 import express from 'express'
-import { getCommentsByLink, newCommentByLink } from '../database'
+import {
+  deleteCommentById,
+  getCommentsByLink,
+  newCommentByLink,
+} from '../database'
 const router = express.Router()
 
 //profile link test url
@@ -29,6 +33,16 @@ router.post('/', async (req, res, next) => {
     return res.status(204).send('Nothing there')
     //}
     //res.json(data)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.delete('/', async (req, res, next) => {
+  try {
+    const data = req.body
+    await deleteCommentById(data.id)
+    return res.status(200).send('Succesfully deleted')
   } catch (err) {
     next(err)
   }
