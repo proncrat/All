@@ -22,7 +22,7 @@ export function Messagebox() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {callStatus && <Call />}
       <div className=" h-12 border-b-2">
         <button onClick={() => setcallStatus(true)} className="cursor-pointer">

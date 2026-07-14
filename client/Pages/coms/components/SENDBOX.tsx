@@ -5,6 +5,7 @@ import { useParams } from 'react-router'
 import { Spinner } from '../../Util/Spinner'
 import { FaFileUpload } from 'react-icons/fa'
 import { Preview } from './ImgPreview'
+import { FaMicrophone } from 'react-icons/fa'
 
 export function Sendbox() {
   const baseUpload = {
@@ -78,6 +79,9 @@ export function Sendbox() {
           id="hiddenFileInput"
           style={{ display: 'none' }}
         />
+        <button className="bg-gray-700 w-8 aspect-square rounded flex justify-center items-center cursor-pointer">
+          <FaMicrophone size={'20px'} />
+        </button>
         <InputGroup className="w-full">
           {mutationstate == 'pending' && (
             <div className="w-3">

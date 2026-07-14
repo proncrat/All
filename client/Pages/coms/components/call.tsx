@@ -1,8 +1,12 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { prominent } from 'color.js'
 
 export function Call() {
   //THIS GETS DESKTOP CAPTURE LEL
   const testVideo = useRef(null)
+  const theWindow = useRef(null)
+
+  const [theheight, settheheight] = useState(false)
 
   async function THESTREAM() {
     try {
@@ -19,20 +23,49 @@ export function Call() {
     }
   }
 
+  function inflationmax() {
+    if (theheight) {
+      settheheight(false)
+    } else {
+      settheheight(true)
+    }
+  }
+
+  const handleImageLoad = async (event) => {
+    //console.log('Image loaded successfully!', event.target)
+    const color = await prominent(event.target, {
+      format: 'hex',
+    })
+    console.log(event.target.parent)
+    event.target.parentElement.style.backgroundColor = color[0]
+  }
+
   return (
-    <div className="absolute bg-[#2a006399] w-[stretch] flex flex-col gap-4 p-6">
+    <div
+      ref={theWindow}
+      className={`absolute bg-[#2a006399] w-[stretch] flex flex-col gap-4 p-6 z-10 ${
+        theheight && 'h-full'
+      }`}
+    >
       <div className="justify-center gap-6 flex">
-        <img
-          className="w-45"
-          src="https://www.eatingwell.com/thmb/5pRGCnuxy6aEEUUmibA3mid6EkM=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-Steamed-Fresh-Green-Beans-1x1-022_preview_maxWidth_4000_maxHeight_4000_ppi_300_quality_100-f3382e02472247a5be27451fdbade752.jpg"
-          alt=""
-        ></img>
-        <img
-          className="w-45"
-          src="https://www.eatingwell.com/thmb/5pRGCnuxy6aEEUUmibA3mid6EkM=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-Steamed-Fresh-Green-Beans-1x1-022_preview_maxWidth_4000_maxHeight_4000_ppi_300_quality_100-f3382e02472247a5be27451fdbade752.jpg"
-          alt=""
-        ></img>
-        <video autoPlay ref={testVideo} className="w-45" />
+        <div className=" relative w-full aspect-video bg-transparent transition flex justify-center items-center rounded-sm">
+          <div className="absolute border-3 border-green-500 h-full w-full rounded-sm " />
+          <img
+            className="w-25 h-25 rounded-full "
+            src="http://localhost:5173/images/janedoe2.jpg"
+            alt=""
+            onLoad={handleImageLoad}
+          />
+        </div>
+        <div className="relative w-full aspect-video bg-transparent flex justify-center items-center rounded-sm">
+          <img
+            className="w-25 h-25 rounded-full"
+            src="http://localhost:5173/images/grace.jpg"
+            alt=""
+            onLoad={handleImageLoad}
+          />
+        </div>
+        {/*<video autoPlay ref={testVideo} className="w-full" />*/}
       </div>
       <div className="flex justify-center gap-4">
         <button
@@ -43,6 +76,12 @@ export function Call() {
         </button>
         <button className="bg-amber-950 px-2 rounded-sm cursor-pointer">
           END CALL
+        </button>
+        <button
+          onClick={inflationmax}
+          className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+        >
+          Make it big
         </button>
       </div>
     </div>
