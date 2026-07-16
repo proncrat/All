@@ -6,7 +6,7 @@ export const CallerCard = forwardRef<HTMLVideoElement>(function CallerCard(
   ref,
 ) {
   return (
-    <div className="max-w-150 relative w-full aspect-video bg-transparent transition flex justify-center items-center rounded-sm">
+    <div className="max-w-150 relative aspect-video bg-transparent transition flex justify-center items-center rounded-sm">
       {data.istalking && (
         <div className="absolute border-3 border-green-500 h-full w-full rounded-sm " />
       )}

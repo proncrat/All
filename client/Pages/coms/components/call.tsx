@@ -1,11 +1,16 @@
 import { useRef, useState } from 'react'
 import { CallerCard } from './callercard'
 
-export function Call() {
+export function Call({ callback }) {
   //THIS GETS DESKTOP CAPTURE LEL
   const theWindow = useRef(null)
 
   const [theheight, settheheight] = useState(false)
+
+  //all for the stream
+  const [streamingscreen, setstreamingscreen] = useState(false)
+  const [streamId, setStreamId] = useState(NaN)
+  const [streamVid, setStreamVid] = useState()
 
   const [people, setpeople] = useState([
     {
@@ -22,6 +27,47 @@ export function Call() {
     },
   ])
 
+  function ENDDACALL() {
+    callback(false)
+  }
+
+  async function shareScreenLocal() {
+    setstreamingscreen(true)
+    const maxId = people.reduce(
+      (max, item) => (item.id > max ? item.id : max),
+      -Infinity,
+    )
+    const temp_id = maxId + 1
+    leAddVideo(temp_id)
+    setStreamId(temp_id)
+    try {
+      const captureStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: false,
+      })
+      setSource(temp_id, captureStream)
+
+      const videoTrack = captureStream.getVideoTracks()[0]
+      setStreamVid(videoTrack)
+      videoTrack.addEventListener('ended', () => {
+        console.log('User clicked the native stop sharing button.')
+
+        stopStream()
+      })
+    } catch (err) {
+      //one day actual error handling
+      console.error('Error capturing screen: ', err)
+    }
+  }
+
+  function stopStream() {
+    leRemoveVideo(streamId)
+    setstreamingscreen(false)
+    if (streamVid) {
+      streamVid.stop()
+    }
+  }
+
   // does a thing????
   const videoRefs = useRef(new Map())
 
@@ -29,27 +75,24 @@ export function Call() {
     return videoRefs.current
   }
 
-  function playVideo(id, stream) {
+  function setSource(id, stream) {
     const node = getMap().get(id)
     console.log(node)
     if (node) node.srcObject = stream
   }
 
-  //gets desktop shid
-  async function THESTREAM() {
-    leAddVideo()
-    try {
-      // Request permission and get the video stream
-      const captureStream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: false, // Set to true if you need to capture system audio
-      })
+  const leAddVideo = (tempid) => {
+    const temp = [...people]
+    const video = { id: tempid, isvideo: true }
+    console.log(people)
+    console.log(temp)
+    temp.push(video)
+    setpeople(temp)
+  }
 
-      // Bind the stream to the HTML video element
-      playVideo(3, captureStream)
-    } catch (err) {
-      console.error('Error capturing screen: ', err)
-    }
+  const leRemoveVideo = (tempid) => {
+    const updatedItems = people.filter((item) => item.id !== tempid)
+    setpeople(updatedItems)
   }
 
   function inflationmax() {
@@ -58,15 +101,6 @@ export function Call() {
     } else {
       settheheight(true)
     }
-  }
-
-  const leAddVideo = () => {
-    const temp = [...people]
-    const video = { id: 3, isvideo: true }
-    console.log(people)
-    console.log(temp)
-    temp.push(video)
-    setpeople(temp)
   }
 
   //The change things in lists function
@@ -83,11 +117,15 @@ export function Call() {
   return (
     <div
       ref={theWindow}
-      className={`absolute bg-[#11001cf4] w-[stretch] flex flex-col gap-4 p-6 z-10 ${
+      className={`absolute bg-[#11001cf4] w-[stretch] flex flex-col gap-4 p-6 z-10 items-center ${
         theheight && 'h-full'
       }`}
     >
-      <div className="justify-center gap-6 flex">
+      <div
+        className="grid gap-2 p-2 h-full
+            grid-cols-[repeat(auto-fit,minmax(300px,1fr))]
+            auto-rows-fr w-full"
+      >
         {people.map((person) => (
           <CallerCard
             key={person.id}
@@ -103,15 +141,25 @@ export function Call() {
           />
         ))}
       </div>
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-4 bg-cyan-400 p-2 rounded-sm max-w-fit">
+        {streamingscreen ? (
+          <button
+            onClick={stopStream}
+            className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+          >
+            End Stream
+          </button>
+        ) : (
+          <button
+            onClick={shareScreenLocal}
+            className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+          >
+            Stream Screen
+          </button>
+        )}
+
         <button
-          onClick={THESTREAM}
-          className="bg-amber-950 px-2 rounded-sm cursor-pointer"
-        >
-          STREAM SCREEN?
-        </button>
-        <button
-          onClick={() => talkingtest(2)}
+          onClick={ENDDACALL}
           className="bg-amber-950 px-2 rounded-sm cursor-pointer"
         >
           END CALL

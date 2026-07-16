@@ -23,7 +23,7 @@ export function Messagebox() {
 
   return (
     <div className="flex flex-col h-full relative">
-      {callStatus && <Call />}
+      {callStatus && <Call callback={setcallStatus} />}
       <div className=" h-12 border-b-2">
         <button onClick={() => setcallStatus(true)} className="cursor-pointer">
           <FaPhone className="hover:fill-gray-500" size={'25px'} />
