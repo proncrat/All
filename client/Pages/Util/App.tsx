@@ -45,18 +45,20 @@ function App() {
     // Listen for incoming messages targeting this client
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      console.log('Received targeted message:', data)
-      new Notification(data.user, {
-        body: data.text,
-        icon: data.icon,
-      })
+      if (data.type == 'notification') {
+        console.log('Received targeted message:', data)
+        new Notification(data.user, {
+          body: data.text,
+          icon: data.icon,
+        })
+      }
     }
 
     // Handle connection errors
     eventSource.onerror = (err) => {
       console.error('SSE Connection failed:', err)
     }
-  }, [seshpend])
+  }, [seshpend, session])
 
   return (
     <StrictMode>

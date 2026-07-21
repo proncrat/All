@@ -15,6 +15,7 @@ export const CallerCard = forwardRef<HTMLVideoElement>(function CallerCard(
           autoPlay
           ref={ref}
           className="w-full h-full  bg-black rounded-sm"
+          type="video/mp4; codecs=hevc"
         />
       ) : (
         <img

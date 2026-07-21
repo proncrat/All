@@ -1,5 +1,11 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { CallerCard } from './callercard'
+import { FcEndCall } from 'react-icons/fc'
+import { LuScreenShare, LuScreenShareOff } from 'react-icons/lu'
+import { BiSolidMicrophone, BiSolidMicrophoneOff } from 'react-icons/bi'
+import { FaChevronCircleDown } from 'react-icons/fa'
+import { useNewSse } from '@/client/hooks/useCall'
+import { useSession } from '@/lib/auth'
 
 export function Call({ callback }) {
   //THIS GETS DESKTOP CAPTURE LEL
@@ -16,14 +22,16 @@ export function Call({ callback }) {
     {
       img: 'http://localhost:5173/images/janedoe2.jpg',
       id: 1,
-      istalking: true,
+      istalking: false,
       isvideo: false,
+      iscamera: false,
     },
     {
       img: 'http://localhost:5173/images/grace.jpg',
       id: 2,
       istalking: false,
       isvideo: false,
+      iscamera: false,
     },
   ])
 
@@ -43,7 +51,7 @@ export function Call({ callback }) {
     try {
       const captureStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
-        audio: false,
+        audio: true,
       })
       setSource(temp_id, captureStream)
 
@@ -114,6 +122,220 @@ export function Call({ callback }) {
     setpeople(updatedTasks)
   }
 
+  //The exchange for calls using sse?
+  const [offerSDP, setOfferSDP] = useState('')
+
+  //
+  async function testcall() {
+    const sdp = await startCall()
+    sendCallRequest('oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS', JSON.stringify(sdp))
+  }
+
+  const { data: session, isPending: seshpend } = useSession()
+  const ssemessage = useNewSse()
+
+  //sends sdp request to other client
+  async function sendCallRequest(id: string, sdpthing?: string) {
+    const data = {
+      targetClientId: id,
+      message: { type: 'call', offer: sdpthing, order: 'initial' },
+    }
+
+    await ssemessage.mutateAsync(data)
+  }
+
+  useEffect(() => {
+    const myClientId = session?.user.id
+
+    const eventSource = new EventSource(
+      `http://localhost:3000/api/v1/test/events?clientId=${myClientId}`,
+    )
+
+    // Listen for incoming messages targeting this client
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      if (data.type == 'call') {
+        console.log('Received targeted message:', data)
+      }
+    }
+
+    // Handle connection errors
+    eventSource.onerror = (err) => {
+      console.error('SSE Connection failed:', err)
+    }
+  }, [seshpend, session])
+
+  //THIS STUFF IS FOR THE CALL IT SELF
+
+  const ICE_SERVERS = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+    ],
+  }
+
+  const [phase, setPhase] = useState('idle') // idle | ready | calling | connected
+  const [answerSDP, setAnswerSDP] = useState('')
+  const [remoteInput, setRemoteInput] = useState('')
+  const [micOn, setMicOn] = useState(true)
+  const [camOn, setCamOn] = useState(true)
+  const [error, setError] = useState('')
+
+  const pcRef = useRef(null)
+  const localStreamRef = useRef(null)
+  const localVideoRef = useRef(null)
+  const remoteVideoRef = useRef(null)
+
+  const cleanup = useCallback(() => {
+    if (pcRef.current) {
+      pcRef.current.close()
+      pcRef.current = null
+    }
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((t) => t.stop())
+      localStreamRef.current = null
+    }
+    if (localVideoRef.current) localVideoRef.current.srcObject = null
+    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null
+    setPhase('idle')
+    setOfferSDP('')
+    setAnswerSDP('')
+    setRemoteInput('')
+    setError('')
+  }, [])
+
+  useEffect(() => () => cleanup(), [cleanup])
+
+  const getMedia = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    })
+    localStreamRef.current = stream
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = stream
+    }
+    return stream
+  }
+
+  const buildPC = (stream) => {
+    const pc = new RTCPeerConnection(ICE_SERVERS)
+    pcRef.current = pc
+
+    stream.getTracks().forEach((track) => pc.addTrack(track, stream))
+
+    pc.ontrack = (e) => {
+      if (remoteVideoRef.current && e.streams[0]) {
+        remoteVideoRef.current.srcObject = e.streams[0]
+        setPhase('connected')
+      }
+    }
+
+    pc.oniceconnectionstatechange = () => {
+      if (
+        pc.iceConnectionState === 'disconnected' ||
+        pc.iceConnectionState === 'failed'
+      ) {
+        setError('Connection lost.')
+        setPhase('ready')
+      }
+    }
+
+    return pc
+  }
+
+  const startCall = async () => {
+    setError('')
+    try {
+      const stream = await getMedia()
+      const pc = buildPC(stream)
+      setPhase('calling')
+
+      // Gather all ICE candidates before sharing (trickle-less for simplicity)
+      const offer = await pc.createOffer()
+      await pc.setLocalDescription(offer)
+
+      console.log(pc.localDescription)
+      setOfferSDP(pc.localDescription)
+
+      return pc.localDescription
+      /*
+      await new Promise((resolve) => {
+        if (pc.iceGatheringState === 'complete') return resolve()
+        pc.onicegatheringstatechange = () => {
+          if (pc.iceGatheringState === 'complete') resolve()
+        }
+      })
+*/
+    } catch (e) {
+      setError(e.message)
+      setPhase('idle')
+    }
+  }
+
+  const submitAnswer = async () => {
+    setError('')
+    try {
+      const answer = JSON.parse(remoteInput.trim())
+      await pcRef.current.setRemoteDescription(
+        new RTCSessionDescription(answer),
+      )
+    } catch (e) {
+      setError('Invalid answer SDP: ' + e.message)
+    }
+  }
+
+  const acceptCall = async () => {
+    setError('')
+    try {
+      const offer = JSON.parse(remoteInput.trim())
+      const stream = await getMedia()
+      const pc = buildPC(stream)
+      setPhase('calling')
+
+      await pc.setRemoteDescription(new RTCSessionDescription(offer))
+      const answer = await pc.createAnswer()
+      await pc.setLocalDescription(answer)
+
+      await new Promise((resolve) => {
+        if (pc.iceGatheringState === 'complete') return resolve()
+        pc.onicegatheringstatechange = () => {
+          if (pc.iceGatheringState === 'complete') resolve()
+        }
+      })
+
+      setAnswerSDP(JSON.stringify(pc.localDescription))
+      setRemoteInput('')
+    } catch (e) {
+      setError('Failed to accept: ' + e.message)
+      setPhase('idle')
+    }
+  }
+
+  const toggleMic = () => {
+    const track = localStreamRef.current?.getAudioTracks()[0]
+    if (track) {
+      track.enabled = !track.enabled
+      setMicOn((v) => !v)
+    }
+  }
+
+  const toggleCam = () => {
+    const track = localStreamRef.current?.getVideoTracks()[0]
+    if (track) {
+      track.enabled = !track.enabled
+      setCamOn((v) => !v)
+    }
+  }
+
+  const isActive = phase === 'calling' || phase === 'connected'
+  const statusMap = {
+    idle: 'Ready to connect',
+    ready: 'Media acquired',
+    calling: 'Exchanging signals…',
+    connected: 'Connected',
+  }
+
   return (
     <div
       ref={theWindow}
@@ -147,14 +369,29 @@ export function Call({ callback }) {
             onClick={stopStream}
             className="bg-amber-950 px-2 rounded-sm cursor-pointer"
           >
-            End Stream
+            <LuScreenShareOff />
           </button>
         ) : (
           <button
             onClick={shareScreenLocal}
             className="bg-amber-950 px-2 rounded-sm cursor-pointer"
           >
-            Stream Screen
+            <LuScreenShare />
+          </button>
+        )}
+        {micOn ? (
+          <button
+            onClick={toggleMic}
+            className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+          >
+            <BiSolidMicrophone />
+          </button>
+        ) : (
+          <button
+            onClick={toggleMic}
+            className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+          >
+            <BiSolidMicrophoneOff />
           </button>
         )}
 
@@ -162,14 +399,22 @@ export function Call({ callback }) {
           onClick={ENDDACALL}
           className="bg-amber-950 px-2 rounded-sm cursor-pointer"
         >
-          END CALL
+          <FcEndCall />
         </button>
         <button
           onClick={inflationmax}
           className="bg-amber-950 px-2 rounded-sm cursor-pointer"
         >
-          Make it big
+          <FaChevronCircleDown />
         </button>
+        <button
+          onClick={testcall}
+          className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+        >
+          Test call
+        </button>
+        <p>{error}</p>
+        <p>{phase}</p>
       </div>
     </div>
   )

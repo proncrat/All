@@ -3,10 +3,10 @@ import { IoEllipsisVerticalOutline } from 'react-icons/io5'
 import { useState } from 'react'
 import { useDeleteMessage } from '@/client/hooks/usemessages'
 
-export function ShownMessage(data) {
+export function ShownMessage({ data, userId }) {
   const [other, setother] = useState(false)
 
-  const message = data.data
+  const message = data
 
   function stateHandler() {
     if (other) {
@@ -21,8 +21,6 @@ export function ShownMessage(data) {
   async function deleteMessageReq(data) {
     await deleteMessage.mutateAsync(data)
   }
-
-  const temp = 1
 
   return (
     <div className="flex justify-between">
@@ -51,7 +49,7 @@ export function ShownMessage(data) {
           )}
         </div>
       </div>
-      {temp == message.senderid && (
+      {userId == message.senderid && (
         <div className="flex h-min">
           <div
             onClick={stateHandler}
