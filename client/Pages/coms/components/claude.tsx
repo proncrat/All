@@ -401,12 +401,15 @@ export default function WebRTCCall() {
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
 
-      await new Promise((resolve) => {
-        if (pc.iceGatheringState === 'complete') return resolve()
-        pc.onicegatheringstatechange = () => {
-          if (pc.iceGatheringState === 'complete') resolve()
-        }
-      })
+      await Promise.race([
+        new Promise<void>((resolve) => {
+          if (pc.iceGatheringState === 'complete') return resolve()
+          pc.onicegatheringstatechange = () => {
+            if (pc.iceGatheringState === 'complete') resolve()
+          }
+        }),
+        new Promise<void>((resolve) => setTimeout(resolve, 2000)), // give up after 2s, use whatever candidates you have
+      ])
 
       setOfferSDP(JSON.stringify(pc.localDescription))
     } catch (e) {
@@ -441,12 +444,15 @@ export default function WebRTCCall() {
       const answer = await pc.createAnswer()
       await pc.setLocalDescription(answer)
 
-      await new Promise((resolve) => {
-        if (pc.iceGatheringState === 'complete') return resolve()
-        pc.onicegatheringstatechange = () => {
-          if (pc.iceGatheringState === 'complete') resolve()
-        }
-      })
+      await Promise.race([
+        new Promise<void>((resolve) => {
+          if (pc.iceGatheringState === 'complete') return resolve()
+          pc.onicegatheringstatechange = () => {
+            if (pc.iceGatheringState === 'complete') resolve()
+          }
+        }),
+        new Promise<void>((resolve) => setTimeout(resolve, 2000)), // give up after 2s, use whatever candidates you have
+      ])
 
       setAnswerSDP(JSON.stringify(pc.localDescription))
       setRemoteInput('')

@@ -6,6 +6,7 @@ import { ShownMessage } from './messages'
 import { FaPhone } from 'react-icons/fa6'
 import { Call } from './call'
 import { useFetchId } from '@/client/hooks/useId'
+import { Spinner } from '../../Util/Spinner'
 
 //import WebRTCCall from './claude'
 
@@ -23,7 +24,7 @@ export function Messagebox() {
   const userid = leId.userid
 
   if (isPending) {
-    return <p>beans</p>
+    return <Spinner />
   }
 
   return (

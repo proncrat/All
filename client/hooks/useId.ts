@@ -25,5 +25,5 @@ export function useFetchId() {
     loading = false
   }
 
-  return { data, loading: loading, error: problem1 }
+  return { data, loading, error: problem1 }
 }

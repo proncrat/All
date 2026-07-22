@@ -6,6 +6,7 @@ import { BiSolidMicrophone, BiSolidMicrophoneOff } from 'react-icons/bi'
 import { FaChevronCircleDown } from 'react-icons/fa'
 import { useNewSse } from '@/client/hooks/useCall'
 import { useSession } from '@/lib/auth'
+import WebRTCCall from './claude'
 
 export function Call({ callback }) {
   //THIS GETS DESKTOP CAPTURE LEL
@@ -122,23 +123,54 @@ export function Call({ callback }) {
     setpeople(updatedTasks)
   }
 
+  /* ----THE CALLING SECTION CLEANUP WILL BE NECASSARY---- */
+
   //The exchange for calls using sse?
-  const [offerSDP, setOfferSDP] = useState('')
+  const [mysdp, setmysdp] = useState('')
+  const [theirsdp, settheirsdp] = useState('')
+  const [finalsdp, setfinalsdp] = useState('')
+
+  const ringtone = useRef(null)
 
   //
   async function testcall() {
     const sdp = await startCall()
-    sendCallRequest('oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS', JSON.stringify(sdp))
+    //My vclient id :oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS
+    //Bros client id : rztLnolAoFGAaevREVdZcUgsv7GXVlEq
+    sendCallRequest(
+      'rztLnolAoFGAaevREVdZcUgsv7GXVlEq',
+      JSON.stringify(sdp),
+      'initial',
+    )
+  }
+
+  async function testanswerCall() {
+    const sdp = await acceptCall()
+    sendCallRequest(
+      'oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS',
+      JSON.stringify(sdp),
+      'final',
+    )
+  }
+
+  function letest() {
+    if (pcRef.current) {
+      console.log('Current Connection State ' + pcRef.current.connectionState)
+    }
   }
 
   const { data: session, isPending: seshpend } = useSession()
   const ssemessage = useNewSse()
 
   //sends sdp request to other client
-  async function sendCallRequest(id: string, sdpthing?: string) {
+  async function sendCallRequest(
+    id: string,
+    sdpthing?: string,
+    order?: string,
+  ) {
     const data = {
       targetClientId: id,
-      message: { type: 'call', offer: sdpthing, order: 'initial' },
+      message: { type: 'call', order: order, offer: sdpthing },
     }
 
     await ssemessage.mutateAsync(data)
@@ -154,8 +186,17 @@ export function Call({ callback }) {
     // Listen for incoming messages targeting this client
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
+
       if (data.type == 'call') {
-        console.log('Received targeted message:', data)
+        if (data.order == 'final') {
+          console.log('Received targeted message:', data)
+          submitAnswer(data.offer)
+        } else {
+          console.log('Received targeted message:', data)
+          settheirsdp(data.offer)
+          //console.log(theirsdp)
+          //ringtone.current.play()
+        }
       }
     }
 
@@ -175,6 +216,7 @@ export function Call({ callback }) {
   }
 
   const [phase, setPhase] = useState('idle') // idle | ready | calling | connected
+  const [offerSDP, setOfferSDP] = useState('')
   const [answerSDP, setAnswerSDP] = useState('')
   const [remoteInput, setRemoteInput] = useState('')
   const [micOn, setMicOn] = useState(true)
@@ -255,9 +297,19 @@ export function Call({ callback }) {
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
 
-      console.log(pc.localDescription)
-      setOfferSDP(pc.localDescription)
+      //console.log(pc.localDescription)
+      //setOfferSDP(pc.localDescription)
 
+      await Promise.race([
+        new Promise<void>((resolve) => {
+          if (pc.iceGatheringState === 'complete') return resolve()
+          pc.onicegatheringstatechange = () => {
+            if (pc.iceGatheringState === 'complete') resolve()
+          }
+        }),
+        new Promise<void>((resolve) => setTimeout(resolve, 2000)), // give up after 2s, use whatever candidates you have
+      ])
+      console.log('Current Connection State ' + pc.connectionState)
       return pc.localDescription
       /*
       await new Promise((resolve) => {
@@ -273,10 +325,11 @@ export function Call({ callback }) {
     }
   }
 
-  const submitAnswer = async () => {
+  //For me not for thee
+  const submitAnswer = async (sdp) => {
     setError('')
     try {
-      const answer = JSON.parse(remoteInput.trim())
+      const answer = JSON.parse(sdp)
       await pcRef.current.setRemoteDescription(
         new RTCSessionDescription(answer),
       )
@@ -285,10 +338,11 @@ export function Call({ callback }) {
     }
   }
 
+  //for the other person to accept
   const acceptCall = async () => {
     setError('')
     try {
-      const offer = JSON.parse(remoteInput.trim())
+      const offer = JSON.parse(theirsdp)
       const stream = await getMedia()
       const pc = buildPC(stream)
       setPhase('calling')
@@ -297,15 +351,27 @@ export function Call({ callback }) {
       const answer = await pc.createAnswer()
       await pc.setLocalDescription(answer)
 
+      await Promise.race([
+        new Promise<void>((resolve) => {
+          if (pc.iceGatheringState === 'complete') return resolve()
+          pc.onicegatheringstatechange = () => {
+            if (pc.iceGatheringState === 'complete') resolve()
+          }
+        }),
+        new Promise<void>((resolve) => setTimeout(resolve, 2000)), // give up after 2s, use whatever candidates you have
+      ])
+
+      /*
       await new Promise((resolve) => {
         if (pc.iceGatheringState === 'complete') return resolve()
         pc.onicegatheringstatechange = () => {
           if (pc.iceGatheringState === 'complete') resolve()
         }
       })
-
-      setAnswerSDP(JSON.stringify(pc.localDescription))
+*/
+      //setAnswerSDP(JSON.stringify(pc.localDescription))
       setRemoteInput('')
+      return pc.localDescription
     } catch (e) {
       setError('Failed to accept: ' + e.message)
       setPhase('idle')
@@ -343,11 +409,16 @@ export function Call({ callback }) {
         theheight && 'h-full'
       }`}
     >
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption*/}
+      <audio className="hidden" ref={ringtone}>
+        <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
+      </audio>
       <div
         className="grid gap-2 p-2 h-full
             grid-cols-[repeat(auto-fit,minmax(300px,1fr))]
             auto-rows-fr w-full"
       >
+        <video ref={remoteVideoRef} autoPlay></video>
         {people.map((person) => (
           <CallerCard
             key={person.id}
@@ -413,8 +484,18 @@ export function Call({ callback }) {
         >
           Test call
         </button>
-        <p>{error}</p>
-        <p>{phase}</p>
+        <button
+          onClick={testanswerCall}
+          className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+        >
+          Answer? call
+        </button>
+        <button
+          onClick={letest}
+          className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+        >
+          test
+        </button>
       </div>
     </div>
   )

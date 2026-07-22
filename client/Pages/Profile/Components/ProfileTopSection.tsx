@@ -7,6 +7,7 @@ import {
   useDeleteFollow,
   useGetFollowing,
 } from '@/client/hooks/useFollow'
+import { useFetchId } from '@/client/hooks/useId'
 
 function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   //const [banner, setbanner] = useState(true)
@@ -28,20 +29,13 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
 
   const navigate = useNavigate()
 
-  const { data: session, isPending: seshpend } = useSession()
+  const { data: leId, loading: leLoading, error: leError } = useFetchId()
 
-  const userseshid = session?.session.userId
-
-  const { data: idcheck, isPending: idpend } = Usesessionid(
-    userseshid,
-    !seshpend,
-  )
-
-  const userId = idcheck?.id
+  const userId = leId.userid
 
   const { data: followersthing, isPending: followpending } = useGetFollowing(
     userId,
-    !idpend,
+    !leLoading,
   )
 
   //console.log(userId)
@@ -136,7 +130,7 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
                 {data.describe && <p>{`${data.describe}`}</p>}
 
                 <div className="flex flex-row gap-2">
-                  {session && data.link_id == session.user.id && (
+                  {data.id == userId && (
                     <button
                       onClick={() => navigate('/settings/customize')}
                       className="abutton mt-2"
@@ -144,7 +138,7 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
                       Customize
                     </button>
                   )}
-                  {session && data.link_id !== session.user.id && (
+                  {data.id !== userId && (
                     <div>
                       {!followstatus && (
                         <button onClick={follow} className="abutton mt-2">
