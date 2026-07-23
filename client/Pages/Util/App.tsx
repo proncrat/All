@@ -8,6 +8,7 @@ import { Outlet } from 'react-router'
 import { Toaster } from '@/components/ui/sonner'
 import { SideBar } from '../Main/Sidebar'
 import { useSession } from '@/lib/auth'
+import { CallingStuffs } from './Calls'
 
 function App() {
   const queryClient = new QueryClient()
@@ -29,7 +30,7 @@ function App() {
       document.documentElement.classList.remove('dark')
     }
   }, [])
-
+  /*
   const { data: session, isPending: seshpend } = useSession()
 
   useEffect(() => {
@@ -59,7 +60,7 @@ function App() {
       console.error('SSE Connection failed:', err)
     }
   }, [seshpend, session])
-
+*/
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -68,6 +69,7 @@ function App() {
           <div className="w-full h-screen">
             <THEHEADER sidebar={handlewidth} />
             <SideBar width={width} />
+            <CallingStuffs />
             <div
               style={{ marginLeft: `${width}px` }}
               className=" transition-all pt-12 h-full"

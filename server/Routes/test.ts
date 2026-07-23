@@ -19,7 +19,7 @@ router.get('/events', (req, res) => {
   })
 
   // 3. Keep connection alive with an initial heartbeat/ping
-  //res.write('data: {"text": "connected"}\n\n')
+  res.write('data: {"text": "connected"}\n\n')
 
   // 4. Store the response object mapped to the client identifier
   clients.set(clientId, res)

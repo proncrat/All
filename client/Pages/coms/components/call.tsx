@@ -248,11 +248,18 @@ export function Call({ callback }) {
 
   useEffect(() => () => cleanup(), [cleanup])
 
+  const constraints = {
+    audio: {
+      echoCancellation: false, // Reduces echoes in calls
+      noiseSuppression: false, // Filters out background noise
+      autoGainControl: false, // Adjusts microphone volume automatically
+      sampleRate: 48000, // Sets the audio sample rate
+    },
+    video: true,
+  }
+
   const getMedia = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    })
+    const stream = await navigator.mediaDevices.getUserMedia(constraints)
     localStreamRef.current = stream
     if (localVideoRef.current) {
       localVideoRef.current.srcObject = stream
