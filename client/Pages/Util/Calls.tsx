@@ -234,19 +234,102 @@ export function CallingStuffs() {
     connected: 'Connected',
   }
 
+  const [volume, setVolume] = useState(0)
+  const [talking, settalking] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+
+  useEffect(() => {
+    if (!isListening) return
+
+    let audioContext
+    let analyser
+    let dataArray
+    let source
+    let animationId
+
+    async function setupAudio() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        })
+        audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        analyser = audioContext.createAnalyser()
+        analyser.fftSize = 256
+
+        source = audioContext.createMediaStreamSource(stream)
+        source.connect(analyser)
+
+        dataArray = new Uint8Array(analyser.frequencyBinCount)
+
+        function updateVolume() {
+          analyser.getByteFrequencyData(dataArray)
+          let sum = 0
+          for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i]
+          }
+          const average = sum / dataArray.length
+          setVolume(Math.round(average))
+          animationId = requestAnimationFrame(updateVolume)
+        }
+
+        updateVolume()
+      } catch (err) {
+        console.error('Microphone access denied or not supported', err)
+        setIsListening(false)
+      }
+    }
+
+    setupAudio()
+
+    return () => {
+      cancelAnimationFrame(animationId)
+      if (audioContext && audioContext.state !== 'closed') {
+        audioContext.close()
+      }
+    }
+  }, [isListening])
+
   return (
-    <div className={`fixed z-50 bottom-0 ${!isActive2 && 'hidden'} `}>
-      <div className="bg-black m-5 p-4 rounded-sm">
+    <div className={`fixed z-50 bottom-0 `}>
+      {/*<div className={`fixed z-50 bottom-0 ${!isActive2 && 'hidden'} `}>*/}
+
+      <div style={{ padding: '20px' }}>
+        <button onClick={() => setIsListening(!isListening)}>
+          {isListening ? 'Stop Listening' : 'Start Listening'}
+        </button>
+      </div>
+      <div className="bg-black m-5 p-2 rounded-sm">
         <audio className="hidden" ref={ringtone}>
           <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
         </audio>
-        <audio />
         <div className="flex gap-3">
-          <p>Incoming call</p>
-          <button className="cursor-pointer">✓</button>
-          <button onClick={DeclineCall} className="cursor-pointer">
-            X
-          </button>
+          <div className="relative">
+            {volume > 0 && (
+              <div className="absolute border-3 border-green-500 h-full w-full rounded-full " />
+            )}
+            <img
+              alt="img"
+              className="rounded-full aspect-square w-10"
+              src={session?.user.image}
+            />
+          </div>
+          <div>
+            <p>God</p>
+            <p className="text-gray-400 text-xs">doing thing</p>
+          </div>
+        </div>
+        {/*green bar and circle with toggle yes */}
+        <div
+          className="mt-2 rounded-full bg-gray-700"
+          style={{ width: '200px', height: '5px' }}
+        >
+          <div
+            className="rounded-full bg-green-500"
+            style={{
+              width: `${Math.min(volume * 2, 200)}px`,
+              height: '100%',
+            }}
+          />
         </div>
       </div>
     </div>

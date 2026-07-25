@@ -6,7 +6,7 @@ import { BiSolidMicrophone, BiSolidMicrophoneOff } from 'react-icons/bi'
 import { FaChevronCircleDown } from 'react-icons/fa'
 import { useNewSse } from '@/client/hooks/useCall'
 import { useSession } from '@/lib/auth'
-import WebRTCCall from './claude'
+import { IoVideocam, IoVideocamOff } from 'react-icons/io5'
 
 export function Call({ callback }) {
   //THIS GETS DESKTOP CAPTURE LEL
@@ -216,8 +216,6 @@ export function Call({ callback }) {
   }
 
   const [phase, setPhase] = useState('idle') // idle | ready | calling | connected
-  const [offerSDP, setOfferSDP] = useState('')
-  const [answerSDP, setAnswerSDP] = useState('')
   const [remoteInput, setRemoteInput] = useState('')
   const [micOn, setMicOn] = useState(true)
   const [camOn, setCamOn] = useState(true)
@@ -240,14 +238,13 @@ export function Call({ callback }) {
     if (localVideoRef.current) localVideoRef.current.srcObject = null
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null
     setPhase('idle')
-    setOfferSDP('')
-    setAnswerSDP('')
     setRemoteInput('')
     setError('')
   }, [])
 
   useEffect(() => () => cleanup(), [cleanup])
 
+  //CHANGE LATER?????
   const constraints = {
     audio: {
       echoCancellation: false, // Reduces echoes in calls
@@ -300,12 +297,8 @@ export function Call({ callback }) {
       const pc = buildPC(stream)
       setPhase('calling')
 
-      // Gather all ICE candidates before sharing (trickle-less for simplicity)
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
-
-      //console.log(pc.localDescription)
-      //setOfferSDP(pc.localDescription)
 
       await Promise.race([
         new Promise<void>((resolve) => {
@@ -318,14 +311,6 @@ export function Call({ callback }) {
       ])
       console.log('Current Connection State ' + pc.connectionState)
       return pc.localDescription
-      /*
-      await new Promise((resolve) => {
-        if (pc.iceGatheringState === 'complete') return resolve()
-        pc.onicegatheringstatechange = () => {
-          if (pc.iceGatheringState === 'complete') resolve()
-        }
-      })
-*/
     } catch (e) {
       setError(e.message)
       setPhase('idle')
@@ -367,16 +352,6 @@ export function Call({ callback }) {
         }),
         new Promise<void>((resolve) => setTimeout(resolve, 2000)), // give up after 2s, use whatever candidates you have
       ])
-
-      /*
-      await new Promise((resolve) => {
-        if (pc.iceGatheringState === 'complete') return resolve()
-        pc.onicegatheringstatechange = () => {
-          if (pc.iceGatheringState === 'complete') resolve()
-        }
-      })
-*/
-      //setAnswerSDP(JSON.stringify(pc.localDescription))
       setRemoteInput('')
       return pc.localDescription
     } catch (e) {
@@ -470,6 +445,21 @@ export function Call({ callback }) {
             className="bg-amber-950 px-2 rounded-sm cursor-pointer"
           >
             <BiSolidMicrophoneOff />
+          </button>
+        )}
+        {camOn ? (
+          <button
+            onClick={toggleCam}
+            className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+          >
+            <IoVideocam />
+          </button>
+        ) : (
+          <button
+            onClick={toggleCam}
+            className="bg-amber-950 px-2 rounded-sm cursor-pointer"
+          >
+            <IoVideocamOff />
           </button>
         )}
 
