@@ -134,6 +134,7 @@ export function Call({ callback }) {
 
   //
   async function testcall() {
+    const myClientId = session?.user.id
     const sdp = await startCall()
     //My vclient id :oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS
     //Bros client id : rztLnolAoFGAaevREVdZcUgsv7GXVlEq
@@ -141,6 +142,7 @@ export function Call({ callback }) {
       'rztLnolAoFGAaevREVdZcUgsv7GXVlEq',
       JSON.stringify(sdp),
       'initial',
+      myClientId,
     )
   }
 
@@ -167,10 +169,11 @@ export function Call({ callback }) {
     id: string,
     sdpthing?: string,
     order?: string,
+    userid?: string,
   ) {
     const data = {
       targetClientId: id,
-      message: { type: 'call', order: order, offer: sdpthing },
+      message: { type: 'call', userid: userid, order: order, offer: sdpthing },
     }
 
     await ssemessage.mutateAsync(data)

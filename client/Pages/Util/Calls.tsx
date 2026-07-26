@@ -3,6 +3,8 @@ import { useSession } from '@/lib/auth'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BiSolidMicrophone, BiSolidMicrophoneOff } from 'react-icons/bi'
 import { TbHeadphonesOff, TbHeadphones } from 'react-icons/tb'
+import { getSharedAudioContext } from './audioContext'
+import { TheBar } from './call/TheBar'
 
 export function CallingStuffs() {
   //----------------WEb rtx logic----------------------------
@@ -14,12 +16,13 @@ export function CallingStuffs() {
     ],
   }
 
+  const [otherID, setotherID] = useState('')
+
   const [initialsdp, setinitialsdp] = useState('')
   const [responsesdp, setresponsesdp] = useState('')
   const [finalsdp, setfinalsdp] = useState('')
 
   //calling
-  const [phase, setPhase] = useState('idle') // idle | ready | calling | connected
   const [offerSDP, setOfferSDP] = useState('')
   const [answerSDP, setAnswerSDP] = useState('')
   const [remoteInput, setRemoteInput] = useState('')
@@ -30,6 +33,7 @@ export function CallingStuffs() {
   const localStreamRef = useRef(null)
   const localVideoRef = useRef(null)
   const remoteVideoRef = useRef(null)
+  const localAudioRef = useRef(null)
 
   const cleanup = useCallback(() => {
     if (pcRef.current) {
@@ -42,7 +46,6 @@ export function CallingStuffs() {
     }
     if (localVideoRef.current) localVideoRef.current.srcObject = null
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null
-    setPhase('idle')
     setOfferSDP('')
     setAnswerSDP('')
     setRemoteInput('')
@@ -74,21 +77,8 @@ export function CallingStuffs() {
 
     stream.getTracks().forEach((track) => pc.addTrack(track, stream))
 
-    pc.ontrack = (e) => {
-      if (remoteVideoRef.current && e.streams[0]) {
-        remoteVideoRef.current.srcObject = e.streams[0]
-        setPhase('connected')
-      }
-    }
-
-    pc.oniceconnectionstatechange = () => {
-      if (
-        pc.iceConnectionState === 'disconnected' ||
-        pc.iceConnectionState === 'failed'
-      ) {
-        setError('Connection lost.')
-        setPhase('ready')
-      }
+    pc.onconnectionstatechange = () => {
+      letest()
     }
 
     return pc
@@ -99,7 +89,6 @@ export function CallingStuffs() {
     try {
       const stream = await getMedia()
       const pc = buildPC(stream)
-      setPhase('calling')
 
       // Gather all ICE candidates before sharing (trickle-less for simplicity)
       const offer = await pc.createOffer()
@@ -119,17 +108,8 @@ export function CallingStuffs() {
       ])
       console.log('Current Connection State ' + pc.connectionState)
       return pc.localDescription
-      /*
-      await new Promise((resolve) => {
-        if (pc.iceGatheringState === 'complete') return resolve()
-        pc.onicegatheringstatechange = () => {
-          if (pc.iceGatheringState === 'complete') resolve()
-        }
-      })
-*/
     } catch (e) {
       setError(e.message)
-      setPhase('idle')
     }
   }
 
@@ -153,7 +133,6 @@ export function CallingStuffs() {
       const offer = JSON.parse(initialsdp)
       const stream = await getMedia()
       const pc = buildPC(stream)
-      setPhase('calling')
 
       await pc.setRemoteDescription(new RTCSessionDescription(offer))
       const answer = await pc.createAnswer()
@@ -173,81 +152,26 @@ export function CallingStuffs() {
       return pc.localDescription
     } catch (e) {
       setError('Failed to accept: ' + e.message)
-      setPhase('idle')
     }
   }
 
   //-----------------------The talking indicators--------------------
 
   const [volume, setVolume] = useState(0)
-  const [talking, settalking] = useState(false)
   const [isListening, setIsListening] = useState(false)
 
   const [talkingbar1, settalkingbar1] = useState(false)
-  const [talkingbar2, settalkingbar2] = useState(true)
-
-  useEffect(() => {
-    if (!isListening) return
-
-    let audioContext
-    let analyser
-    let dataArray
-    let source
-    let animationId
-
-    async function setupAudio() {
-      try {
-        const stream = await getMedia()
-        audioContext = new (window.AudioContext || window.webkitAudioContext)()
-        analyser = audioContext.createAnalyser()
-        analyser.fftSize = 256
-
-        source = audioContext.createMediaStreamSource(stream)
-        source.connect(analyser)
-
-        dataArray = new Uint8Array(analyser.frequencyBinCount)
-
-        function updateVolume() {
-          analyser.getByteFrequencyData(dataArray)
-          let sum = 0
-          for (let i = 0; i < dataArray.length; i++) {
-            sum += dataArray[i]
-          }
-          const average = sum / dataArray.length
-          setVolume(Math.round(average))
-          animationId = requestAnimationFrame(updateVolume)
-        }
-
-        updateVolume()
-      } catch (err) {
-        console.error('Microphone access denied or not supported', err)
-        setIsListening(false)
-      }
-    }
-
-    setupAudio()
-
-    return () => {
-      cancelAnimationFrame(animationId)
-      if (audioContext && audioContext.state !== 'closed') {
-        audioContext.close()
-      }
-    }
-  }, [isListening])
 
   //-----------------deaf/mute-------------------
 
   const [deafen, setDeafen] = useState(true)
   const [mute, setmute] = useState(true)
 
-  //Kinda stupid, will fix later?
-  function setGlobalDOMVolume(volumeLevel: number) {
-    // volumeLevel must be a number between 0.0 and 1.0
-    const allAudios = document.querySelectorAll('audio, video')
-    allAudios.forEach((media) => {
-      media.volume = volumeLevel
-    })
-  }
+  const mutesound = new Audio('/audio/mute.mp3')
+  const unmutesound = new Audio('/audio/unmute.mp3')
+
+  const deafensound = new Audio('/audio/deafen.mp3')
+  const undeafensound = new Audio('/audio/undeafen.mp3')
 
   async function setMicVolume() {
     const track = localStreamRef.current?.getAudioTracks()[0]
@@ -257,10 +181,15 @@ export function CallingStuffs() {
   }
 
   const toggleDeafen = () => {
+    localAudioRef.current.muted = !localAudioRef.current.muted
+
     if (deafen) {
-      setGlobalDOMVolume(0)
-    } else {
-      setGlobalDOMVolume(1)
+      deafensound.play()
+      setmute(false)
+    }
+    if (!deafen) {
+      undeafensound.play()
+      setmute(true)
     }
     setDeafen((v) => !v)
   }
@@ -268,6 +197,12 @@ export function CallingStuffs() {
   const toggleMute = () => {
     if (deafen) {
       setMicVolume()
+    }
+    if (mute) {
+      mutesound.play()
+    }
+    if (!mute) {
+      unmutesound.play()
     }
     setmute((v) => !v)
   }
@@ -299,6 +234,7 @@ export function CallingStuffs() {
           //submitAnswer(data.offer)
         } else if (data.order == 'initial') {
           setinitialsdp(data.offer)
+          setotherID(data.userid)
           if (ringtone) {
             ringtone.current.currentTime = 0
             ringtone.current.volume = 0.2
@@ -320,12 +256,7 @@ export function CallingStuffs() {
     setincomingCall(false)
     setinCall(true)
     const sdp = await acceptCall()
-    sendCallRequest(
-      'oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS',
-      JSON.stringify(sdp),
-      'final',
-    )
-    letest()
+    sendCallRequest(otherID, JSON.stringify(sdp), 'final')
   }
 
   function DeclineCall() {
@@ -335,6 +266,7 @@ export function CallingStuffs() {
 
   function HangUpCall() {
     setinCall(false)
+    cleanup()
   }
 
   //----------------Com to other client---------------------
@@ -345,10 +277,11 @@ export function CallingStuffs() {
     id: string,
     sdpthing?: string,
     order?: string,
+    userid?: string,
   ) {
     const data = {
       targetClientId: id,
-      message: { type: 'call', order: order, offer: sdpthing },
+      message: { type: 'call', userid: userid, order: order, offer: sdpthing },
     }
 
     await ssemessage.mutateAsync(data)
@@ -373,7 +306,7 @@ export function CallingStuffs() {
         <audio className="hidden" ref={ringtone}>
           <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
         </audio>
-
+        <audio ref={localAudioRef} />
         {incomingCall && (
           <div className="mb-3 flex justify-between border-b pb-2">
             <p>God calling</p>
@@ -444,16 +377,7 @@ export function CallingStuffs() {
             )}
           </div>
         </div>
-        {talkingbar2 && (
-          <div className="mt-2 rounded-full bg-gray-700 w-full h-1">
-            <div
-              className="rounded-full bg-green-500 h-full"
-              style={{
-                width: `${Math.min(volume * 2, 200)}px`,
-              }}
-            />
-          </div>
-        )}
+        <TheBar isListening={isListening} />
       </div>
     </div>
   )
