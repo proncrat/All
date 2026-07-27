@@ -33,7 +33,8 @@ export function CallingStuffs() {
   const localStreamRef = useRef(null)
   const localVideoRef = useRef(null)
   const remoteVideoRef = useRef(null)
-  const localAudioRef = useRef(null)
+
+  const remoteAudioRef = useRef(null)
 
   const cleanup = useCallback(() => {
     if (pcRef.current) {
@@ -76,6 +77,13 @@ export function CallingStuffs() {
     pcRef.current = pc
 
     stream.getTracks().forEach((track) => pc.addTrack(track, stream))
+
+    //adds strem to ref
+    pc.ontrack = (e) => {
+      if (remoteAudioRef.current && e.streams[0]) {
+        remoteAudioRef.current.srcObject = e.streams[0]
+      }
+    }
 
     pc.onconnectionstatechange = () => {
       letest()
@@ -181,7 +189,9 @@ export function CallingStuffs() {
   }
 
   const toggleDeafen = () => {
-    localAudioRef.current.muted = !localAudioRef.current.muted
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.muted = !remoteAudioRef.current.muted
+    }
 
     if (deafen) {
       deafensound.play()
@@ -252,6 +262,7 @@ export function CallingStuffs() {
   }, [seshpend, session])
 
   async function AcceptCall() {
+    setIsListening(true)
     ringtone.current.pause()
     setincomingCall(false)
     setinCall(true)
@@ -265,8 +276,22 @@ export function CallingStuffs() {
   }
 
   function HangUpCall() {
+    setIsListening(false)
     setinCall(false)
     cleanup()
+  }
+
+  async function testcall() {
+    const myClientId = session?.user.id
+    const sdp = await startCall()
+    //My vclient id :oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS
+    //Bros client id : rztLnolAoFGAaevREVdZcUgsv7GXVlEq
+    sendCallRequest(
+      'rztLnolAoFGAaevREVdZcUgsv7GXVlEq',
+      JSON.stringify(sdp),
+      'initial',
+      myClientId,
+    )
   }
 
   //----------------Com to other client---------------------
@@ -293,91 +318,99 @@ export function CallingStuffs() {
     }
   }
 
+  //User statuses
+
+  const statuses = {
+    online:
+      'animate-gradient-bg bg-linear-160 from-green-500 via-gray-700 to-gray-700',
+    idle: 'animate-gradient-bg bg-linear-160 from-yellow-500 via-gray-700 to-gray-700',
+    donotdih:
+      'animate-gradient-bg bg-linear-160 from-red-500 via-gray-700 to-gray-700',
+    offline: 'bg-gray-700',
+  }
+
+  const [currentStatus, setcurrentStatus] = useState(statuses.online)
+
   return (
     <div className={`fixed z-50 bottom-0 `}>
-      {/*<div className={`fixed z-50 bottom-0 ${!isActive2 && 'hidden'} `}>*/}
-
-      <div style={{ padding: '20px' }}>
-        <button onClick={() => setIsListening(!isListening)}>
-          {isListening ? 'Stop Listening' : 'Start Listening'}
-        </button>
-      </div>
-      <div className="bg-black m-5 p-2 rounded-sm">
-        <audio className="hidden" ref={ringtone}>
-          <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
-        </audio>
-        <audio ref={localAudioRef} />
-        {incomingCall && (
-          <div className="mb-3 flex justify-between border-b pb-2">
-            <p>God calling</p>
-            <div className="flex gap-4">
-              <button onClick={AcceptCall}>✓</button>
-              <button onClick={DeclineCall}>X</button>
+      <div className={`m-5 rounded-sm  ${currentStatus} p-px`}>
+        <div className="rounded-sm bg-black p-2 w-[280px]">
+          <audio className="hidden" ref={ringtone}>
+            <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
+          </audio>
+          <audio ref={remoteAudioRef} />
+          {incomingCall && (
+            <div className="mb-3 flex justify-between border-b pb-2">
+              <p>God calling</p>
+              <div className="flex gap-4">
+                <button onClick={AcceptCall}>✓</button>
+                <button onClick={DeclineCall}>X</button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {inCall && (
-          <div className="mb-3 flex justify-between border-b pb-2">
-            <p>{connectionStatus}</p>
-            <div className="flex gap-4">
-              <button onClick={HangUpCall}>X</button>
+          {inCall && (
+            <div className="mb-3 flex justify-between border-b pb-2">
+              <p>{connectionStatus}</p>
+              <div className="flex gap-4">
+                <button onClick={HangUpCall}>X</button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="flex gap-14">
-          <div className="flex gap-3">
-            <div className="relative">
-              {talkingbar1 && volume > 0 && (
-                <div className="absolute border-3 border-green-500 h-full w-full rounded-full " />
+          <div className="flex justify-between">
+            <div className="flex gap-3 w-full hover:bg-gray-900 cursor-pointer rounded-sm">
+              <div className="relative">
+                {talkingbar1 && volume > 0 && (
+                  <div className="absolute border-3 border-green-500 h-full w-full rounded-full " />
+                )}
+
+                <img
+                  alt="img"
+                  className="rounded-full aspect-square w-10"
+                  src={session?.user.image}
+                />
+              </div>
+              <div>
+                <p className="select-none">God</p>
+                <p className="select-none text-gray-400 text-xs">doing thing</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {mute ? (
+                <button
+                  onClick={toggleMute}
+                  className="px-2 rounded-sm cursor-pointer hover:bg-gray-900"
+                >
+                  <BiSolidMicrophone size={'20px'} />
+                </button>
+              ) : (
+                <button
+                  onClick={toggleMute}
+                  className="bg-red-700 px-2 rounded-sm cursor-pointer"
+                >
+                  <BiSolidMicrophoneOff size={'20px'} />
+                </button>
               )}
-
-              <img
-                alt="img"
-                className="rounded-full aspect-square w-10"
-                src={session?.user.image}
-              />
-            </div>
-            <div>
-              <p>God</p>
-              <p className="text-gray-400 text-xs">doing thing</p>
+              {deafen ? (
+                <button
+                  onClick={toggleDeafen}
+                  className="px-2 rounded-sm cursor-pointer hover:bg-gray-900"
+                >
+                  <TbHeadphones size={'20px'} />
+                </button>
+              ) : (
+                <button
+                  onClick={toggleDeafen}
+                  className="bg-red-700 px-2 rounded-sm cursor-pointer"
+                >
+                  <TbHeadphonesOff size={'20px'} />
+                </button>
+              )}
             </div>
           </div>
-          <div className="flex gap-2">
-            {mute ? (
-              <button
-                onClick={toggleMute}
-                className="px-2 rounded-sm cursor-pointer hover:bg-gray-900"
-              >
-                <BiSolidMicrophone size={'20px'} />
-              </button>
-            ) : (
-              <button
-                onClick={toggleMute}
-                className="bg-red-700 px-2 rounded-sm cursor-pointer"
-              >
-                <BiSolidMicrophoneOff size={'20px'} />
-              </button>
-            )}
-            {deafen ? (
-              <button
-                onClick={toggleDeafen}
-                className="px-2 rounded-sm cursor-pointer hover:bg-gray-900"
-              >
-                <TbHeadphones size={'20px'} />
-              </button>
-            ) : (
-              <button
-                onClick={toggleDeafen}
-                className="bg-red-700 px-2 rounded-sm cursor-pointer"
-              >
-                <TbHeadphonesOff size={'20px'} />
-              </button>
-            )}
-          </div>
+          <TheBar isListening={isListening} />
         </div>
-        <TheBar isListening={isListening} />
       </div>
     </div>
   )

@@ -8,6 +8,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --animate-gradient-bg: gradient-bg 6s ease infinite;
+
+  @keyframes gradient-bg {
+    0%,
+    100% {
+      background-position: 0% 50%;
+      background-size: 250% 200%;
+    }
+    50% {
+      background-position: 100% 50%;
+      background-size: 100% 100%;
+    }
+  }
+}
+
 body {
   font-family: 'Poppins', sans-serif;
 }
