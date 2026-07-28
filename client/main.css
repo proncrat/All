@@ -9,7 +9,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --animate-gradient-bg: gradient-bg 6s ease infinite;
+  --animate-gradient-bg: gradient-bg 8s ease infinite;
 
   @keyframes gradient-bg {
     0%,

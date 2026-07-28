@@ -9,6 +9,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { SideBar } from '../Main/Sidebar'
 import { useSession } from '@/lib/auth'
 import { CallingStuffs } from './Calls'
+import { NthParentContext } from './call/Context'
 
 function App() {
   const queryClient = new QueryClient()
@@ -61,22 +62,32 @@ function App() {
     }
   }, [seshpend, session])
 */
+
+  const [data, setData] = useState('')
+
+  const handleChildAction = (childData) => {
+    setData(childData)
+    console.log('Received by Nth Parent:', childData)
+  }
+
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <CookiesProvider>
           <Toaster />
-          <div className="w-full h-screen">
-            <THEHEADER sidebar={handlewidth} />
-            <SideBar width={width} />
-            <CallingStuffs />
-            <div
-              style={{ marginLeft: `${width}px` }}
-              className=" transition-all pt-12 h-full"
-            >
-              <Outlet />
+          <NthParentContext.Provider value={{ handleChildAction }}>
+            <div className="w-full h-screen">
+              <THEHEADER sidebar={handlewidth} />
+              <SideBar width={width} />
+              <CallingStuffs callrequest={data} />
+              <div
+                style={{ marginLeft: `${width}px` }}
+                className=" transition-all pt-12 h-full"
+              >
+                <Outlet />
+              </div>
             </div>
-          </div>
+          </NthParentContext.Provider>
         </CookiesProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

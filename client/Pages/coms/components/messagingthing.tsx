@@ -7,6 +7,7 @@ import { FaPhone } from 'react-icons/fa6'
 import { Call } from './call'
 import { useFetchId } from '@/client/hooks/useId'
 import { Spinner } from '../../Util/Spinner'
+import { useNthParent } from '../../Util/call/Context'
 
 //import WebRTCCall from './claude'
 
@@ -23,6 +24,8 @@ export function Messagebox() {
 
   const userid = leId.userid
 
+  const { handleChildAction } = useNthParent()
+
   if (isPending) {
     return <Spinner />
   }
@@ -33,6 +36,11 @@ export function Messagebox() {
       <div className=" h-12 border-b-2">
         <button onClick={() => setcallStatus(true)} className="cursor-pointer">
           <FaPhone className="hover:fill-gray-500" size={'25px'} />
+        </button>
+        <button
+          onClick={() => handleChildAction('rztLnolAoFGAaevREVdZcUgsv7GXVlEq')}
+        >
+          Call using other method
         </button>
       </div>
       <div className="flex-1 h-0">

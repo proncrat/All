@@ -6,7 +6,7 @@ import { TbHeadphonesOff, TbHeadphones } from 'react-icons/tb'
 import { getSharedAudioContext } from './audioContext'
 import { TheBar } from './call/TheBar'
 
-export function CallingStuffs() {
+export function CallingStuffs({ callrequest }) {
   //----------------WEb rtx logic----------------------------
 
   const ICE_SERVERS = {
@@ -281,17 +281,12 @@ export function CallingStuffs() {
     cleanup()
   }
 
-  async function testcall() {
+  async function testcall(id) {
     const myClientId = session?.user.id
     const sdp = await startCall()
     //My vclient id :oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS
     //Bros client id : rztLnolAoFGAaevREVdZcUgsv7GXVlEq
-    sendCallRequest(
-      'rztLnolAoFGAaevREVdZcUgsv7GXVlEq',
-      JSON.stringify(sdp),
-      'initial',
-      myClientId,
-    )
+    sendCallRequest(id, JSON.stringify(sdp), 'initial', myClientId)
   }
 
   //----------------Com to other client---------------------
@@ -318,7 +313,7 @@ export function CallingStuffs() {
     }
   }
 
-  //User statuses
+  //User statuses, make send to server later
 
   const statuses = {
     online:
@@ -329,16 +324,29 @@ export function CallingStuffs() {
     offline: 'bg-gray-700',
   }
 
-  const [currentStatus, setcurrentStatus] = useState(statuses.online)
+  const [currentStatus, setcurrentStatus] = useState('online')
+  const [popover, setpopover] = useState(false)
+
+  //Fix it later
+  const handleParentClick = (e) => {
+    if (e.target !== e.currentTarget) return
+    setpopover((v) => !v)
+  }
+
+  function statusHandler(e) {
+    //console.log(e.target.value)
+    setcurrentStatus(e.target.value)
+  }
 
   return (
-    <div className={`fixed z-50 bottom-0 `}>
-      <div className={`m-5 rounded-sm  ${currentStatus} p-px`}>
+    <div className={`fixed z-5000 bottom-0 `}>
+      <div className={`m-5 rounded-sm  ${statuses[currentStatus]} p-px `}>
         <div className="rounded-sm bg-black p-2 w-[280px]">
           <audio className="hidden" ref={ringtone}>
             <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
           </audio>
           <audio ref={remoteAudioRef} />
+
           {incomingCall && (
             <div className="mb-3 flex justify-between border-b pb-2">
               <p>God calling</p>
@@ -359,12 +367,30 @@ export function CallingStuffs() {
           )}
 
           <div className="flex justify-between">
-            <div className="flex gap-3 w-full hover:bg-gray-900 cursor-pointer rounded-sm">
+            <div
+              onClick={handleParentClick}
+              className="flex gap-3 w-full hover:bg-gray-900 cursor-pointer rounded-sm"
+            >
+              {popover && (
+                <div className="absolute bottom-full border border-gray-700 bg-black rounded-sm p-2 w-40 h-20">
+                  <p>Popover</p>
+                  <select
+                    onChange={statusHandler}
+                    defaultValue={currentStatus}
+                    className="select"
+                  >
+                    <option value="online">Online</option>
+                    <option value="idle">idle</option>
+                    <option value="donotdih">do not dihsturb</option>
+                    <option value="offline">Offline</option>
+                  </select>
+                </div>
+              )}
+
               <div className="relative">
                 {talkingbar1 && volume > 0 && (
                   <div className="absolute border-3 border-green-500 h-full w-full rounded-full " />
                 )}
-
                 <img
                   alt="img"
                   className="rounded-full aspect-square w-10"
