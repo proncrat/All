@@ -67,7 +67,7 @@ function App() {
 
   const handleChildAction = (childData) => {
     setData(childData)
-    console.log('Received by Nth Parent:', childData)
+    //console.log('Received by Nth Parent:', childData)
   }
 
   return (
@@ -79,7 +79,7 @@ function App() {
             <div className="w-full h-screen">
               <THEHEADER sidebar={handlewidth} />
               <SideBar width={width} />
-              <CallingStuffs callrequest={data} />
+              <CallingStuffs callrequest={data} callcleanup={setData} />
               <div
                 style={{ marginLeft: `${width}px` }}
                 className=" transition-all pt-12 h-full"

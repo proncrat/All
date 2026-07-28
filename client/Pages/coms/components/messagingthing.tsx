@@ -26,6 +26,11 @@ export function Messagebox() {
 
   const { handleChildAction } = useNthParent()
 
+  const test_data = {
+    name: 'bro',
+    userId: 'rztLnolAoFGAaevREVdZcUgsv7GXVlEq',
+  }
+
   if (isPending) {
     return <Spinner />
   }
@@ -33,14 +38,12 @@ export function Messagebox() {
   return (
     <div className="flex flex-col h-full relative">
       {callStatus && <Call callback={setcallStatus} />}
-      <div className=" h-12 border-b-2">
-        <button onClick={() => setcallStatus(true)} className="cursor-pointer">
-          <FaPhone className="hover:fill-gray-500" size={'25px'} />
-        </button>
+      <div className=" h-12 border-b-2 flex p-2">
         <button
-          onClick={() => handleChildAction('rztLnolAoFGAaevREVdZcUgsv7GXVlEq')}
+          onClick={() => handleChildAction(test_data)}
+          className="cursor-pointer"
         >
-          Call using other method
+          <FaPhone className="hover:fill-gray-500" size={'25px'} />
         </button>
       </div>
       <div className="flex-1 h-0">

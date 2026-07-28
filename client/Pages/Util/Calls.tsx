@@ -6,7 +6,7 @@ import { TbHeadphonesOff, TbHeadphones } from 'react-icons/tb'
 import { getSharedAudioContext } from './audioContext'
 import { TheBar } from './call/TheBar'
 
-export function CallingStuffs({ callrequest }) {
+export function CallingStuffs({ callrequest, callcleanup }) {
   //----------------WEb rtx logic----------------------------
 
   const ICE_SERVERS = {
@@ -15,6 +15,9 @@ export function CallingStuffs({ callrequest }) {
       { urls: 'stun:stun1.l.google.com:19302' },
     ],
   }
+
+  const [connectionStatus, setconnectionStatus] = useState('null')
+  const [otherusername, setotherusername] = useState('')
 
   const [otherID, setotherID] = useState('')
 
@@ -51,6 +54,8 @@ export function CallingStuffs({ callrequest }) {
     setAnswerSDP('')
     setRemoteInput('')
     setError('')
+    setconnectionStatus('')
+    callcleanup('')
   }, [])
 
   useEffect(() => () => cleanup(), [cleanup])
@@ -218,7 +223,6 @@ export function CallingStuffs({ callrequest }) {
   }
 
   //----------------------call interface stuffs----------------------
-  const [connectionStatus, setconnectionStatus] = useState('null')
 
   const [incomingCall, setincomingCall] = useState(false)
   const [inCall, setinCall] = useState(false)
@@ -241,8 +245,9 @@ export function CallingStuffs({ callrequest }) {
       if (data.type == 'call') {
         if (data.order == 'final') {
           //Need this lul
-          //submitAnswer(data.offer)
+          submitAnswer(data.offer)
         } else if (data.order == 'initial') {
+          setotherusername(data.username)
           setinitialsdp(data.offer)
           setotherID(data.userid)
           if (ringtone) {
@@ -262,6 +267,7 @@ export function CallingStuffs({ callrequest }) {
   }, [seshpend, session])
 
   async function AcceptCall() {
+    setconnectionStatus('Calling')
     setIsListening(true)
     ringtone.current.pause()
     setincomingCall(false)
@@ -281,13 +287,29 @@ export function CallingStuffs({ callrequest }) {
     cleanup()
   }
 
-  async function testcall(id) {
+  async function SendCall(id) {
+    setconnectionStatus('Calling')
+    setIsListening(true)
+    setinCall(true)
     const myClientId = session?.user.id
     const sdp = await startCall()
     //My vclient id :oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS
     //Bros client id : rztLnolAoFGAaevREVdZcUgsv7GXVlEq
-    sendCallRequest(id, JSON.stringify(sdp), 'initial', myClientId)
+    sendCallRequest(
+      id,
+      JSON.stringify(sdp),
+      'initial',
+      myClientId,
+      session?.user.username,
+    )
   }
+
+  useEffect(() => {
+    if (callrequest) {
+      SendCall(callrequest.userId)
+      setotherusername(callrequest.name)
+    }
+  }, [callrequest])
 
   //----------------Com to other client---------------------
 
@@ -298,10 +320,17 @@ export function CallingStuffs({ callrequest }) {
     sdpthing?: string,
     order?: string,
     userid?: string,
+    username?: string,
   ) {
     const data = {
       targetClientId: id,
-      message: { type: 'call', userid: userid, order: order, offer: sdpthing },
+      message: {
+        type: 'call',
+        userid: userid,
+        username: username,
+        order: order,
+        offer: sdpthing,
+      },
     }
 
     await ssemessage.mutateAsync(data)
@@ -345,11 +374,10 @@ export function CallingStuffs({ callrequest }) {
           <audio className="hidden" ref={ringtone}>
             <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
           </audio>
-          <audio ref={remoteAudioRef} />
-
+          <audio ref={remoteAudioRef} autoPlay />
           {incomingCall && (
             <div className="mb-3 flex justify-between border-b pb-2">
-              <p>God calling</p>
+              <p>{otherusername} calling</p>
               <div className="flex gap-4">
                 <button onClick={AcceptCall}>✓</button>
                 <button onClick={DeclineCall}>X</button>
@@ -359,7 +387,10 @@ export function CallingStuffs({ callrequest }) {
 
           {inCall && (
             <div className="mb-3 flex justify-between border-b pb-2">
-              <p>{connectionStatus}</p>
+              <div className="flex justify-between w-full pr-4">
+                <p>{otherusername}</p>
+                <p>{connectionStatus}</p>
+              </div>
               <div className="flex gap-4">
                 <button onClick={HangUpCall}>X</button>
               </div>
@@ -379,10 +410,18 @@ export function CallingStuffs({ callrequest }) {
                     defaultValue={currentStatus}
                     className="select"
                   >
-                    <option value="online">Online</option>
-                    <option value="idle">idle</option>
-                    <option value="donotdih">do not dihsturb</option>
-                    <option value="offline">Offline</option>
+                    <option className="text-black bg-white" value="online">
+                      Online
+                    </option>
+                    <option className="text-black bg-white" value="idle">
+                      idle
+                    </option>
+                    <option className="text-black bg-white" value="donotdih">
+                      do not dihsturb
+                    </option>
+                    <option className="text-black bg-white" value="offline">
+                      Offline
+                    </option>
                   </select>
                 </div>
               )}
@@ -398,7 +437,7 @@ export function CallingStuffs({ callrequest }) {
                 />
               </div>
               <div>
-                <p className="select-none">God</p>
+                <p className="select-none">{session?.user.username}</p>
                 <p className="select-none text-gray-400 text-xs">doing thing</p>
               </div>
             </div>

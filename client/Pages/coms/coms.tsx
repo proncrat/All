@@ -1,8 +1,9 @@
 import { useChats, Usesessionid, useUserData } from '@/client/hooks'
 import { useSession } from '@/lib/auth'
 import { NavLink, Outlet, useParams } from 'react-router'
-
+import { FaPhone } from 'react-icons/fa6'
 import { Spinner } from '../Util/Spinner'
+import { useNthParent } from '../Util/call/Context'
 
 export function Coms() {
   const { id } = useParams()
@@ -19,6 +20,8 @@ export function Coms() {
   const userid = idcheck?.id
 
   //console.log(userid)
+
+  const { handleChildAction } = useNthParent()
 
   const { data: userdata, isSuccess: userdataload } = useUserData(
     userid,
@@ -61,13 +64,26 @@ export function Coms() {
             to={'/coms/' + person.chatid}
             key={index}
           >
-            <div className="flex items-center gap-4  rounded-lg cursor-pointer p-1 ">
-              <img
-                className="rounded-full w-12 aspect-square"
-                alt="some pfp"
-                src={person.pfp}
-              />
-              <p className="text-lg">{person.name}</p>
+            <div className="flex justify-between pr-4 ">
+              <div className="flex items-center gap-4  rounded-lg cursor-pointer p-1 ">
+                <img
+                  className="rounded-full w-12 aspect-square"
+                  alt="some pfp"
+                  src={person.pfp}
+                />
+                <p className="text-lg">{person.name}</p>
+              </div>
+              <button
+                onClick={() =>
+                  handleChildAction({
+                    name: person.name,
+                    userId: person.link_id,
+                  })
+                }
+                className="cursor-pointer"
+              >
+                <FaPhone className="hover:fill-gray-500" size={'25px'} />
+              </button>
             </div>
           </NavLink>
         ))}

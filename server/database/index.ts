@@ -78,7 +78,7 @@ const get_chats_schema = [
   'chats.chatid',
   'profiledata.name',
   'profiledata.pfp',
-  'profiledata.peer_id',
+  'profiledata.link_id',
 ]
 
 export async function getchats(ownerid: string) {
