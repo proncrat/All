@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+  changeStatus,
   deleteMessage,
   getchats,
   getIdMatch,
@@ -74,6 +75,17 @@ router.post('/', async (req, res, next) => {
     return res.status(200).send('Nothing there')
   } catch (err) {
     next(err)
+  }
+})
+
+router.post('/status', async (req, res, next) => {
+  const linkmatch = res.locals.session.session.userId
+  try {
+    const data = req.body
+    await changeStatus(linkmatch, data.status)
+    return res.status(200)
+  } catch (error) {
+    next(error)
   }
 })
 

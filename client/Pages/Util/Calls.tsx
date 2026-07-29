@@ -1,4 +1,4 @@
-import { useNewSse } from '@/client/hooks/useCall'
+import { useNewSse, useStatusChange } from '@/client/hooks/useCall'
 import { useSession } from '@/lib/auth'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BiSolidMicrophone, BiSolidMicrophoneOff } from 'react-icons/bi'
@@ -367,6 +367,12 @@ export function CallingStuffs({ callrequest, callcleanup }) {
     setcurrentStatus(e.target.value)
   }
 
+  const statusslop = useStatusChange()
+
+  async function changeStatus() {
+    await statusslop.mutateAsync({ status: currentStatus })
+  }
+
   return (
     <div className={`fixed z-5000 bottom-0 `}>
       <div className={`m-5 rounded-sm  ${statuses[currentStatus]} p-px `}>
@@ -375,6 +381,7 @@ export function CallingStuffs({ callrequest, callcleanup }) {
             <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
           </audio>
           <audio ref={remoteAudioRef} autoPlay />
+          <button onClick={() => changeStatus()}>CHANGEIT</button>
           {incomingCall && (
             <div className="mb-3 flex justify-between border-b pb-2">
               <p>{otherusername} calling</p>

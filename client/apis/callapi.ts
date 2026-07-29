@@ -6,3 +6,9 @@ export async function sendDataSse(data) {
   const response = await requestURL.send(data)
   return response.body
 }
+
+export async function sendStatusChange(data) {
+  const requestURL = request.post(`${rootURL}/coms/status`)
+  const response = await requestURL.send(data)
+  return response.body
+}

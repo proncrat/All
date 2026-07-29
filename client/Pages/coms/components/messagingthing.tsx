@@ -38,6 +38,7 @@ export function Messagebox() {
   return (
     <div className="flex flex-col h-full relative">
       {callStatus && <Call callback={setcallStatus} />}
+      {/*
       <div className=" h-12 border-b-2 flex p-2">
         <button
           onClick={() => handleChildAction(test_data)}
@@ -46,6 +47,7 @@ export function Messagebox() {
           <FaPhone className="hover:fill-gray-500" size={'25px'} />
         </button>
       </div>
+*/}
       <div className="flex-1 h-0">
         <div className=" h-full p-5 flex flex-col-reverse gap-8 overflow-auto scrollbar hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]">
           {data.map((message, index) => (

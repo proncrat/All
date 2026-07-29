@@ -282,3 +282,9 @@ export async function getFollowedById(userId: number) {
     .where('follows.following_user_id', userId)
     .join('profiledata', 'follows.followed_user_id', 'profiledata.id')
 }
+
+//the status slop
+
+export async function changeStatus(userId: number, status: string) {
+  return await db('status').where({ userId: userId }).update({ status: status })
+}
