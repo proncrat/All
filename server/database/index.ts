@@ -181,7 +181,7 @@ export async function getCommentsByLink(linkId: string, LinkType: string) {
   return await db('comments')
     .join('profiledata', 'comments.author_id', 'profiledata.id')
     .where('comments.link_id', linkId)
-    .andWhere('comments.Link_type', LinkType)
+    .andWhere('comments.link_type', LinkType)
     .select(get_comment_schema)
     .orderBy([{ column: 'comments.id', order: 'desc' }])
 }
