@@ -141,7 +141,7 @@ export async function newmessage(data) {
     icon: '',
     user: 'person',
   })
-  //return await db('messages').insert({ ...data })
+  return await db('messages').insert({ ...data })
 }
 
 export async function deleteMessage(messageId: number, requesterId: number) {

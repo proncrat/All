@@ -235,7 +235,7 @@ export function CallingStuffs({ callrequest, callcleanup }) {
     const myClientId = session?.user.id
 
     const eventSource = new EventSource(
-      `http://localhost:3000/api/v1/test/events?clientId=${myClientId}`,
+      `/api/v1/test/events?clientId=${myClientId}`,
     )
 
     // Listen for incoming messages targeting this client
@@ -381,7 +381,7 @@ export function CallingStuffs({ callrequest, callcleanup }) {
             <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
           </audio>
           <audio ref={remoteAudioRef} autoPlay />
-          <button onClick={() => changeStatus()}>CHANGEIT</button>
+          {/*<button onClick={() => changeStatus()}>CHANGEIT</button>*/}
           {incomingCall && (
             <div className="mb-3 flex justify-between border-b pb-2">
               <p>{otherusername} calling</p>
