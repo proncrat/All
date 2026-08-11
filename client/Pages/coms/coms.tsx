@@ -63,10 +63,10 @@ export function Coms() {
             key={index}
             className="animate-gradient-bg bg-linear-160 from-green-500 via-gray-700 to-gray-700 rounded-lg p-px"
           >
-            <div className="rounded-lg bg-black w-full p-1">
+            <div className="rounded-lg bg-black w-full p-1 ">
               <NavLink
                 className={
-                  'hover:bg-linear-to-br [&.active]:bg-linear-to-br rounded-sm block from-black from-60% to-slate-600'
+                  'hover:bg-position-[100%_50%] bg-linear-to-br [&.active]:bg-position-[100%_70%] rounded-sm block from-black from-60% to-slate-600 bg-size-[200%_200%] bg-position-[100%_0%] transition-all'
                 }
                 to={'/coms/' + person.chatid}
               >
