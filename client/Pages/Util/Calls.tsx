@@ -376,7 +376,7 @@ export function CallingStuffs({ callrequest, callcleanup }) {
   return (
     <div className={`fixed z-5000 bottom-0 `}>
       <div className={`m-5 rounded-sm  ${statuses[currentStatus]} p-px `}>
-        <div className="rounded-sm bg-black p-2 w-[280px]">
+        <div className="rounded-sm bg-black p-1 w-[280px]">
           <audio className="hidden" ref={ringtone}>
             <source src="/audio/Over_the_Horizon.ogg" type="audio/ogg" />
           </audio>
@@ -405,34 +405,33 @@ export function CallingStuffs({ callrequest, callcleanup }) {
           )}
 
           <div className="flex justify-between">
+            {popover && (
+              <div className=" absolute bottom-full border border-gray-700 bg-black rounded-sm p-2 w-40 h-20">
+                <p>Popover</p>
+                <select
+                  onChange={statusHandler}
+                  defaultValue={currentStatus}
+                  className="select"
+                >
+                  <option className="text-black bg-white" value="online">
+                    Online
+                  </option>
+                  <option className="text-black bg-white" value="idle">
+                    idle
+                  </option>
+                  <option className="text-black bg-white" value="donotdih">
+                    do not dihsturb
+                  </option>
+                  <option className="text-black bg-white" value="offline">
+                    Offline
+                  </option>
+                </select>
+              </div>
+            )}
             <div
               onClick={handleParentClick}
-              className="flex gap-3 w-full hover:bg-gray-900 cursor-pointer rounded-sm"
+              className="transition-all flex gap-3 w-full hover:bg-[#6363633b] cursor-pointer rounded-sm p-1"
             >
-              {popover && (
-                <div className="absolute bottom-full border border-gray-700 bg-black rounded-sm p-2 w-40 h-20">
-                  <p>Popover</p>
-                  <select
-                    onChange={statusHandler}
-                    defaultValue={currentStatus}
-                    className="select"
-                  >
-                    <option className="text-black bg-white" value="online">
-                      Online
-                    </option>
-                    <option className="text-black bg-white" value="idle">
-                      idle
-                    </option>
-                    <option className="text-black bg-white" value="donotdih">
-                      do not dihsturb
-                    </option>
-                    <option className="text-black bg-white" value="offline">
-                      Offline
-                    </option>
-                  </select>
-                </div>
-              )}
-
               <div className="relative">
                 {talkingbar1 && volume > 0 && (
                   <div className="absolute border-3 border-green-500 h-full w-full rounded-full " />
@@ -452,7 +451,7 @@ export function CallingStuffs({ callrequest, callcleanup }) {
               {mute ? (
                 <button
                   onClick={toggleMute}
-                  className="px-2 rounded-sm cursor-pointer hover:bg-gray-900"
+                  className="px-2 rounded-sm cursor-pointer hover:bg-[#6363633b] transition-all"
                 >
                   <BiSolidMicrophone size={'20px'} />
                 </button>
@@ -467,7 +466,7 @@ export function CallingStuffs({ callrequest, callcleanup }) {
               {deafen ? (
                 <button
                   onClick={toggleDeafen}
-                  className="px-2 rounded-sm cursor-pointer hover:bg-gray-900"
+                  className="px-2 rounded-sm cursor-pointer hover:bg-[#6363633b] transition-all"
                 >
                   <TbHeadphones size={'20px'} />
                 </button>

@@ -37,6 +37,19 @@ export function Messagebox() {
 
   return (
     <div className="flex flex-col h-full relative">
+      <div>
+        <button
+          onClick={() =>
+            handleChildAction({
+              name: person.name,
+              userId: person.link_id,
+            })
+          }
+          className="cursor-pointer"
+        >
+          <FaPhone className="hover:fill-gray-500" size={'25px'} />
+        </button>
+      </div>
       {callStatus && <Call callback={setcallStatus} />}
       {/*
       <div className=" h-12 border-b-2 flex p-2">

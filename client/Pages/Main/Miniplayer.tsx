@@ -16,6 +16,9 @@ export function Miniplayer({ width }) {
   const trackall = useRef(null)
   const miniplayer = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [volstate, setvolstate] = useState(false)
+
+  const volbutt = useRef(null)
 
   useEffect(() => {
     if (width == '60') {
@@ -51,11 +54,19 @@ export function Miniplayer({ width }) {
   }
 
   function trackHandler() {
-    console.log(
+    /*console.log(
       (audioRef.current.currentTime / audioRef.current.duration) * 100,
-    )
+    )*/
     track.current.style.width =
       (audioRef.current.currentTime / audioRef.current.duration) * 100 + '%'
+  }
+
+  function changevolume(e) {
+    audioRef.current.volume = e.target.value / 100
+  }
+
+  function volhover(state) {
+    setvolstate(state)
   }
 
   return (
@@ -65,7 +76,7 @@ export function Miniplayer({ width }) {
         onPlay={() => setIsPlaying(true)}
         onTimeUpdate={trackHandler}
         ref={audioRef}
-        src="/audio/shessonice.m4a"
+        src="/audio/song.mp3"
       />
       <div ref={detailref}>
         <img
@@ -83,11 +94,11 @@ export function Miniplayer({ width }) {
           </div>
           <div
             ref={trackall}
-            className="w-full h-2 bg-gray-400 rounded-sm overflow-hidden"
+            className="w-full h-1 bg-[#6363633b] rounded-sm overflow-hidden"
           >
             <div
               ref={track}
-              className=" transition-all h-full rounded-sm bg-white "
+              className=" transition-all h-full rounded-sm bg-white w-0"
             />
           </div>
           <div className="flex gap-3 items-center ">
@@ -110,17 +121,28 @@ export function Miniplayer({ width }) {
             <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
               <IoPlaySkipForward size={'20px'} />
             </button>
-            <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
-              <IoVolumeHighSharp size={'20px'} />
-            </button>
+            <div
+              onMouseEnter={() => volhover(true)}
+              onMouseLeave={() => volhover(false)}
+              className="relative"
+            >
+              {volstate && (
+                <div
+                  ref={volbutt}
+                  className="bg-[#ffffff4a] w-[100px] h-full rounded-sm absolute right-0 z-10"
+                >
+                  <input
+                    id="default-range"
+                    type="range"
+                    className="w-full h-2 bg-neutral-quaternary rounded-full cursor-pointer"
+                    onChange={changevolume}
+                  ></input>
+                </div>
+              )}
 
-            <div className="w-4 hidden">
-              <input
-                id="default-range"
-                type="range"
-                value="50"
-                className="w-full h-2 bg-neutral-quaternary rounded-full appearance-none cursor-pointer"
-              ></input>
+              <button className="cursor-pointer p-2 text-gray-400 hover:text-white z-20 relative">
+                <IoVolumeHighSharp size={'20px'} />
+              </button>
             </div>
           </div>
         </div>
