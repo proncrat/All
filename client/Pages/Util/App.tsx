@@ -10,6 +10,7 @@ import { SideBar } from '../Main/Sidebar'
 import { useSession } from '@/lib/auth'
 import { CallingStuffs } from './Calls'
 import { NthParentContext } from './call/Context'
+import { MiniPlayer } from './Miniplayer'
 
 function App() {
   const queryClient = new QueryClient()
@@ -80,6 +81,7 @@ function App() {
               <THEHEADER sidebar={handlewidth} />
               <SideBar width={width} />
               <CallingStuffs callrequest={data} callcleanup={setData} />
+              <MiniPlayer />
               <div
                 style={{ marginLeft: `${width}px` }}
                 className=" transition-all pt-12 h-full"

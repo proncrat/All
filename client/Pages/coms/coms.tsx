@@ -46,7 +46,7 @@ export function Coms() {
     <div className="flex h-full">
       <div
         style={{ width: '300px' }}
-        className="bg-black shrink-0 border-r-2 p-4 gap-4 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
+        className=" bg-black shrink-0 border-r-2 p-3 gap-2 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
       >
         <NavLink
           className={'[&.active]:bg-mist-800 rounded-lg hover:bg-mist-800'}
@@ -66,14 +66,14 @@ export function Coms() {
             <div className="rounded-lg bg-black w-full p-1 ">
               <NavLink
                 className={
-                  'hover:bg-position-[100%_50%] bg-linear-to-br [&.active]:bg-position-[100%_70%] rounded-sm block from-black from-60% to-slate-600 bg-size-[200%_200%] bg-position-[100%_0%] transition-all'
+                  ' text-gray-500! hover:text-white! [&.active]:text-white! active:bg-position-[100%_30%] hover:bg-position-[100%_50%] bg-linear-to-br [&.active]:bg-position-[100%_70%] rounded-sm block from-black from-60% to-slate-600 bg-size-[200%_200%] bg-position-[100%_0%] transition-all'
                 }
                 to={'/coms/' + person.chatid}
               >
                 <div className="flex justify-between pr-4 ">
                   <div className="flex items-center gap-4  rounded-lg cursor-pointer p-1 ">
                     <img
-                      className="rounded-full w-10 aspect-square"
+                      className="rounded-full w-9 aspect-square"
                       alt="some pfp"
                       src={person.pfp}
                     />
