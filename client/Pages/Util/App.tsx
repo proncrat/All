@@ -72,28 +72,26 @@ function App() {
   }
 
   return (
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <CookiesProvider>
-          <Toaster />
-          <NthParentContext.Provider value={{ handleChildAction }}>
-            <div className="w-full h-screen">
-              <THEHEADER sidebar={handlewidth} />
-              <SideBar width={width} />
-              <CallingStuffs callrequest={data} callcleanup={setData} />
-              <MiniPlayer />
-              <div
-                style={{ marginLeft: `${width}px` }}
-                className=" transition-all pt-12 h-full"
-              >
-                <Outlet />
-              </div>
+    <QueryClientProvider client={queryClient}>
+      <CookiesProvider>
+        <Toaster />
+        <NthParentContext.Provider value={{ handleChildAction }}>
+          <div className="w-full h-screen">
+            <THEHEADER sidebar={handlewidth} />
+            <SideBar width={width} />
+            <CallingStuffs callrequest={data} callcleanup={setData} />
+            {/*<MiniPlayer />*/}
+            <div
+              style={{ marginLeft: `${width}px` }}
+              className=" transition-all pt-12 h-full"
+            >
+              <Outlet />
             </div>
-          </NthParentContext.Provider>
-        </CookiesProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </StrictMode>
+          </div>
+        </NthParentContext.Provider>
+      </CookiesProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   )
 }
 

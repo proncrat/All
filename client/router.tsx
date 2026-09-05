@@ -29,6 +29,7 @@ import { Theme } from './Pages/Settings/components/Theme'
 import { AboutHome } from './Pages/About/AboutHome'
 import { People } from './Pages/coms/components/People'
 import { Authsett } from './Pages/Settings/components/Authsettform'
+import { Shortz } from './Pages/short/shortz'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -38,6 +39,7 @@ const routes = createRoutesFromElements(
       <Route path="theme" element={<Theme />} />
       <Route path="authsett" element={<Authsett />} />
     </Route>
+    <Route path="/shortz" element={<Shortz />} />
     <Route path="/Info" element={<AboutHome />} />
     <Route path="/post" element={<PostPage />} />
     <Route path="/signin" element={<SignInForm />} />

@@ -373,8 +373,10 @@ export function CallingStuffs({ callrequest, callcleanup }) {
     await statusslop.mutateAsync({ status: currentStatus })
   }
 
+  const states = ['', 'hidden']
+
   return (
-    <div className={`fixed z-5000 bottom-0 `}>
+    <div className={`fixed z-5000 bottom-0 ${states[inCall]}`}>
       <div className={`m-5 rounded-sm  ${statuses[currentStatus]} p-px `}>
         <div className="rounded-sm bg-black p-1 w-[280px]">
           <audio className="hidden" ref={ringtone}>
