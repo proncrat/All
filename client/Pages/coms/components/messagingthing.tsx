@@ -42,8 +42,8 @@ export function Messagebox() {
         <button
           onClick={() =>
             handleChildAction({
-              name: person.name,
-              userId: person.link_id,
+              name: 'test',
+              userId: '',
             })
           }
           className="cursor-pointer"

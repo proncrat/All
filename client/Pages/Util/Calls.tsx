@@ -373,7 +373,9 @@ export function CallingStuffs({ callrequest, callcleanup }) {
     await statusslop.mutateAsync({ status: currentStatus })
   }
 
-  const states = ['', 'hidden']
+  //const states = ['', 'hidden']
+
+  const states = { true: '', false: 'hidden' }
 
   return (
     <div className={`fixed z-5000 bottom-0 ${states[inCall]}`}>
