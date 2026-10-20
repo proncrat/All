@@ -48,7 +48,10 @@ export function Sendbox() {
 
     try {
       statecontrol('pending')
-      await sendmessage.mutateAsync(data)
+      await sendmessage.mutateAsync({
+        data,
+        sender: { id: 1, name: 'Bob', pfp: 'dg' },
+      })
       statecontrol('success')
       setText('')
     } catch (error) {

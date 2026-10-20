@@ -128,7 +128,7 @@ export async function getmessages(chatId: string) {
     .where('chatid', chatId)
     .select(get_messages_schema)
     .join('profiledata', 'messages.senderid', 'profiledata.id')
-    .orderBy([{ column: 'messages.id', order: 'desc' }])
+    .orderBy([{ column: 'messages.id', order: 'asc' }])
 }
 
 //messaging post

@@ -23,7 +23,11 @@ export function ShownMessage({ data, userId }) {
   }
 
   return (
-    <div className="flex justify-between">
+    <div
+      className={`flex justify-between transition-opacity ${
+        message.pending ? 'opacity-50' : ''
+      }`}
+    >
       <div className="flex gap-4">
         <img
           className="rounded-full w-12 aspect-square h-12"
@@ -49,7 +53,7 @@ export function ShownMessage({ data, userId }) {
           )}
         </div>
       </div>
-      {userId == message.senderid && (
+      {userId == message.senderid && !message.pending && (
         <div className="flex h-min">
           <div
             onClick={stateHandler}
