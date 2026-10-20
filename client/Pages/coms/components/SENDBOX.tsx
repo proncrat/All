@@ -6,6 +6,7 @@ import { Spinner } from '../../Util/Spinner'
 import { FaFileUpload } from 'react-icons/fa'
 import { Preview } from './ImgPreview'
 import { FaMicrophone } from 'react-icons/fa'
+import { useSession } from '@/lib/auth'
 
 export function Sendbox() {
   const baseUpload = {
@@ -35,6 +36,8 @@ export function Sendbox() {
 
   const [mutationstate, statecontrol] = useState('')
 
+  const { data: session, isPending: seshpend } = useSession()
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -50,7 +53,11 @@ export function Sendbox() {
       statecontrol('pending')
       await sendmessage.mutateAsync({
         data,
-        sender: { id: 1, name: 'Bob', pfp: 'dg' },
+        sender: {
+          id: 123,
+          name: session.user.displayUsername,
+          pfp: session.user.image,
+        },
       })
       statecontrol('success')
       setText('')

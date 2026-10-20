@@ -8,7 +8,7 @@ export function useSendMessage() {
     // Only `data` goes to the server; `sender` is just for the optimistic row
     mutationFn: async ({ data }) => {
       //WIll he forget about this??
-      await new Promise((r) => setTimeout(r, 2000))
+      await new Promise((r) => setTimeout(r, 500))
       return sendMessage(data)
     },
 

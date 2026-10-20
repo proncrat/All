@@ -10,7 +10,7 @@ export function SideBar({ width }) {
 
   return (
     <div
-      className=" bg-tpbackground fixed top-[50.2px] left-0 border-r-2 transition-all"
+      className="backdrop-blur-md bg-black/30 fixed top-[49px] left-0 border-r border-zinc-800 transition-all"
       style={{
         width: `${width}px`,
         height: '100vh',

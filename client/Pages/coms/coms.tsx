@@ -46,7 +46,7 @@ export function Coms() {
     <div className="flex h-full">
       <div
         style={{ width: '300px' }}
-        className=" bg-black shrink-0 border-r-2 p-3 gap-2 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
+        className=" bg-black shrink-0 border-r border-zinc-800 p-3 gap-2 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
       >
         <NavLink
           className={'[&.active]:bg-mist-800 rounded-lg hover:bg-mist-800'}

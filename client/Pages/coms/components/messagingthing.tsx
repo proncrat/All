@@ -67,9 +67,9 @@ export function Messagebox() {
   }
 
   return (
-    <div className="flex flex-col h-full relative">
+    <div className="bg-black flex flex-col h-full relative">
       {callStatus && <Call callback={setcallStatus} />}
-      <div className=" h-12 border-b-2 flex p-2">
+      <div className=" h-12 border-b border-zinc-800 flex p-2">
         <button
           onClick={() =>
             handleChildAction({
@@ -86,22 +86,28 @@ export function Messagebox() {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className=" h-full p-5 flex flex-col gap-8 overflow-auto scrollbar hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
+          className=" h-full p-5 flex flex-col gap-8 overflow-auto scrollbar scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-transparent hover:scrollbar-thumb-zinc-400"
         >
           {data.map((message) => (
             <ShownMessage key={message.id} data={message} userId={userid} />
           ))}
         </div>
 
-        {showScrollButton && (
-          <button
-            onClick={() => scrollToBottom('smooth')}
-            className="absolute bottom-4 right-6 p-3 rounded-full bg-zinc-700 text-white shadow-lg hover:bg-zinc-600 cursor-pointer"
-            aria-label="Scroll to bottom"
-          >
-            <FaChevronDown size={16} />
-          </button>
-        )}
+        <button
+          onClick={() => scrollToBottom('smooth')}
+          aria-label="Scroll to bottom"
+          aria-hidden={!showScrollButton}
+          tabIndex={showScrollButton ? 0 : -1}
+          className={`absolute bottom-4 right-6 p-3 rounded-full bg-zinc-700 text-white shadow-lg hover:bg-zinc-600 cursor-pointer
+          transition-all duration-200 ease-out
+          ${
+            showScrollButton
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-2 pointer-events-none'
+          }`}
+        >
+          <FaChevronDown size={16} />
+        </button>
       </div>
       <div className="h-12">
         <Sendbox statecontrol={setmessageload} />

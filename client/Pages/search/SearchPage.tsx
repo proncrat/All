@@ -37,8 +37,8 @@ function Search() {
   }
 
   return (
-    <div>
-      <div className="w-full h-12 border-b-2 flex gap-1 pl-4 pt-2 pb-2 overflow-y-hidden">
+    <div className="bg-black h-full">
+      <div className="w-full h-12 border-b border-zinc-800 flex gap-1 pl-4 pt-2 pb-2 overflow-y-hidden">
         <Headerbutton
           click={clickhandler}
           activething={searchoption}
@@ -83,26 +83,38 @@ function Search() {
 
         {isSuccess &&
           data.map((profile: profile) => (
-            <div key={profile.id} className="border mb-4 rounded-xl p-2">
-              <Link to={`/profile/${profile.id}`}>
-                <div className="flex gap-6">
-                  <img
-                    className="rounded-xl aspect-square w-30"
-                    alt="A THUMBNAIL"
-                    src={profile.pfp}
-                  />
-                  <div className="mt-2">
-                    <p>{profile.name}</p>
-                    <div className="flex gap-2">
-                      <p>@{profile.id}</p>
-                      <p>&middot;</p>
-                      <p>{profile.followers}</p>
-                    </div>
-                    <p>{profile.description}</p>
+            <Link
+              key={profile.id}
+              className="mb-4 group flex border border-zinc-800 rounded-xl p-2 shadow-[0px_0px_8px_0px_#ffffff17] transition-colors duration-150 hover:border-white/25 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+              to={`/profile/${profile.id}`}
+            >
+              <div className="flex gap-6">
+                <img
+                  className="rounded-xl aspect-square w-30"
+                  alt="A THUMBNAIL"
+                  src={profile.pfp}
+                />
+                <div className="mt-2">
+                  <p className="truncate text-base font-semibold text-white">
+                    {profile.name}
+                  </p>
+                  <div className="flex gap-3">
+                    <p className="truncate text-sm text-neutral-400">
+                      @{profile.id}
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                      {profile.followers} follower
+                    </p>
+                    <p className="text-sm text-neutral-500">
+                      {profile.following} following
+                    </p>
                   </div>
+                  <p className="mt-1 line-clamp-2 text-sm text-neutral-300">
+                    {profile.description}
+                  </p>
                 </div>
-              </Link>
-            </div>
+              </div>
+            </Link>
           ))}
       </div>
     </div>

@@ -47,7 +47,7 @@ export function THEHEADER({ sidebar }) {
   }
 
   return (
-    <header className="bg-tpbackground THEHEADER mb-5 flex justify-between p-2 items border-b-2 fixed top-0 w-full z-30">
+    <header className="backdrop-blur-md bg-black/30 mb-5 flex justify-between p-2 items border-b border-zinc-800 fixed top-0 w-full z-30">
       <div className="flex gap-4 items-center">
         <RxHamburgerMenu
           className="cursor-pointer"
