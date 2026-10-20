@@ -67,7 +67,7 @@ export function Messagebox() {
   }
 
   return (
-    <div className="bg-black flex flex-col h-full relative">
+    <div className="flex flex-col h-full relative">
       {callStatus && <Call callback={setcallStatus} />}
       <div className=" h-12 border-b border-zinc-800 flex p-2">
         <button

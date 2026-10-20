@@ -35,7 +35,7 @@ export function People() {
   }
 
   return (
-    <div className="pl-8 pr-8 pt-5 bg-black h-full">
+    <div className="pl-8 pr-8 pt-5 h-full">
       <p className="mb-4 text-lg ">People</p>
       <div className="flex flex-col gap-4">
         {followersthing.map((person) => (

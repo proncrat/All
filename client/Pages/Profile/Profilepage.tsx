@@ -13,10 +13,12 @@ function Profile() {
   const { data, isPending, isError, error, isSuccess } = useUserData(id ?? '')
 
   useEffect(() => {
+    if (!isSuccess || !data?.bg) return
+    let cancelled = false
+
     async function colorthingy() {
-      const color = await prominent(data.bg, {
-        format: 'hex',
-      })
+      const color = await prominent(data.bg, { format: 'hex' })
+      if (cancelled) return
       document.body.style.backgroundColor = color[0]
       document.documentElement.style.setProperty('--after-color', color[0])
     }
@@ -24,9 +26,11 @@ function Profile() {
     colorthingy()
 
     return () => {
+      cancelled = true
       document.body.style.backgroundColor = ''
+      document.documentElement.style.removeProperty('--after-color')
     }
-  }, [isSuccess])
+  }, [isSuccess, data?.bg])
 
   if (isError) {
     return <ProfileLost></ProfileLost>

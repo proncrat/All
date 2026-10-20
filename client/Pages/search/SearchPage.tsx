@@ -37,7 +37,7 @@ function Search() {
   }
 
   return (
-    <div className="bg-black h-full">
+    <div className="h-full">
       <div className="w-full h-12 border-b border-zinc-800 flex gap-1 pl-4 pt-2 pb-2 overflow-y-hidden">
         <Headerbutton
           click={clickhandler}

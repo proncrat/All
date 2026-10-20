@@ -257,3 +257,18 @@ ul#images {
   --color-tpbackground: lab(100 0 0 / 0.51);
   --color-tpbgprofile: lab(3 0 0 / 0.71);
 }
+
+/*Ouu shiii this smexy, fade in for pf*/
+@property --after-color {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: black;
+}
+
+html {
+  transition: --after-color 700ms ease;
+}
+
+body {
+  transition: background-color 700ms ease;
+}
