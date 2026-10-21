@@ -14,7 +14,7 @@ import { MiniPlayer } from './Miniplayer'
 import { PlayerProvider, usePlayer } from '../Main/PlayerContext' // <-- added usePlayer
 
 function Layout() {
-  //State fo sidebar
+  // State for sidebar
   const [width, setWidth] = useState(60)
   const { playRequest } = usePlayer()
 
@@ -31,7 +31,6 @@ function Layout() {
 
   const handleChildAction = (childData) => {
     setData(childData)
-    //console.log('Received by Nth Parent:', childData)
   }
 
   return (
@@ -40,10 +39,13 @@ function Layout() {
         <THEHEADER sidebar={handlewidth} />
         <SideBar width={width} />
         <CallingStuffs callrequest={data} callcleanup={setData} />
-        {/*<MiniPlayer />*/}
         <div
-          style={{ marginLeft: `${width}px` }}
-          className=" transition-all pt-12 h-full"
+          style={{ '--sidebar-width': `${width}px` } as React.CSSProperties}
+          className="
+            transition-all pt-12 h-full
+            ml-0 pb-20
+            md:ml-[var(--sidebar-width)] md:pb-0
+          "
         >
           <Outlet />
         </div>

@@ -4,10 +4,9 @@
  */
 export async function seed(knex) {
   // Deletes ALL existing entries
-  //await knex('profiledata').del()
+  await knex('profiledata').del()
   await knex('profiledata').insert([
     {
-      id: 1,
       level: 9999,
       link_id: '8ZVcqNO87geQy0fdJ9pLxdOmPvVrbt1j',
       name: 'GOD',
@@ -22,7 +21,6 @@ export async function seed(knex) {
         '[{"name":"Instagram","link":"instagram.com/jullian.bublitz/"},{"name":"Github","link":"github.com/proncrat"}]',
     },
     {
-      id: 2,
       level: 0,
       link_id: '7t5tsLklaSRZP9wjfUXsZCZjmiFOOeHD',
       name: 'Jean',
@@ -33,7 +31,6 @@ export async function seed(knex) {
       bg: '/images/lock.png',
     },
     {
-      id: 3,
       level: 25,
       link_id: null,
       name: 'Goth',
