@@ -1,25 +1,39 @@
 import { useChats, Usesessionid, useUserData } from '@/client/hooks'
 import { useSession } from '@/lib/auth'
 import { NavLink, Outlet, useParams } from 'react-router'
-import { Spinner } from '../Util/Spinner'
 import { useNthParent } from '../Util/call/Context'
 import { RxCross1 } from 'react-icons/rx'
+
+// same outer shape as a real chat card, so nothing jumps when data arrives
+function ChatSkeleton({ nameWidth }: { nameWidth: string }) {
+  return (
+    <div className="rounded-lg p-px bg-zinc-800/60 animate-pulse">
+      <div className="rounded-lg bg-black w-full p-1">
+        <div className="flex justify-between items-center pr-4">
+          <div className="flex items-center gap-4 p-1">
+            <div className="rounded-full w-9 aspect-square bg-zinc-800 shrink-0" />
+            <div className={`h-4 rounded bg-zinc-800 ${nameWidth}`} />
+          </div>
+          <div className="size-4 rounded bg-zinc-800" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const SKELETON_WIDTHS = ['w-24', 'w-16', 'w-28', 'w-20']
 
 export function Coms() {
   const { id } = useParams()
 
   const { data: lesesh, isPending: seshpend } = useSession()
-
   const userseshid = lesesh?.session.userId
 
   const { data: idcheck, isPending: idpend } = Usesessionid(
     userseshid,
     !seshpend,
   )
-
   const userid = idcheck?.id
-
-  //console.log(userid)
 
   const { handleChildAction } = useNthParent()
 
@@ -29,18 +43,7 @@ export function Coms() {
     !idpend,
   )
 
-  const { data, isPending, isError, error, isSuccess } = useChats(
-    userid,
-    !idpend,
-  )
-
-  if (isPending) {
-    return <Spinner></Spinner>
-  }
-
-  if (isError) {
-    return <p>Something exploded</p>
-  }
+  const { data, isPending, isError } = useChats(userid, !idpend)
 
   return (
     <div className="flex h-full">
@@ -58,7 +61,13 @@ export function Coms() {
           </div>
         </NavLink>
         <p>Chats -</p>
-        {data.map((person, index) => (
+
+        {isPending &&
+          SKELETON_WIDTHS.map((w, i) => <ChatSkeleton key={i} nameWidth={w} />)}
+
+        {isError && <p>Something exploded</p>}
+
+        {data?.map((person, index) => (
           <div
             key={index}
             className="animate-gradient-bg bg-linear-160 from-green-500 via-gray-700 to-gray-700 rounded-lg p-px"

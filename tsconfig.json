@@ -4,7 +4,7 @@
       "@/*": ["./*"],
       "@server/*": ["./server/src/*"]
     },
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "target": "es2020", 
     "jsx": "react-jsx",
     "module": "ES2020",

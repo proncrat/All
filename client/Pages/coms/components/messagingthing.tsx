@@ -5,10 +5,45 @@ import { ShownMessage } from './messages'
 import { FaPhone } from 'react-icons/fa6'
 import { Call } from './call'
 import { useFetchId } from '@/client/hooks/useId'
-import { Spinner } from '../../Util/Spinner'
 import { useNthParent } from '../../Util/call/Context'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
+import { useMessageSocket } from '@/client/hooks/useMessageSocket'
+
+// mirrors a real message: avatar, name + timestamp line, then text (or an image)
+function MessageSkeleton({
+  lineWidth,
+  image = false,
+}: {
+  lineWidth: string
+  image?: boolean
+}) {
+  return (
+    <div className="flex gap-5 animate-pulse">
+      <div className="size-14 rounded-full bg-zinc-800 shrink-0" />
+      <div className="flex flex-col gap-2 pt-1">
+        <div className="flex items-center gap-3">
+          <div className="h-4 w-12 rounded bg-zinc-800" />
+          <div className="h-3 w-32 rounded bg-zinc-900" />
+        </div>
+        {image ? (
+          <div className="w-[480px] max-w-full aspect-video rounded bg-zinc-900" />
+        ) : (
+          <div className={`h-4 rounded bg-zinc-800 ${lineWidth}`} />
+        )}
+      </div>
+    </div>
+  )
+}
+
+const SKELETONS = [
+  { w: 'w-16' },
+  { w: 'w-64', image: true },
+  { w: 'w-40' },
+  { w: 'w-24' },
+  { w: 'w-56' },
+  { w: 'w-20' },
+]
 
 export function Messagebox() {
   const { id } = useParams()
@@ -16,6 +51,8 @@ export function Messagebox() {
   const [mutationstate, setmessageload] = useState(false)
 
   const { data, isPending, isError, error, isSuccess } = useMessages(id)
+
+  useMessageSocket(id)
 
   const [callStatus, setcallStatus] = useState(false)
 
@@ -62,10 +99,6 @@ export function Messagebox() {
     scrollToBottom('auto')
   }, [scrollToBottom])
 
-  if (isPending) {
-    return <Spinner />
-  }
-
   return (
     <div className="flex flex-col h-full relative">
       {callStatus && <Call callback={setcallStatus} />}
@@ -74,7 +107,7 @@ export function Messagebox() {
           onClick={() =>
             handleChildAction({
               name: 'test',
-              userId: '',
+              userId: 'oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS',
             })
           }
           className="cursor-pointer"
@@ -86,9 +119,18 @@ export function Messagebox() {
         <div
           ref={containerRef}
           onScroll={handleScroll}
-          className=" h-full p-5 flex flex-col gap-8 overflow-auto scrollbar scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-transparent hover:scrollbar-thumb-zinc-400"
+          className={`h-full p-5 flex flex-col gap-8 scrollbar scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-transparent hover:scrollbar-thumb-zinc-400 ${
+            isPending ? 'overflow-hidden' : 'overflow-auto'
+          }`}
         >
-          {data.map((message) => (
+          {isPending &&
+            SKELETONS.map((s, i) => (
+              <MessageSkeleton key={i} lineWidth={s.w} />
+            ))}
+
+          {isError && <p>Failed to load messages</p>}
+
+          {data?.map((message) => (
             <ShownMessage key={message.id} data={message} userId={userid} />
           ))}
         </div>

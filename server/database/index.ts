@@ -1,4 +1,5 @@
-import { sendDataToClient } from '../Routes/test.ts'
+//import { sendDataToClient } from '../Routes/test.ts'
+import { sendDataToClient } from '../socket.ts'
 import db from './connection.ts'
 
 //auth utilitys
@@ -132,7 +133,7 @@ export async function getmessages(chatId: string) {
 }
 
 //messaging post
-
+/*
 export async function newmessage(data) {
   console.log(data)
   const userid = await getUnIdMatch(data.senderid)
@@ -142,6 +143,36 @@ export async function newmessage(data) {
     user: 'person',
   })
   return await db('messages').insert({ ...data })
+}
+*/
+
+export async function newmessage(data) {
+  console.log(data)
+
+  // 1. save first, then emit the saved row
+  const [saved] = await db('messages')
+    .insert({ ...data })
+    .returning('*')
+
+  // 2. everyone in this chat (both users, including the sender)
+  const members = await db('chats') // <- your chats table name
+    .where({ chatid: data.chatid })
+    .distinct('ownerid')
+
+  // 3. internal user id -> auth id (link_id), then emit to each user's room
+  await Promise.all(
+    members.map(async ({ ownerid }) => {
+      const u = await getUnIdMatch(ownerid)
+      if (!u?.link_id) {
+        console.warn('[newmessage] no link_id for user', ownerid)
+        return
+      }
+      console.log('[newmessage] emitting to user', ownerid, '->', u.link_id)
+      sendDataToClient(u.link_id, saved)
+    }),
+  )
+
+  return saved
 }
 
 export async function deleteMessage(messageId: number, requesterId: number) {

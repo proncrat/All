@@ -16,41 +16,121 @@ export type Song = {
 }
 
 type PlayerCtx = {
+  audioRef: React.RefObject<HTMLAudioElement | null>
   current: Song | null
   playing: boolean
   playSong: (song: Song, queue?: Song[]) => void
   toggle: () => void
   next: () => void
   prev: () => void
+  playRequest: number
 }
 
 const PlayerContext = createContext<PlayerCtx | null>(null)
+
+const FADE = 0.4 // seconds
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [queue, setQueue] = useState<Song[]>([])
   const [current, setCurrent] = useState<Song | null>(null)
   const [playing, setPlaying] = useState(false)
-
   const [playRequest, setPlayRequest] = useState(0)
 
+  // --- fade plumbing ---
+  const ctxRef = useRef<AudioContext | null>(null)
+  const gainRef = useRef<GainNode | null>(null)
+  const pauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const fadingOut = useRef(false)
+
+  // Built lazily (needs a user gesture) and only once, because an
+  // <audio> element can only be connected to the Web Audio graph one time.
+  function ensureGraph() {
+    if (!ctxRef.current || !gainRef.current) {
+      const ctx = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )()
+      const source = ctx.createMediaElementSource(audioRef.current!)
+      const gain = ctx.createGain()
+      source.connect(gain).connect(ctx.destination)
+      ctxRef.current = ctx
+      gainRef.current = gain
+    }
+    return { ctx: ctxRef.current, gain: gainRef.current.gain }
+  }
+
+  function rampTo(value: number) {
+    const { ctx, gain } = ensureGraph()
+    const now = ctx.currentTime
+    gain.cancelScheduledValues(now)
+    gain.setValueAtTime(gain.value, now) // start from the current level
+    gain.linearRampToValueAtTime(value, now + FADE)
+  }
+
+  function clearPauseTimer() {
+    if (pauseTimer.current) clearTimeout(pauseTimer.current)
+    pauseTimer.current = null
+  }
+
+  // fromSilence = true for a freshly loaded track: snap to 0, then fade up
+  async function fadeIn(fromSilence = false) {
+    const a = audioRef.current
+    if (!a) return
+    const { ctx, gain } = ensureGraph()
+    clearPauseTimer()
+    fadingOut.current = false
+    setPlaying(true) // flip the icon immediately
+    await ctx.resume()
+
+    if (a.paused || fromSilence) {
+      gain.cancelScheduledValues(ctx.currentTime)
+      gain.setValueAtTime(0, ctx.currentTime)
+      try {
+        await a.play()
+      } catch {
+        setPlaying(false)
+        return
+      }
+    }
+    rampTo(1)
+  }
+
+  function fadeOut() {
+    const a = audioRef.current
+    if (!a) return
+    fadingOut.current = true
+    setPlaying(false) // flip the icon immediately
+    rampTo(0)
+    clearPauseTimer()
+    pauseTimer.current = setTimeout(() => {
+      a.pause()
+      fadingOut.current = false
+    }, FADE * 1000)
+  }
+
+  useEffect(() => clearPauseTimer, [])
+
+  // --- player logic ---
   const playSong = (song: Song, newQueue?: Song[]) => {
     if (newQueue) setQueue(newQueue)
     setCurrent(song)
     setPlayRequest((n) => n + 1)
   }
 
-  // load + play whenever the current song changes
+  // load + fade in whenever the current song changes
   useEffect(() => {
-    if (!current || !audioRef.current) return
-    audioRef.current.src = current.src
-    audioRef.current.play().catch(() => {})
+    const a = audioRef.current
+    if (!current || !a) return
+    a.src = current.src
+    fadeIn(true)
   }, [current])
 
   const toggle = () => {
     const a = audioRef.current
     if (!a) return
-    a.paused ? a.play() : a.pause()
+    // if a fade-out is in progress, clicking again fades back in
+    if (a.paused || fadingOut.current) fadeIn()
+    else fadeOut()
   }
 
   const step = (dir: 1 | -1) => {
@@ -75,6 +155,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       {children}
       <audio
         ref={audioRef}
+        crossOrigin="anonymous"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => step(1)}
