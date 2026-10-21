@@ -4,6 +4,7 @@ export interface profile {
   name: string
   describe: string
   followers: number
+  following: number
   peerid: string
   pfp: string
   description: string

@@ -30,6 +30,7 @@ import { AboutHome } from './Pages/About/AboutHome'
 import { People } from './Pages/coms/components/People'
 import { Authsett } from './Pages/Settings/components/Authsettform'
 import { Shortz } from './Pages/short/shortz'
+import { SongList } from './Pages/Profile/pages/songs/Songs'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -50,7 +51,7 @@ const routes = createRoutesFromElements(
       <Route path="videos" element={<Videos />} />
       <Route path="Posts" element={<Posts />} />
       <Route path="Live" element={<Live />} />
-      <Route path="Song" element={<Song />} />
+      <Route path="Song" element={<SongList />} />
       <Route path="playlist" element={<Playlist />} />
       <Route path="Picture" element={<Photos />} />
       <Route path="About" element={<About />} />

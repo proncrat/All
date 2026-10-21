@@ -11,15 +11,49 @@ import { useSession } from '@/lib/auth'
 import { CallingStuffs } from './Calls'
 import { NthParentContext } from './call/Context'
 import { MiniPlayer } from './Miniplayer'
+import { PlayerProvider, usePlayer } from '../Main/PlayerContext' // <-- added usePlayer
 
-function App() {
-  const queryClient = new QueryClient()
+function Layout() {
   //State fo sidebar
   const [width, setWidth] = useState(60)
+  const { playRequest } = usePlayer()
 
   const handlewidth = () => {
     setWidth(width === 60 ? 300 : 60)
   }
+
+  // open the sidebar whenever a song is started
+  useEffect(() => {
+    if (playRequest > 0) setWidth(300)
+  }, [playRequest])
+
+  const [data, setData] = useState('')
+
+  const handleChildAction = (childData) => {
+    setData(childData)
+    //console.log('Received by Nth Parent:', childData)
+  }
+
+  return (
+    <NthParentContext.Provider value={{ handleChildAction }}>
+      <div className="w-full h-screen">
+        <THEHEADER sidebar={handlewidth} />
+        <SideBar width={width} />
+        <CallingStuffs callrequest={data} callcleanup={setData} />
+        {/*<MiniPlayer />*/}
+        <div
+          style={{ marginLeft: `${width}px` }}
+          className=" transition-all pt-12 h-full"
+        >
+          <Outlet />
+        </div>
+      </div>
+    </NthParentContext.Provider>
+  )
+}
+
+function App() {
+  const queryClient = new QueryClient()
 
   //document.documentElement.classList.add('dark')
 
@@ -36,62 +70,20 @@ function App() {
   const { data: session, isPending: seshpend } = useSession()
 
   useEffect(() => {
-    const myClientId = session?.user.id
-
-    console.log(myClientId)
-
-    // Pass the identifier as a query parameter when opening the SSE connection
-    const eventSource = new EventSource(
-      `http://localhost:3000/api/v1/test/events?clientId=${myClientId}`,
-    )
-
-    // Listen for incoming messages targeting this client
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      if (data.type == 'notification') {
-        console.log('Received targeted message:', data)
-        new Notification(data.user, {
-          body: data.text,
-          icon: data.icon,
-        })
-      }
-    }
-
-    // Handle connection errors
-    eventSource.onerror = (err) => {
-      console.error('SSE Connection failed:', err)
-    }
+    ...your commented-out SSE code...
   }, [seshpend, session])
 */
 
-  const [data, setData] = useState('')
-
-  const handleChildAction = (childData) => {
-    setData(childData)
-    //console.log('Received by Nth Parent:', childData)
-  }
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <CookiesProvider>
-        <Toaster />
-        <NthParentContext.Provider value={{ handleChildAction }}>
-          <div className="w-full h-screen">
-            <THEHEADER sidebar={handlewidth} />
-            <SideBar width={width} />
-            <CallingStuffs callrequest={data} callcleanup={setData} />
-            {/*<MiniPlayer />*/}
-            <div
-              style={{ marginLeft: `${width}px` }}
-              className=" transition-all pt-12 h-full"
-            >
-              <Outlet />
-            </div>
-          </div>
-        </NthParentContext.Provider>
-      </CookiesProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <PlayerProvider>
+      <QueryClientProvider client={queryClient}>
+        <CookiesProvider>
+          <Toaster />
+          <Layout />
+        </CookiesProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </PlayerProvider>
   )
 }
 

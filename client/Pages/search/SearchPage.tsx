@@ -85,7 +85,7 @@ function Search() {
           data.map((profile: profile) => (
             <Link
               key={profile.id}
-              className="mb-4 group flex border border-zinc-800 rounded-xl p-2 shadow-[0px_0px_8px_0px_#ffffff17] transition-colors duration-150 hover:border-white/25 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+              className=" mb-4 group flex border border-zinc-800 rounded-xl p-2 shadow-[0px_0px_8px_0px_#ffffff17] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:bg-position-[100%_30%] hover:bg-position-[100%_50%] bg-linear-to-br [&.active]:bg-position-[100%_70%]  from-black from-60% to-slate-600 bg-size-[200%_200%] bg-position-[100%_0%] transition-all"
               to={`/profile/${profile.id}`}
             >
               <div className="flex gap-6">

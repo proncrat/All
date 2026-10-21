@@ -2,7 +2,6 @@ import Viewer from 'viewerjs'
 import { useEffect, useState } from 'react'
 
 import 'viewerjs/dist/viewer.css'
-import Peer from 'peerjs'
 
 import { Link, useParams } from 'react-router'
 import { useUserData } from '../../../hooks'
