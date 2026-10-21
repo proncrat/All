@@ -26,7 +26,7 @@ export function Posts() {
           key={item.id}
           title={item.title}
           handle={'God'}
-          avatar={'http://localhost:5173/images/janedoe2.jpg'}
+          avatar={'/images/janedoe2.jpg'}
           body={item.the_post}
           date={item.post_date}
           images={[
@@ -50,8 +50,7 @@ export function Posts() {
             {
               id: 2,
               handle: 'alice',
-              avatar:
-                'http://localhost:5173/images/4cc1d0f3-a346-4359-91ca-6d1a76db487f.png',
+              avatar: '/images/4cc1d0f3-a346-4359-91ca-6d1a76db487f.png',
               date: '2026-03-25T09:10:00Z',
               body: 'agreed',
             },

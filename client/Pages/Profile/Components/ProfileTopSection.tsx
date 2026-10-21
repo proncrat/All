@@ -43,11 +43,12 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
 
   let followstatus = false
 
-  if (!followpending && !isPending) {
+  const { data: session, isPending: seshpend } = useSession()
+
+  if (!followpending && !isPending && session?.user && followersthing) {
     followstatus = followersthing.some(
       (follow) => follow.following_user_id === data.id,
     )
-    //console.log(followstatus)
   }
 
   async function follow() {
@@ -147,7 +148,7 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
                       Customize
                     </button>
                   )}
-                  {data.id !== userId && (
+                  {userId && data.id !== userId && (
                     <div>
                       {!followstatus && (
                         <button onClick={follow} className="abutton mt-2">
