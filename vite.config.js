@@ -5,11 +5,14 @@ import path from 'path'
 //import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vitejs.dev/config/
+
+const dir = import.meta.dirname
+
 export default defineConfig({
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './'),
-      '@server': path.resolve(__dirname, './server'),
+      '@': path.resolve(dir, './'),
+      '@server': path.resolve(dir, './server'),
     },
   },
   plugins: [react(), tailwindcss() /*tsconfigPaths()*/],
