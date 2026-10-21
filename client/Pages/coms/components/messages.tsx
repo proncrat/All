@@ -5,7 +5,7 @@ import {
   IoPencilOutline,
 } from 'react-icons/io5'
 import { useState, useRef, useEffect } from 'react'
-import { useDeleteMessage } from '@/client/hooks/usemessages'
+import { useDeleteMessage, useEditMessage } from '@/client/hooks/usemessages'
 
 export function ShownMessage({ data, userId }) {
   const [open, setOpen] = useState(false)
@@ -15,7 +15,7 @@ export function ShownMessage({ data, userId }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const message = data
   const deleteMessage = useDeleteMessage()
-  //const editMessage = useEditMessage()
+  const editMessage = useEditMessage()
 
   // Close menu on outside click or Escape
   useEffect(() => {
@@ -62,7 +62,7 @@ export function ShownMessage({ data, userId }) {
     setEditing(false)
     setDraft('')
   }
-  /*
+
   async function saveEdit() {
     const text = draft.trim()
     // Nothing to save: empty or unchanged
@@ -73,11 +73,11 @@ export function ShownMessage({ data, userId }) {
     setEditing(false)
     await editMessage.mutateAsync({ id: message.id, text })
   }
-*/
+
   function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       e.preventDefault()
-      //saveEdit()
+      saveEdit()
     } else if (e.key === 'Escape') {
       cancelEdit()
     }
@@ -106,6 +106,9 @@ export function ShownMessage({ data, userId }) {
             <p className="text-xs text-zinc-400">
               {new Date(message.date).toLocaleString()}
             </p>
+            {message.edited == 1 && (
+              <p className="text-xs text-zinc-400">Edited</p>
+            )}
           </div>
 
           {message.type == 'text' &&
@@ -128,7 +131,7 @@ export function ShownMessage({ data, userId }) {
                   </button>{' '}
                   • enter to{' '}
                   <button
-                    //onClick={saveEdit}
+                    onClick={saveEdit}
                     className="text-sky-400 hover:underline cursor-pointer"
                   >
                     save

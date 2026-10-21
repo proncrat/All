@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { deleteMessage, sendMessage } from '../apis/messagesapi'
+import { deleteMessage, editMessage, sendMessage } from '../apis/messagesapi'
 
 export function useSendMessage() {
   const queryClient = useQueryClient()
@@ -50,6 +50,20 @@ export function useDeleteMessage() {
   return useMutation({
     mutationFn: async (data) => {
       return deleteMessage(data)
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['messages'] }),
+    onError: () => {
+      console.log('Problem??')
+    },
+  })
+}
+
+export function useEditMessage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data) => {
+      return editMessage(data)
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['messages'] }),
     onError: () => {

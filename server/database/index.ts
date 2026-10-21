@@ -120,6 +120,7 @@ const get_messages_schema = [
   'messages.type',
   'messages.text',
   'messages.send_date as date',
+  'messages.is_edited as edited',
   'profiledata.name',
   'profiledata.pfp',
 ]
@@ -173,6 +174,17 @@ export async function newmessage(data) {
   )
 
   return saved
+}
+
+export async function editMessage(
+  messageId: number,
+  requesterId: number,
+  newText: string,
+) {
+  return await db('messages')
+    .where('id', messageId)
+    .andWhere('senderid', requesterId)
+    .update({ is_edited: true, text: newText })
 }
 
 export async function deleteMessage(messageId: number, requesterId: number) {

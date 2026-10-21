@@ -2,6 +2,7 @@ import express from 'express'
 import {
   changeStatus,
   deleteMessage,
+  editMessage,
   getchats,
   getIdMatch,
   getmessages,
@@ -96,6 +97,18 @@ router.delete('/', async (req, res, next) => {
     const userId = await getLinkId(linkmatch)
     const data = req.body
     const lerespones = await deleteMessage(data.id, userId.id)
+    return res.status(200).send(lerespones)
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.put('/', async (req, res, next) => {
+  try {
+    const linkmatch = res.locals.session.session.userId
+    const userId = await getLinkId(linkmatch)
+    const data = req.body
+    const lerespones = await editMessage(data.id, userId.id, data.text)
     return res.status(200).send(lerespones)
   } catch (err) {
     next(err)

@@ -13,6 +13,12 @@ export async function deleteMessage(data) {
   return response.body
 }
 
+export async function editMessage(data) {
+  const requestURL = request.put(`${rootURL}/coms`)
+  const response = await requestURL.send(data)
+  return response.body
+}
+
 export async function newChat(data) {
   const requestURL = request.post(`${rootURL}/coms/chat`)
   const response = await requestURL.send(data)
