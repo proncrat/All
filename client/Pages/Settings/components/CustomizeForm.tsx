@@ -1,38 +1,130 @@
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { updateUser } from '@/lib/auth'
 
+import { FiPlus, FiTrash2 } from 'react-icons/fi'
+
+export type LinkItem = { name: string; link: string }
+
+const MAX_LINKS = 10
+
+export function LinksEditor({
+  links,
+  onChange,
+}: {
+  links: LinkItem[] | undefined
+  onChange: (links: LinkItem[]) => void
+}) {
+  const list = links ?? []
+
+  const update = (index: number, field: keyof LinkItem, value: string) =>
+    onChange(list.map((l, i) => (i === index ? { ...l, [field]: value } : l)))
+
+  const add = () => onChange([...list, { name: '', link: '' }])
+
+  const remove = (index: number) => onChange(list.filter((_, i) => i !== index))
+
+  return (
+    <div>
+      <p>Links</p>
+
+      <div className="mt-3 flex flex-col gap-4">
+        {list.length === 0 && (
+          <p className="text-sm text-zinc-500">
+            No links yet. Add one to show it on your profile.
+          </p>
+        )}
+
+        {list.map((link, index) => (
+          <div key={index} className="rounded-lg border border-zinc-800 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p>Link {index + 1}</p>
+              <button
+                type="button"
+                onClick={() => remove(index)}
+                aria-label={`Delete link ${index + 1}`}
+                className="cursor-pointer rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-red-500/10 hover:text-red-400 focus-visible:bg-red-500/10 focus-visible:text-red-400 focus-visible:outline-none"
+              >
+                <FiTrash2 size={16} />
+              </button>
+            </div>
+
+            <p className="mb-1 text-sm text-zinc-400">Name</p>
+            <InputGroup>
+              <InputGroupInput
+                onChange={(e) => update(index, 'name', e.target.value)}
+                value={link.name}
+                placeholder="website"
+                spellCheck="false"
+                type="text"
+                autoComplete="off"
+              />
+            </InputGroup>
+
+            <p className="mb-1 mt-4 text-sm text-zinc-400">Link</p>
+            <InputGroup>
+              <InputGroupInput
+                onChange={(e) => update(index, 'link', e.target.value)}
+                value={link.link}
+                placeholder="website.com"
+                spellCheck="false"
+                type="text"
+                autoComplete="off"
+              />
+            </InputGroup>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={add}
+          disabled={list.length >= MAX_LINKS}
+          className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-zinc-700 py-3 text-sm text-zinc-400 transition-colors hover:border-zinc-400 hover:text-white focus-visible:border-zinc-400 focus-visible:text-white focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-zinc-700 disabled:hover:text-zinc-400"
+        >
+          <FiPlus size={16} />
+          {list.length >= MAX_LINKS
+            ? `Limit of ${MAX_LINKS} links reached`
+            : 'Add link'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function CustomizeForm({ initialdata }) {
+  const [form, setform] = useState(initialdata)
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = e.currentTarget
+    const formEl = e.currentTarget
     await updateUser({
-      image: form.image.value,
+      image: formEl.image.value,
     })
   }
-
-  const [form, setform] = useState(initialdata)
 
   function formHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value
     const name = e.target.name
-    setform({ ...form, [name]: value })
+    setform((f) => ({ ...f, [name]: value }))
   }
 
-  function linkHandler(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value
+  function imgHandler(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const value = URL.createObjectURL(file)
     const name = e.target.name
-    setform({ ...form, [name]: value })
+    setform((f) => ({ ...f, [name]: value }))
   }
 
-  const links = JSON.parse(form.links)
-  //console.log(links)
-
-  function imgHandler(e) {
-    const value = URL.createObjectURL(e.target.files[0])
-    const name = e.target.name
-    setform({ ...form, [name]: value })
-  }
+  // parse safely so empty/invalid JSON doesn't crash the page
+  const links: LinkItem[] = useMemo(() => {
+    try {
+      const parsed = JSON.parse(form.links)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }, [form.links])
 
   return (
     <div className="m-7 w-full">
@@ -95,38 +187,12 @@ export function CustomizeForm({ initialdata }) {
           </InputGroup>
         </div>
 
-        <p>Links</p>
-        {links && (
-          <div>
-            {links.map((link, index) => (
-              <div key={index}>
-                <p className="mb-2">Link {index + 1}</p>
-                <p className="mb-1">Name</p>
-                <InputGroup>
-                  <InputGroupInput
-                    onChange={linkHandler}
-                    value={link.name}
-                    spellCheck="false"
-                    type="text"
-                    autoComplete="off"
-                    name={'name' + index}
-                  />
-                </InputGroup>
-                <p className="mb-1 mt-4">Link</p>
-                <InputGroup>
-                  <InputGroupInput
-                    onChange={linkHandler}
-                    value={link.link}
-                    spellCheck="false"
-                    type="text"
-                    autoComplete="off"
-                    name={'link' + index}
-                  />
-                </InputGroup>
-              </div>
-            ))}
-          </div>
-        )}
+        <LinksEditor
+          links={links}
+          onChange={(next) =>
+            setform((f) => ({ ...f, links: JSON.stringify(next) }))
+          }
+        />
 
         <p>Pfp</p>
         <img
@@ -147,7 +213,7 @@ export function CustomizeForm({ initialdata }) {
         "
         />
         <p>Bg</p>
-        <img className="rounded-xl w-100" alt="pfp" src={form.bg} />
+        <img className="rounded-xl w-100" alt="bg" src={form.bg} />
         <input
           onChange={imgHandler}
           name="bg"
@@ -163,7 +229,7 @@ export function CustomizeForm({ initialdata }) {
         <p>Banner</p>
         <img
           className="rounded-xl aspect-10/2 w-100"
-          alt="pfp"
+          alt="banner"
           src={form.banner}
         />
         <input

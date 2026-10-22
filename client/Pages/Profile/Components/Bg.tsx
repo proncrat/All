@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 function BgImage({ url }: { url: string }) {
   const [loaded, setLoaded] = useState(false)
@@ -19,13 +19,47 @@ function BgImage({ url }: { url: string }) {
   )
 }
 
-export function PfBg({ src }: { src?: { bg?: string } }) {
-  if (!src?.bg) return null
+export function PfBg({
+  src,
+  speed = 0.5,
+}: {
+  src?: { bg?: string }
+  speed?: number
+}) {
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const bg = src?.bg
+
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let raf = 0
+    const update = () => {
+      raf = 0
+      el.style.transform = `translate3d(0, ${window.scrollY * (1 - speed)}px, 0)`
+    }
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [speed, bg]) // re-run once the bg (and therefore the wrapper) exists
+
+  if (!bg) return null
 
   return (
-    <div className="absolute top-0 left-0 w-full -z-10">
+    <div
+      ref={wrapRef}
+      className="absolute top-0 left-0 w-full -z-10 will-change-transform"
+    >
       <div className="relative after:content-[''] after:absolute after:w-full after:h-full after:bg-[linear-gradient(0deg,var(--after-color,black),rgba(255,255,255,0)_50%)] after:pointer-events-none after:top-0 after:left-0">
-        <BgImage key={src.bg} url={src.bg} />
+        <BgImage key={bg} url={bg} />
       </div>
     </div>
   )

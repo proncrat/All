@@ -37,7 +37,7 @@ function Profile() {
   }
 
   return (
-    <div className="pt-4">
+    <div className="pt-4 pb-20">
       <div className="max-w-375 m-auto rounded-xl p-4 bg-tpbgprofile border border-zinc-800">
         <PfBg src={data} />
         <ProfileTopSection

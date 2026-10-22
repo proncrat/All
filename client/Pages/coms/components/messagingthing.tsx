@@ -9,6 +9,8 @@ import { useNthParent } from '../../Util/call/Context'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
 import { useMessageSocket } from '@/client/hooks/useMessageSocket'
+import { Link } from 'react-router'
+import { FaChevronLeft } from 'react-icons/fa6'
 
 // mirrors a real message: avatar, name + timestamp line, then text (or an image)
 function MessageSkeleton({
@@ -102,14 +104,13 @@ export function Messagebox() {
   return (
     <div className="flex flex-col h-full relative">
       {callStatus && <Call callback={setcallStatus} />}
-      <div className=" h-12 border-b border-zinc-800 flex p-2">
+      <div className="h-12 border-b border-zinc-800 flex items-center gap-3 p-2">
+        <Link to="/coms" className="md:hidden" aria-label="Back to chats">
+          <FaChevronLeft size={'20px'} />
+        </Link>
+
         <button
-          onClick={() =>
-            handleChildAction({
-              name: 'test',
-              userId: 'oiZ6VbOZbNaN1zbtNqk0pubBRyvkq2hS',
-            })
-          }
+          onClick={() => handleChildAction({ name: 'test', userId: '...' })}
           className="cursor-pointer"
         >
           <FaPhone className="hover:fill-gray-500" size={'20px'} />

@@ -48,8 +48,12 @@ export function Coms() {
   return (
     <div className="flex h-full">
       <div
-        style={{ width: '300px' }}
-        className=" shrink-0 border-r border-zinc-800 p-3 gap-2 flex flex-col overflow-auto scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]"
+        className={`
+        shrink-0 border-r border-zinc-800 p-3 gap-2 flex-col overflow-auto
+        w-full md:w-[300px]
+        ${id ? 'hidden md:flex' : 'flex'}
+        scrollbar hover:scrollbar-thin hover:scrollbar-thumb-zinc-400 hover:scrollbar-track-[lab(2.75381% 0 0)]
+      `}
       >
         <NavLink
           className={'[&.active]:bg-zinc-900 rounded-lg hover:bg-mist-800'}
@@ -97,7 +101,7 @@ export function Coms() {
           </div>
         ))}
       </div>
-      <div className="w-full">
+      <div className={`min-w-0 w-full ${id ? 'block' : 'hidden md:block'}`}>
         <Outlet />
       </div>
     </div>
