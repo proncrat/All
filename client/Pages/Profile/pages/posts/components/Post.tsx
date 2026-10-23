@@ -190,7 +190,7 @@ export function PostCard({
 
   return (
     <div className="w-full min-w-0">
-      <article className="grid w-full rounded-2xl border border-white/8 backdrop-blur-md bg-black/30 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-4">
+      <article className="grid w-full rounded-0 md:rounded-2xl  border border-white/8 backdrop-blur-md bg-black/30 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-4">
         {/* LEFT: header, text, image, actions */}
         <div className="min-w-0">
           <header className="mb-4 flex items-center gap-3">

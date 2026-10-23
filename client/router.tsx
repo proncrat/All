@@ -41,7 +41,6 @@ const routes = createRoutesFromElements(
       <Route path="authsett" element={<Authsett />} />
     </Route>
     <Route path="/shortz" element={<Shortz />} />
-    <Route path="/Info" element={<AboutHome />} />
     <Route path="/post" element={<PostPage />} />
     <Route path="/signin" element={<SignInForm />} />
     <Route path="/signup" element={<SignUpForm />} />
@@ -65,6 +64,11 @@ const routes = createRoutesFromElements(
 
     <Route path="/video/:id" element={<Video />} />
     <Route path="/" element={<HomePage />} />
+
+    <Route path="/privacy" element={<AboutHome />} />
+    <Route path="/terms" element={<AboutHome />} />
+    <Route path="/help" element={<AboutHome />} />
+    <Route path="/about" element={<AboutHome />} />
   </Route>,
 )
 

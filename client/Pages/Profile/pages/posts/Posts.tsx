@@ -20,7 +20,7 @@ export function Posts() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-0 md:gap-4 px-0 md:px-4">
       {data.map((item: post) => (
         <PostCard
           key={item.id}

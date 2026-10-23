@@ -43,7 +43,7 @@ export function Photos() {
   return (
     <ul
       ref={listRef}
-      className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2.5 py-3"
+      className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2.5 py-3 px-4"
     >
       {data.map((item) => (
         <li

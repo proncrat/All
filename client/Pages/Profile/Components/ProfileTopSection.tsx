@@ -75,7 +75,7 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
   }
 
   return (
-    <div className="mb-5">
+    <div className="mb-5 pt-4 px-4">
       {/* Banner */}
       <div className="relative">
         {isPending && (

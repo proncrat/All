@@ -22,7 +22,7 @@ export function About() {
 
   if (isSuccess) {
     return (
-      <div>
+      <div className="px-4">
         <h2 className="text-2xl mb-2">Describe</h2>
         {data.description ? (
           <p className="mb-8">{data.description}</p>

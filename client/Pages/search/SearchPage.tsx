@@ -11,15 +11,17 @@ interface sublinks {
 }
 
 function Headerbutton({ text, activething, click }: sublinks) {
-  let classes =
-    'pl-2 pr-2 rounded-sm cursor-pointer hover:text-[#8d8d8d] border-2-transparent [&.active]:border-2 '
-
-  if (text == activething) {
-    classes += 'active'
-  }
+  const isActive = text === activething
 
   return (
-    <button onClick={click} className={classes}>
+    <button
+      onClick={click}
+      className={`px-2 py-1 rounded-sm cursor-pointer border-2 transition-colors
+        [-webkit-tap-highlight-color:transparent] focus:outline-none
+        ${
+          isActive ? 'border-white' : 'border-transparent hover:text-[#8d8d8d]'
+        }`}
+    >
       {text}
     </button>
   )
@@ -36,44 +38,33 @@ function Search() {
     setsearchoption(e.currentTarget.textContent)
   }
 
+  const options = [
+    'Everything',
+    'Profiles',
+    'Videos',
+    'Posts',
+    'Songs',
+    'Photos',
+    'Playlists',
+  ]
+
   return (
     <div className="h-full">
-      <div className="w-full h-12 border-b border-zinc-800 flex gap-1 pl-4 pt-2 pb-2 overflow-y-hidden">
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Everything'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Profiles'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Videos'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Posts'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Songs'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Photos'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Playlists'}
-        />
+      <div
+        className="w-full border-b border-zinc-800 flex gap-2 px-4 py-2
+    overflow-x-auto overflow-y-hidden whitespace-nowrap
+    [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+    snap-x snap-proximity overscroll-x-contain"
+      >
+        {options.map((text) => (
+          <div key={text} className="shrink-0 snap-start">
+            <Headerbutton
+              click={clickhandler}
+              activething={searchoption}
+              text={text}
+            />
+          </div>
+        ))}
       </div>
       <div className=" max-w-7xl m-auto p-4">
         {isPending && <div>Loading...</div>}

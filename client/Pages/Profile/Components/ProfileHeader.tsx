@@ -30,6 +30,8 @@ function ProfileHeader() {
       [scrollbar-width:none] [-ms-overflow-style:none]
       [&::-webkit-scrollbar]:hidden
       snap-x
+      border-b border-b-zinc-400
+      px-4
     "
       >
         <SubHeaderLink link={'/profile/' + id} text="Home" />
@@ -40,7 +42,6 @@ function ProfileHeader() {
         <SubHeaderLink link={'picture'} text="Photos" />
         <SubHeaderLink link={'about'} text="About" />
       </div>
-      <Separator className="mb-2" />
     </div>
   )
 }

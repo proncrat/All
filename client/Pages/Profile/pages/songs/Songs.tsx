@@ -60,7 +60,7 @@ export function SongList() {
 
   return (
     <div>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-2 px-4 pb-4">
         {data.map((song, i) => {
           const isActive = current?.id === song.id
 
