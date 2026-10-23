@@ -7,7 +7,7 @@ export async function seed(knex) {
   await knex('profiledata').del()
   await knex('profiledata').insert([
     {
-      user_id: 1,
+      id: 1,
       level: 9999,
       link_id: '8ZVcqNO87geQy0fdJ9pLxdOmPvVrbt1j',
       name: 'GOD',
