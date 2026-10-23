@@ -20,5 +20,19 @@ export async function seed(knex) {
       author: 'Pink Guy',
       author_id: 1,
     },
+    {
+      name: 'That one song',
+      url: '/audio/song.mp3',
+      runtime: '1:54',
+      author: 'obeisity',
+      author_id: 1,
+    },
+    {
+      name: 'Deathwish',
+      url: '/audio/Deathwish.mp3',
+      runtime: '4:48',
+      author: 'akiaura',
+      author_id: 1,
+    },
   ])
 }
