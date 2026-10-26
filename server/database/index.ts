@@ -31,7 +31,15 @@ export async function getPostsByUser(userId: string) {
 }
 
 export async function getPhotosByUser(userId: string) {
-  return await db('photos').where('author_id', userId).select()
+  return await db('photos')
+    .join('profiledata', 'profiledata.id', 'photos.author_id')
+    .where('photos.author_id', userId)
+    .select(
+      'photos.*',
+      'profiledata.name as handle',
+      'profiledata.pfp as avatar',
+      'photos.uploaded_at as date',
+    )
 }
 
 export async function getDescriptionByUser(userId: string) {
@@ -248,8 +256,16 @@ export async function getUnIdMatch(LinkId) {
 
 //photo post
 
+export async function getPhotoById(id: number | string) {
+  return await db('photos').where('id', id).first()
+}
+
 export async function newPhoto(data) {
   return await db('photos').insert({ ...data })
+}
+
+export async function deletePhoto(id: number | string) {
+  return await db('photos').where('id', id).del()
 }
 
 //Follows

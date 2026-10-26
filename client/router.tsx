@@ -31,6 +31,7 @@ import { People } from './Pages/coms/components/People'
 import { Authsett } from './Pages/Settings/components/Authsettform'
 import { Shortz } from './Pages/short/shortz'
 import { SongList } from './Pages/Profile/pages/songs/Songs'
+import Market from './Pages/market/market'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -69,6 +70,7 @@ const routes = createRoutesFromElements(
     <Route path="/terms" element={<AboutHome />} />
     <Route path="/help" element={<AboutHome />} />
     <Route path="/about" element={<AboutHome />} />
+    <Route path="/market" element={<Market />} />
   </Route>,
 )
 

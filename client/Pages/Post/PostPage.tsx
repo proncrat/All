@@ -1,20 +1,6 @@
 import { useState } from 'react'
 import { PhotoUpload } from './components/Photo'
-
-function Headerbutton({ text, activething, click }) {
-  let classes =
-    'pl-2 pr-2 rounded-sm cursor-pointer hover:text-[#8d8d8d] border-2-transparent [&.active]:border-2 '
-
-  if (text == activething) {
-    classes += 'active'
-  }
-
-  return (
-    <button onClick={click} className={classes}>
-      {text}
-    </button>
-  )
-}
+import Headerbutton from '../Util/Headerbutton'
 
 export function PostPage() {
   //const { id } = useParams()
@@ -25,29 +11,25 @@ export function PostPage() {
     setsearchoption(e.target.textContent)
   }
 
+  const options = ['Video', 'Post', 'Song', 'Photo']
+
   return (
     <div>
-      <div className="w-full h-12 border-b-2 flex gap-1 pl-4 pt-2 pb-2 overflow-y-hidden">
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Video'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Post'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Song'}
-        />
-        <Headerbutton
-          click={clickhandler}
-          activething={searchoption}
-          text={'Photo'}
-        />
+      <div
+        className="w-full border-b border-zinc-800 flex gap-2 px-4 py-2
+    overflow-x-auto overflow-y-hidden whitespace-nowrap
+    [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+    snap-x snap-proximity overscroll-x-contain"
+      >
+        {options.map((text) => (
+          <div key={text} className="shrink-0 snap-start">
+            <Headerbutton
+              click={clickhandler}
+              activething={searchoption}
+              text={text}
+            />
+          </div>
+        ))}
       </div>
       <div className=" max-w-7xl m-auto p-4">
         <PhotoUpload />

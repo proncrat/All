@@ -6,3 +6,9 @@ export async function sendPhoto(data) {
   const response = await requestURL.send(data)
   return response.body
 }
+
+export async function deletePhoto(data) {
+  const requestURL = request.delete(`${rootURL}/photo`)
+  const response = await requestURL.send(data)
+  return response.body
+}
