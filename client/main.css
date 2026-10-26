@@ -2,7 +2,6 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/geist';
-@import '@daveyplate/better-auth-ui/css';
 @import 'tw-shimmer';
 @plugin 'tailwind-scrollbar';
 
