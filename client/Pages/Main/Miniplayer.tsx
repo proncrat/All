@@ -5,6 +5,7 @@ import {
   IoPauseSharp,
   IoVolumeHighSharp,
   IoShuffle,
+  IoClose,
 } from 'react-icons/io5'
 import { Link } from 'react-router'
 import { useEffect, useRef, useState } from 'react'
@@ -18,10 +19,19 @@ function fmt(s) {
 }
 
 export function Miniplayer({ width }) {
-  const { audioRef, current, playing, toggle, next, prev } = usePlayer()
+  const { audioRef, current, playing, toggle, next, prev, video, closeVideo } =
+    usePlayer()
 
   // layout is derived from the prop during render: no effect, no DOM mutation
   const isCollapsed = String(width) === '60'
+
+  // --- song vs video ---
+  const videoRef = useRef(null)
+  const [videoPlaying, setVideoPlaying] = useState(false)
+  const mode = video ? 'video' : 'song'
+  const isPlaying = mode === 'video' ? videoPlaying : playing
+  // the media element every control below acts on
+  const getEl = () => (mode === 'video' ? videoRef.current : audioRef.current)
 
   const scrubbing = useRef(false)
   const volWrap = useRef(null)
@@ -37,58 +47,64 @@ export function Miniplayer({ width }) {
   // progress is derived from state, so it survives the bar unmounting/remounting
   const progress = dur ? Math.min(100, (cur / dur) * 100) : 0
 
-  // progress bar + time labels follow the shared audio element
+  // stop the <video> when the video is closed or replaced by a song
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
+    if (!video) videoRef.current?.pause()
+  }, [video])
+
+  // progress bar + time labels follow whichever element is active
+  useEffect(() => {
+    const el = mode === 'video' ? videoRef.current : audioRef.current
+    if (!el) return
 
     const sync = () => {
-      setDur(audio.duration || 0)
+      setDur(el.duration || 0)
       if (scrubbing.current) return // don't fight the user's drag
-      setCur(audio.currentTime)
+      setCur(el.currentTime)
     }
 
-    audio.addEventListener('timeupdate', sync)
-    audio.addEventListener('loadedmetadata', sync)
-    audio.addEventListener('durationchange', sync)
+    el.addEventListener('timeupdate', sync)
+    el.addEventListener('loadedmetadata', sync)
+    el.addEventListener('durationchange', sync)
     sync()
     return () => {
-      audio.removeEventListener('timeupdate', sync)
-      audio.removeEventListener('loadedmetadata', sync)
-      audio.removeEventListener('durationchange', sync)
+      el.removeEventListener('timeupdate', sync)
+      el.removeEventListener('loadedmetadata', sync)
+      el.removeEventListener('durationchange', sync)
     }
-  }, [audioRef])
+  }, [audioRef, mode, video?.src])
 
-  // keep the volume slider in sync with the real audio volume
+  // keep the volume slider in sync with the active element's real volume
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    const onVol = () => setVolume(Math.round(audio.volume * 100))
-    audio.addEventListener('volumechange', onVol)
+    const el = mode === 'video' ? videoRef.current : audioRef.current
+    if (!el) return
+    const onVol = () => setVolume(Math.round(el.volume * 100))
+    el.addEventListener('volumechange', onVol)
     onVol()
-    return () => audio.removeEventListener('volumechange', onVol)
-  }, [audioRef])
+    return () => el.removeEventListener('volumechange', onVol)
+  }, [audioRef, mode])
 
   function changevolume(e) {
     // the 'volumechange' listener above updates the slider state
-    audioRef.current.volume = Number(e.target.value) / 100
+    const el = getEl()
+    if (el) el.volume = Number(e.target.value) / 100
   }
 
   // scroll wheel over the volume control changes the volume.
   // Needs a native non-passive listener so we can stop the page from scrolling.
   useEffect(() => {
-    const el = volWrap.current
-    if (!el) return
+    const wrap = volWrap.current
+    if (!wrap) return
     const onWheel = (e) => {
       e.preventDefault()
-      const audio = audioRef.current
-      if (!audio) return
+      const el = mode === 'video' ? videoRef.current : audioRef.current
+      if (!el) return
       const step = e.deltaY < 0 ? 0.05 : -0.05 // scroll up = louder
-      audio.volume = Math.min(1, Math.max(0, audio.volume + step))
+      el.volume = Math.min(1, Math.max(0, el.volume + step))
     }
-    el.addEventListener('wheel', onWheel, { passive: false })
-    return () => el.removeEventListener('wheel', onWheel)
-  }, [audioRef])
+    wrap.addEventListener('wheel', onWheel, { passive: false })
+    return () => wrap.removeEventListener('wheel', onWheel)
+  }, [audioRef, mode])
 
   // hover with a short grace period so the popup doesn't vanish instantly
   function openVol() {
@@ -116,18 +132,30 @@ export function Miniplayer({ width }) {
 
   useEffect(() => () => clearTimeout(closeTimer.current), [])
 
+  // play / pause: videos use the element directly, songs use your fade toggle
+  function togglePlay() {
+    if (mode === 'video') {
+      const v = videoRef.current
+      if (!v) return
+      if (v.paused) v.play().catch(() => {})
+      else v.pause()
+    } else {
+      toggle()
+    }
+  }
+
   // maps pointer position to a time, updates the label (and so the bar), returns the time
   function previewSeek(e) {
-    const audio = audioRef.current
+    const el = getEl()
     const rect = e.currentTarget.getBoundingClientRect()
     const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
-    const t = ratio * (audio.duration || 0)
+    const t = ratio * (el?.duration || 0)
     setCur(t)
     return t
   }
 
   function scrubStart(e) {
-    if (!audioRef.current?.duration) return
+    if (!getEl()?.duration) return
     scrubbing.current = true
     setIsScrubbing(true) // disables the width transition while dragging
     e.currentTarget.setPointerCapture(e.pointerId) // keep dragging outside the bar
@@ -140,10 +168,16 @@ export function Miniplayer({ width }) {
 
   function scrubEnd(e) {
     if (!scrubbing.current) return
-    audioRef.current.currentTime = previewSeek(e) // seek once, on release
+    getEl().currentTime = previewSeek(e) // seek once, on release
     scrubbing.current = false
     setIsScrubbing(false)
   }
+
+  const title = mode === 'video' ? video.title : current?.title
+  const href =
+    mode === 'video'
+      ? `/video/${video.id}?time=${Math.floor(videoRef.current.currentTime)}`
+      : '/'
 
   return (
     <div
@@ -153,7 +187,26 @@ export function Miniplayer({ width }) {
           : 'bg-black/30 p-2 border border-zinc-800'
       }`}
     >
-      {!isCollapsed && current?.cover && (
+      {/* Always mounted so the ref is stable and audio keeps playing even when
+          the sidebar is collapsed. Only visible for a video in expanded mode. */}
+      <video
+        ref={videoRef}
+        src={video?.src}
+        className={`rounded-sm mb-2 w-full aspect-video bg-black ${
+          mode === 'video' && !isCollapsed ? '' : 'hidden'
+        }`}
+        onPlay={() => setVideoPlaying(true)}
+        onPause={() => setVideoPlaying(false)}
+        onLoadedMetadata={() => {
+          const v = videoRef.current
+          if (!v || !video) return
+          v.currentTime = video.time // resume where the watch page left off
+          v.play().catch(() => {})
+        }}
+        onEnded={closeVideo}
+      />
+
+      {!isCollapsed && mode === 'song' && current?.cover && (
         <img
           className="rounded-sm mb-2"
           src={current.cover}
@@ -164,10 +217,19 @@ export function Miniplayer({ width }) {
       <div className="flex flex-col justify-center items-center">
         {!isCollapsed && (
           <>
-            <div className="rounded-sm mb-2">
-              <Link to={'/'}>
-                <p>{current?.title ?? 'Nothing playing'}</p>
+            <div className="rounded-sm mb-2 flex w-full items-center justify-between gap-2">
+              <Link to={href} className="truncate" title={title}>
+                <p className="truncate">{title ?? 'Nothing playing'}</p>
               </Link>
+              {mode === 'video' && (
+                <button
+                  onClick={closeVideo}
+                  className="cursor-pointer text-gray-400 hover:text-white"
+                  aria-label="Close video"
+                >
+                  <IoClose size={'20px'} />
+                </button>
+              )}
             </div>
 
             <div className="w-full">
@@ -201,15 +263,16 @@ export function Miniplayer({ width }) {
           </button>
           <button
             onClick={prev}
-            className="cursor-pointer p-2 text-gray-400 hover:text-white"
+            disabled={mode === 'video'}
+            className="cursor-pointer p-2 text-gray-400 hover:text-white disabled:opacity-30"
           >
             <IoPlaySkipBackSharp size={'20px'} />
           </button>
           <button
-            onClick={toggle}
+            onClick={togglePlay}
             className="cursor-pointer p-2 hover:text-gray-400"
           >
-            {!playing ? (
+            {!isPlaying ? (
               <IoPlaySharp size={'25px'} />
             ) : (
               <IoPauseSharp size={'25px'} />
@@ -217,7 +280,8 @@ export function Miniplayer({ width }) {
           </button>
           <button
             onClick={next}
-            className="cursor-pointer p-2 text-gray-400 hover:text-white"
+            disabled={mode === 'video'}
+            className="cursor-pointer p-2 text-gray-400 hover:text-white disabled:opacity-30"
           >
             <IoPlaySkipForward size={'20px'} />
           </button>

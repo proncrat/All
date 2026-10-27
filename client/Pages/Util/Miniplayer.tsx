@@ -1,141 +1,202 @@
-import { IoPlaySkipForward } from 'react-icons/io5'
-import { IoPlaySkipBackSharp } from 'react-icons/io5'
-import { IoPlaySharp } from 'react-icons/io5'
-import { IoPauseSharp } from 'react-icons/io5'
+import {
+  IoPlaySkipForward,
+  IoPlaySkipBackSharp,
+  IoPlaySharp,
+  IoPauseSharp,
+  IoVolumeHighSharp,
+  IoShuffle,
+  IoClose,
+} from 'react-icons/io5'
 import { Link } from 'react-router'
-import { IoVolumeHighSharp } from 'react-icons/io5'
-import { IoShuffle } from 'react-icons/io5'
-
 import { useEffect, useRef, useState } from 'react'
+import { usePlayer } from './PlayerContext'
 
-export function MiniPlayer({ width }) {
-  const audioRef = useRef(null)
-  const track = useRef(null)
-  const detailref = useRef(null)
-  const imgref = useRef(null)
-  const trackall = useRef(null)
-  const miniplayer = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [volstate, setvolstate] = useState(false)
+export function MiniPlayer() {
+  const {
+    audioRef,
+    current,
+    playing, // song playing state
+    toggle,
+    next,
+    prev,
+    video,
+    closeVideo,
+  } = usePlayer()
 
-  const volbutt = useRef(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [videoPlaying, setVideoPlaying] = useState(false)
+  const [volOpen, setVolOpen] = useState(false)
 
+  const mode: 'video' | 'song' | null = video
+    ? 'video'
+    : current
+      ? 'song'
+      : null
+  const isPlaying = mode === 'video' ? videoPlaying : playing
+
+  // the element whose progress / volume the controls act on
+  const activeEl = () =>
+    mode === 'video' ? videoRef.current : audioRef.current
+
+  // stop the video element when the video is closed or replaced by a song
   useEffect(() => {
-    miniplayer.current.classList.add('bg-mist-800')
-    miniplayer.current.classList.add('p-2')
-    detailref.current.style.display = 'block'
-    imgref.current.style.display = 'block'
-    trackall.current.style.display = 'block'
-  }, [])
+    if (!video) videoRef.current?.pause()
+  }, [video])
 
-  function beans() {
-    if (width == '60') {
-      detailref.current.style.display = 'none'
-    } else if (width == '300') {
-      detailref.current.style.display = 'block'
+  // progress bar follows whichever element is active
+  useEffect(() => {
+    const el = mode === 'video' ? videoRef.current : audioRef.current
+    if (!el) return
+    const update = () => {
+      if (!trackRef.current || !el.duration) return
+      trackRef.current.style.width = (el.currentTime / el.duration) * 100 + '%'
     }
-  }
+    update()
+    el.addEventListener('timeupdate', update)
+    return () => el.removeEventListener('timeupdate', update)
+  }, [mode, video?.id, current?.id])
 
   const togglePlay = () => {
-    if (isPlaying) {
-      audioRef.current.pause()
+    if (mode === 'video') {
+      const v = videoRef.current
+      if (!v) return
+      if (v.paused) v.play().catch(() => {})
+      else v.pause()
     } else {
-      audioRef.current.play()
+      toggle() // your existing fade in/out
     }
-    setIsPlaying(!isPlaying)
   }
 
-  function trackHandler() {
-    /*console.log(
-      (audioRef.current.currentTime / audioRef.current.duration) * 100,
-    )*/
-    track.current.style.width =
-      (audioRef.current.currentTime / audioRef.current.duration) * 100 + '%'
+  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = activeEl()
+    if (!el || !el.duration) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    el.currentTime = ((e.clientX - rect.left) / rect.width) * el.duration
   }
 
-  function changevolume(e) {
-    audioRef.current.volume = e.target.value / 100
+  const changeVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const el = activeEl()
+    if (el) el.volume = Number(e.target.value) / 100
   }
 
-  function volhover(state) {
-    setvolstate(state)
-  }
+  const title = mode === 'video' ? video!.title : current?.title
+  const href = mode === 'video' ? `/watch/${video!.id}` : '/'
 
   return (
     <div
-      ref={miniplayer}
-      className=" rounded-sm w-100 fixed bottom-0 right-0 z-100 flex gap-4"
+      className={`rounded-sm fixed bottom-0 right-0 z-100 flex gap-4 bg-mist-800 p-2 ${
+        mode ? '' : 'hidden'
+      }`}
     >
-      <audio
-        onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-        onTimeUpdate={trackHandler}
-        ref={audioRef}
-        src="/audio/song.mp3"
-      />
-      <div ref={detailref}>
-        <img
-          className="rounded-sm aspect-square w-16"
-          src="/images/b51d4a51-5c16-4e8c-99ff-a957fadb02c3.png"
-          alt="thumbnail?"
-        ></img>
-      </div>
+      {/* thumbnail: video when a video is active, cover art for songs */}
       <div>
+        <video
+          ref={videoRef}
+          src={video?.src}
+          className={`rounded-sm w-40 aspect-video bg-black ${
+            mode === 'video' ? '' : 'hidden'
+          }`}
+          onPlay={() => setVideoPlaying(true)}
+          onPause={() => setVideoPlaying(false)}
+          onLoadedMetadata={() => {
+            const v = videoRef.current
+            if (!v || !video) return
+            v.currentTime = video.time
+            v.play().catch(() => {})
+          }}
+          onEnded={closeVideo}
+        />
+        {mode === 'song' && (
+          <img
+            className="rounded-sm aspect-square w-16"
+            src={current?.cover ?? '/images/placeholder.png'}
+            alt={current?.title ?? 'cover'}
+          />
+        )}
+      </div>
+
+      <div className="w-56">
         <div className="flex flex-col justify-center items-center">
-          <div ref={imgref} className="rounded-sm mb-2">
-            <Link to={'/'}>
-              <p>She&apos;s so nice</p>
+          {/* title (+ artist for songs) + close for videos */}
+          <div className="flex w-full items-center justify-between mb-2 gap-2">
+            <Link to={href} className="truncate" title={title}>
+              <p className="truncate">{title ?? 'Nothing playing'}</p>
+              {mode === 'song' && (
+                <p className="truncate text-xs text-gray-400">
+                  {current?.artist}
+                </p>
+              )}
             </Link>
+            {mode === 'video' && (
+              <button
+                onClick={closeVideo}
+                className="cursor-pointer text-gray-400 hover:text-white"
+                aria-label="Close mini player"
+              >
+                <IoClose size={'20px'} />
+              </button>
+            )}
           </div>
+
+          {/* progress bar (click to seek) */}
           <div
-            ref={trackall}
-            className="w-full h-1 bg-[#6363633b] rounded-sm relative"
+            onClick={seek}
+            className="w-full h-1 bg-[#6363633b] rounded-sm relative cursor-pointer"
           >
-            <div className="rounded-full bg-gray-400 w-3 h-3 absolute mx-auto "></div>
             <div
-              ref={track}
-              className=" transition-all h-full rounded-sm bg-white w-0 "
+              ref={trackRef}
+              className="transition-all h-full rounded-sm bg-white w-0"
             />
           </div>
-          <div className="flex gap-3 items-center ">
+
+          {/* controls */}
+          <div className="flex gap-3 items-center">
             <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
               <IoShuffle size={'20px'} />
             </button>
-            <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
+            <button
+              onClick={prev}
+              disabled={mode === 'video'}
+              className="cursor-pointer p-2 text-gray-400 hover:text-white disabled:opacity-30"
+            >
               <IoPlaySkipBackSharp size={'20px'} />
             </button>
             <button
               onClick={togglePlay}
               className="cursor-pointer p-2 hover:text-gray-400"
             >
-              {!isPlaying ? (
-                <IoPlaySharp size={'25px'} />
-              ) : (
+              {isPlaying ? (
                 <IoPauseSharp size={'25px'} />
+              ) : (
+                <IoPlaySharp size={'25px'} />
               )}
             </button>
-            <button className="cursor-pointer p-2 text-gray-400 hover:text-white">
+            <button
+              onClick={next}
+              disabled={mode === 'video'}
+              className="cursor-pointer p-2 text-gray-400 hover:text-white disabled:opacity-30"
+            >
               <IoPlaySkipForward size={'20px'} />
             </button>
+
             <div
-              onMouseEnter={() => volhover(true)}
-              onMouseLeave={() => volhover(false)}
+              onMouseEnter={() => setVolOpen(true)}
+              onMouseLeave={() => setVolOpen(false)}
               className="relative"
             >
-              {volstate && (
-                <div
-                  ref={volbutt}
-                  className="bg-[#ffffff4a] w-[100px] h-full rounded-sm absolute right-0 z-10"
-                >
+              {volOpen && (
+                <div className="bg-[#ffffff4a] w-[100px] h-full rounded-sm absolute right-0 z-10">
                   <input
-                    id="default-range"
                     type="range"
-                    className="w-full h-2 bg-neutral-quaternary rounded-full cursor-pointer"
-                    onChange={changevolume}
-                  ></input>
+                    min="0"
+                    max="100"
+                    defaultValue={Math.round((activeEl()?.volume ?? 1) * 100)}
+                    className="w-full h-2 rounded-full cursor-pointer"
+                    onChange={changeVolume}
+                  />
                 </div>
               )}
-
               <button className="cursor-pointer p-2 text-gray-400 hover:text-white z-20 relative">
                 <IoVolumeHighSharp size={'20px'} />
               </button>

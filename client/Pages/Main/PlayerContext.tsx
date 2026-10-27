@@ -15,6 +15,14 @@ export type Song = {
   cover?: string
 }
 
+// A video that was playing when the user left its watch page
+export type VideoItem = {
+  id: string | number
+  src: string
+  title: string
+  time: number // seconds to resume from
+}
+
 type PlayerCtx = {
   audioRef: React.RefObject<HTMLAudioElement | null>
   current: Song | null
@@ -24,6 +32,10 @@ type PlayerCtx = {
   next: () => void
   prev: () => void
   playRequest: number
+  // video handoff
+  video: VideoItem | null
+  openVideo: (v: VideoItem) => void
+  closeVideo: () => void
 }
 
 const PlayerContext = createContext<PlayerCtx | null>(null)
@@ -36,6 +48,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [current, setCurrent] = useState<Song | null>(null)
   const [playing, setPlaying] = useState(false)
   const [playRequest, setPlayRequest] = useState(0)
+  const [video, setVideo] = useState<VideoItem | null>(null)
 
   // --- fade plumbing ---
   const ctxRef = useRef<AudioContext | null>(null)
@@ -110,8 +123,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => clearPauseTimer, [])
 
-  // --- player logic ---
+  // --- song logic ---
   const playSong = (song: Song, newQueue?: Song[]) => {
+    setVideo(null) // a song replaces any video in the mini player
     if (newQueue) setQueue(newQueue)
     setCurrent(song)
     setPlayRequest((n) => n + 1)
@@ -139,6 +153,20 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setCurrent(queue[(i + dir + queue.length) % queue.length])
   }
 
+  // --- video logic ---
+  // A video replaces any song: stop the audio right away (no fade, the
+  // video is taking over) and let the mini player show the video.
+  const openVideo = (v: VideoItem) => {
+    const a = audioRef.current
+    clearPauseTimer()
+    fadingOut.current = false
+    if (a && !a.paused) a.pause()
+    setPlaying(false)
+    setVideo(v)
+  }
+
+  const closeVideo = () => setVideo(null)
+
   return (
     <PlayerContext.Provider
       value={{
@@ -150,6 +178,9 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         next: () => step(1),
         prev: () => step(-1),
         playRequest,
+        video,
+        openVideo,
+        closeVideo,
       }}
     >
       {children}

@@ -46,6 +46,22 @@ const formatDate = (d: string | Date) =>
     day: 'numeric',
   })
 
+const GRID_CLASS =
+  'grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2.5 py-3 px-4'
+
+function PhotosSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <ul className={GRID_CLASS} aria-busy="true" aria-label="Loading photos">
+      {Array.from({ length: count }, (_, i) => (
+        <li
+          key={i}
+          className="aspect-square rounded-xl bg-muted shimmer shimmer-bg shimmer-color-neutral-600 shimmer-duration-1500"
+        />
+      ))}
+    </ul>
+  )
+}
+
 export function Photos() {
   const { id } = useParams()
   const { data, isPending, isError, error } = useUserData(id, 'photos')
@@ -53,13 +69,13 @@ export function Photos() {
 
   const close = useCallback(() => setActiveIndex(null), [])
 
-  if (isPending) return <div>Loading...</div>
+  if (isPending) return <PhotosSkeleton />
   if (isError) return <div>Error: {error.message}</div>
   if (data.length === 0) return <div>True adam error (No photos)</div>
 
   return (
     <>
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2.5 py-3 px-4">
+      <ul className={GRID_CLASS}>
         {data.map((item: Photo, i: number) => (
           <li
             key={item.id}
