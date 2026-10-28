@@ -9,7 +9,7 @@ import {
 } from 'react-icons/io5'
 import { Link } from 'react-router'
 import { useEffect, useRef, useState } from 'react'
-import { usePlayer } from './PlayerContext'
+import { usePlayer } from '../Main/PlayerContext'
 
 export function MiniPlayer() {
   const {

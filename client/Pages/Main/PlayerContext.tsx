@@ -163,6 +163,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     if (a && !a.paused) a.pause()
     setPlaying(false)
     setVideo(v)
+    setPlayRequest((n) => n + 1)
   }
 
   const closeVideo = () => setVideo(null)

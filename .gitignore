@@ -5,3 +5,4 @@ bundle.*
 .DS_Store
 
 trashcan/
+public/

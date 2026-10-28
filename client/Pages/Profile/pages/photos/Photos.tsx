@@ -51,13 +51,16 @@ const PAGE_SIZE = 10
  */
 function useUserPhotosInfinite(id: string | undefined) {
   return useInfiniteQuery({
-    // ADAPT: keep this key the same as what your delete mutation invalidates
     queryKey: ['userData', id, 'photos'],
     queryFn: async ({ pageParam }) => {
-      const qs = new URLSearchParams({ limit: '1' })
+      if (!id) throw new Error('ID is required') // Guard against undefined id
+
+      const qs = new URLSearchParams({ limit: '6' })
       if (pageParam) qs.set('cursor', pageParam)
+
       const res = await fetch(`/api/v1/photo/improv/${id}?${qs}`)
       if (!res.ok) throw new Error('Could not load photos')
+
       return res.json() as Promise<{
         items: Photo[]
         nextCursor: string | null
@@ -151,13 +154,15 @@ export function Photos() {
       )}
 
       {isFetchNextPageError && (
-        <button
-          type="button"
-          onClick={() => fetchNextPage()}
-          className="mx-auto block py-6 text-sm text-white/70 underline"
-        >
-          Could not load more. Try again.
-        </button>
+        /*
+                  <button
+                    type="button"
+                    onClick={() => fetchNextPage()}
+                    className="mx-auto block py-6 text-sm text-white/70 underline"
+                  >
+          */
+        <p>Could not load more. Try again.</p>
+        //</></button>
       )}
 
       {activeIndex !== null && photos[activeIndex] && (
