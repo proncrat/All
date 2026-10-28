@@ -15,8 +15,7 @@ export async function seed(knex) {
       likes: 5,
       dislikes: 5,
       shares: 5,
-      video_link:
-        'https://ia601209.us.archive.org/17/items/ElephantsDream/ed_1024_512kb.mp4',
+      video_link: '/video/galaxybrain.mp4',
       thumbnail_link: 'https://i.ytimg.com/vi/bIsp1K8eJG0/maxresdefault.jpg',
     },
     {
