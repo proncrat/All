@@ -45,6 +45,7 @@ function WatchPage({
       ref={videoRef}
       src={video.video_link}
       controls
+      autoPlay
       className="w-full"
       onLoadedMetadata={(e) => {
         if (startTime && startTime > 0) {

@@ -256,6 +256,49 @@ export async function getUnIdMatch(LinkId) {
 
 //photo post
 
+export async function getPhotoByUserId(
+  userId: number | string,
+  limit: number,
+  cursor: { uploaded_at: string; id: number | string } | null = null,
+) {
+  const query = db('photos')
+    .join('profiledata', 'profiledata.id', '=', 'photos.author_id')
+    .select(
+      'photos.*',
+      db.raw('cast(photos.uploaded_at as text) as uploaded_at_cursor'),
+      'profiledata.name as handle',
+      'profiledata.pfp as avatar',
+      'photos.uploaded_at as date',
+    )
+    .where('photos.author_id', '=', userId)
+    .orderBy([
+      { column: 'photos.uploaded_at', order: 'desc' },
+      { column: 'photos.id', order: 'desc' },
+    ])
+    .limit(limit + 1)
+
+  if (cursor) {
+    // Qualify columns here too so SQLite doesn't get confused during cursor comparison
+    query.whereRaw('(photos.uploaded_at, photos.id) < (?, ?)', [
+      cursor.uploaded_at,
+      cursor.id,
+    ])
+  }
+
+  const rows = await query
+
+  const hasMore = rows.length > limit
+  const items = hasMore ? rows.slice(0, limit) : rows
+  const last = items[items.length - 1]
+
+  return {
+    items,
+    nextCursor: hasMore
+      ? { uploaded_at: last.uploaded_at_cursor, id: last.id }
+      : null,
+  }
+}
+
 export async function getPhotoById(id: number | string) {
   return await db('photos').where('id', id).first()
 }
