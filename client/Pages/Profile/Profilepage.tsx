@@ -47,7 +47,7 @@ function Profile() {
           error={error}
           isSuccess={isSuccess}
         />
-        <ProfileHeader></ProfileHeader>
+        <ProfileHeader />
         <Outlet />
       </div>
     </div>

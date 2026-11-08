@@ -1,46 +1,101 @@
-import { NavLink, useParams } from 'react-router'
-//import { useLocation } from 'react-router'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
+import { NavLink, useLocation, useParams } from 'react-router'
 interface Sublink {
   link: string
   text: string
 }
-
 function SubHeaderLink(props: Sublink) {
-  //const location = useLocation()
-  //const currentPathname = location.pathname
   return (
-    <NavLink end to={props.link} className={'text-lg [&.active]:border-b-2'}>
+    <NavLink end to={props.link} className="text-lg pb-2">
       {props.text}
     </NavLink>
   )
 }
 
-import { Separator } from '@/components/ui/separator'
-
 function ProfileHeader() {
   const { id } = useParams()
+  const { pathname } = useLocation()
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(null)
+  const [animate, setAnimate] = useState(false)
+
+  const options = [
+    'Home',
+    'Videos',
+    'Posts',
+    'Songs',
+    'Playlists',
+    'Photos',
+    'About',
+  ]
+  const links = [
+    '/profile/' + id,
+    'videos',
+    'posts',
+    'song',
+    'playlist',
+    'picture',
+    'about',
+  ]
+
+  const measure = useCallback(() => {
+    const active = containerRef.current?.querySelector<HTMLElement>('a.active')
+    if (!active) {
+      setPill(null)
+      return
+    }
+    setPill({ left: active.offsetLeft, width: active.offsetWidth })
+  }, [])
+
+  useLayoutEffect(() => {
+    measure()
+    containerRef.current
+      ?.querySelector<HTMLElement>('a.active')
+      ?.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      })
+  }, [pathname, measure])
+
+  useEffect(() => {
+    const ro = new ResizeObserver(measure)
+    if (containerRef.current) ro.observe(containerRef.current)
+    const raf = requestAnimationFrame(() => setAnimate(true))
+    return () => {
+      ro.disconnect()
+      cancelAnimationFrame(raf)
+    }
+  }, [measure])
 
   return (
-    <div>
+    <div className="sticky top-[48px] z-20 backdrop-blur-md bg-sidebar">
       <div
-        className="
-      flex gap-3 mb-2
-      overflow-x-auto whitespace-nowrap
-      [&>*]:shrink-0
-      [scrollbar-width:none] [-ms-overflow-style:none]
-      [&::-webkit-scrollbar]:hidden
-      snap-x
-      border-b border-b-zinc-400
-      px-4
-    "
+        ref={containerRef}
+        className="relative flex gap-3 mb-2 overflow-x-auto whitespace-nowrap [&>*]:shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden snap-x border-t border-b border-b-zinc-400 border-t-zinc-800 px-4 pt-2"
       >
-        <SubHeaderLink link={'/profile/' + id} text="Home" />
-        <SubHeaderLink link={'videos'} text="Videos" />
-        <SubHeaderLink link={'posts'} text="Posts" />
-        <SubHeaderLink link={'Song'} text="Songs" />
-        <SubHeaderLink link={'Playlist'} text="Playlists" />
-        <SubHeaderLink link={'picture'} text="Photos" />
-        <SubHeaderLink link={'about'} text="About" />
+        {options.map((text, index) => (
+          <SubHeaderLink key={index} link={links[index]} text={text} />
+        ))}
+
+        <span
+          aria-hidden
+          className={`absolute bottom-0 left-0 h-0.5 rounded-full bg-current pointer-events-none ${
+            animate ? 'transition-[transform,width] duration-400 ease-out' : ''
+          }`}
+          style={{
+            width: pill?.width ?? 0,
+            transform: `translateX(${pill?.left ?? 0}px)`,
+            opacity: pill ? 1 : 0,
+          }}
+        />
       </div>
     </div>
   )
