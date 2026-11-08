@@ -6,6 +6,7 @@ import { useParams } from 'react-router'
 
 import { ImBin } from 'react-icons/im'
 import { useSession } from '@/lib/auth'
+import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 export function ProfileComments() {
   const { id } = useParams()
@@ -36,7 +37,7 @@ export function ProfileComments() {
   const { data, isPending, isError, error } = useComments(id, 'profile')
 
   if (isPending) {
-    return <div>Loading...</div>
+    return <Spinner />
   }
 
   if (isError) {

@@ -2,11 +2,11 @@ import { useSendMessage } from '@/client/hooks/usemessages'
 import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
 import { useState } from 'react'
 import { useParams } from 'react-router'
-import { Spinner } from '../../Util/Spinner'
 import { FaFileUpload } from 'react-icons/fa'
 import { Preview } from './ImgPreview'
 import { FaMicrophone } from 'react-icons/fa'
 import { useSession } from '@/lib/auth'
+import { Spinner } from '../../Util/SpinnerBox'
 
 export function Sendbox() {
   const baseUpload = {

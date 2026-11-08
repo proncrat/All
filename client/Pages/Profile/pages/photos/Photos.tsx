@@ -1,10 +1,10 @@
-import { useUserData } from '@/client/hooks'
 import { useParams } from 'react-router'
 import { Lightbox } from '../util/Lightbok'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useInfiniteScroll } from '../util/Infinitebok'
+import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 //really should fully flesh out db and the types lol
 type Photo = {
@@ -29,26 +29,8 @@ type Photo = {
 const GRID_CLASS =
   'grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] my-3 mx-4 overflow-hidden rounded-xl'
 
-function PhotosSkeleton({ count = 6 }: { count?: number }) {
-  return (
-    <ul className={GRID_CLASS} aria-busy="true" aria-label="Loading photos">
-      {Array.from({ length: count }, (_, i) => (
-        <li
-          key={i}
-          className="aspect-square bg-muted shimmer shimmer-bg shimmer-color-neutral-600 shimmer-duration-1500"
-        />
-      ))}
-    </ul>
-  )
-}
-
 const PAGE_SIZE = 10
 
-/**
- * Replaces `useUserData(id, 'photos')` for this page.
- * ADAPT: the URL and response shape to your API. It must return one page of
- * Photo[] per request. If useUserData already has a fetcher, reuse it here.
- */
 function useUserPhotosInfinite(id: string | undefined) {
   return useInfiniteQuery({
     queryKey: ['userData', id, 'photos'],
@@ -118,7 +100,7 @@ export function Photos() {
     if (activeIndex !== null && activeIndex >= photos.length) close()
   }, [activeIndex, photos.length, close])
 
-  if (isPending) return <PhotosSkeleton />
+  if (isPending) return <Spinner />
   if (isError) return <div>Error: {error.message}</div>
   if (photos.length === 0) return <div>True adam error (No photos)</div>
 
@@ -129,13 +111,13 @@ export function Photos() {
           <li
             key={item.id}
             onClick={() => setActiveIndex(i)}
-            className="group aspect-square cursor-zoom-in overflow-hidden bg-white/5"
+            className="group aspect-square cursor-pointer overflow-hidden bg-white/5 hover:shadow-2xl shadow-black transition-shadow duration-300 hover:z-20"
           >
             <img
               src={item.thumburl}
               alt={item.describe}
               loading="lazy"
-              className="block h-full w-full object-cover transition duration-300 group-hover:scale-105 group-hover:brightness-110"
+              className="block h-full w-full object-cover transition duration-300 group-hover:scale-105"
             />
           </li>
         ))}
@@ -144,26 +126,9 @@ export function Photos() {
       {/* Sentinel: when this scrolls into view, the next page loads */}
       <div ref={sentinelRef} style={{ height: 1 }} />
 
-      {isFetchingNextPage && (
-        <p
-          className="py-6 text-center text-sm text-white/50"
-          aria-live="polite"
-        >
-          Loading more…
-        </p>
-      )}
+      {isFetchingNextPage && <Spinner />}
 
-      {isFetchNextPageError && (
-        /*
-                  <button
-                    type="button"
-                    onClick={() => fetchNextPage()}
-                    className="mx-auto block py-6 text-sm text-white/70 underline"
-                  >
-          */
-        <p>Could not load more. Try again.</p>
-        //</></button>
-      )}
+      {isFetchNextPageError && <p>Could not load more.</p>}
 
       {activeIndex !== null && photos[activeIndex] && (
         <Lightbox

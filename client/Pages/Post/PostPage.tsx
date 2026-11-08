@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import { PhotoUpload } from './components/Photo'
 import Headerbutton from '../Util/Headerbutton'
+import NewPost from './components/Post'
+import { useSession } from '@/lib/auth'
 
 export function PostPage() {
   //const { id } = useParams()
+
+  const { data: session, isPending } = useSession()
+  const user = session?.user
 
   const [searchoption, setsearchoption] = useState('Photo')
 
@@ -31,9 +36,16 @@ export function PostPage() {
           </div>
         ))}
       </div>
-      <div className=" max-w-7xl m-auto p-4">
-        <PhotoUpload />
-      </div>
+      {searchoption == 'Photo' && (
+        <div className=" max-w-7xl m-auto p-4">
+          <PhotoUpload />
+        </div>
+      )}
+      {searchoption == 'Post' && (
+        <div className=" max-w-7xl m-auto p-4">
+          <NewPost user={{ name: user.username, avatar: user.image }} />
+        </div>
+      )}
     </div>
   )
 }

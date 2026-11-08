@@ -1,6 +1,8 @@
 import { useUserData } from '@/client/hooks'
 import { Link, useParams } from 'react-router'
 import { ProfileComments } from './Comments'
+import { AiOutlineLoading } from 'react-icons/ai'
+import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 export function About() {
   const { id } = useParams()
@@ -11,18 +13,16 @@ export function About() {
   )
 
   if (isPending) {
-    return <div>Loading...</div>
+    return <Spinner />
   }
 
   if (isError) {
     return <div>Error: {error.message}</div>
   }
 
-  //console.log(data.links)
-
   if (isSuccess) {
     return (
-      <div className="px-4">
+      <div className="px-4 pt-3">
         <h2 className="text-2xl mb-2">Describe</h2>
         {data.description ? (
           <p className="mb-8">{data.description}</p>

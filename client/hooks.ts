@@ -25,7 +25,7 @@ export function useProfileAll() {
   }
 }
 
-export function Usesessionid(linkId: string, thething: boolean) {
+export function Usesessionid(linkId: string, thething?: boolean) {
   const query = useQuery({
     queryKey: ['match', linkId],
     queryFn: () => API.getprofilematchid(linkId),

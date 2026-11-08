@@ -12,6 +12,8 @@ import { CallingStuffs } from './Calls'
 import { NthParentContext } from './call/Context'
 import { MiniPlayer } from './Miniplayer'
 import { PlayerProvider, usePlayer } from '../Main/PlayerContext' // <-- added usePlayer
+import { ColorFilterOverlay } from './colors/ColorOverlay'
+import { ColorFilterProvider } from './colors/ColorFilterContext'
 
 function Layout() {
   // State for sidebar
@@ -80,8 +82,10 @@ function App() {
     <PlayerProvider>
       <QueryClientProvider client={queryClient}>
         <CookiesProvider>
-          <Toaster />
-          <Layout />
+          <ColorFilterProvider>
+            <Toaster />
+            <Layout />
+          </ColorFilterProvider>
         </CookiesProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
