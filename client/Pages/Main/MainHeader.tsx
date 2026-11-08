@@ -72,7 +72,7 @@ export function THEHEADER({ sidebar }) {
   return (
     <header
       ref={headerRef}
-      className={`backdrop-blur-md bg-black/30 mb-5 flex justify-between p-2 items-center border-b border-zinc-800 fixed top-0 w-full z-30
+      className={`backdrop-blur-md bg-sidebar mb-5 flex justify-between p-2 items-center border-b border-zinc-800 fixed top-0 w-full z-30
         transition-transform duration-300 will-change-transform
         ${hidden ? 'max-md:-translate-y-full' : 'translate-y-0'}`}
     >

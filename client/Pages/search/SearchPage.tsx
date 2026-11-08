@@ -46,7 +46,7 @@ function AdvancedSettings({
                 sort: e.target.value as SortOption,
               }))
             }
-            className="bg-black border border-zinc-700 rounded-md px-2 py-1
+            className="bg-background border border-zinc-700 rounded-md px-2 py-1
               focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <option value="newest">Newest to oldest</option>
@@ -68,7 +68,7 @@ function AdvancedSettings({
                 minFollowers: Math.max(0, Number(e.target.value) || 0),
               }))
             }
-            className="bg-black border border-zinc-700 rounded-md px-2 py-1
+            className="bg-background border border-zinc-700 rounded-md px-2 py-1
               focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
           />
         </label>

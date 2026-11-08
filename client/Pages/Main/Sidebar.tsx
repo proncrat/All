@@ -22,7 +22,7 @@ export function SideBar({ width }) {
   return (
     <div
       className="
-        backdrop-blur-md bg-black/30 fixed z-50 transition-all
+        backdrop-blur-md bg-sidebar fixed z-50 transition-all
         bottom-0 left-0 right-0 w-full h-auto border-t border-zinc-800
         pb-[env(safe-area-inset-bottom)]
         md:pb-0 md:top-[49px] md:bottom-auto md:right-auto md:h-screen md:border-t-0 md:border-r

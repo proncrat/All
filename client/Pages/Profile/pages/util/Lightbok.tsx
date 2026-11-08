@@ -248,7 +248,7 @@ export function Lightbox({
       role="dialog"
       aria-modal="true"
       aria-label={photo.describe || 'Photo viewer'}
-      className={`fixed inset-0 z-50 flex bg-black/85 backdrop-blur-sm transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex bg-sidebar-foreground backdrop-blur-sm transition-opacity duration-300 ${
         shown ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={handleClose}
@@ -325,7 +325,7 @@ export function Lightbox({
       {/* Comments panel (hidden on small screens) */}
       <aside
         onClick={(e) => e.stopPropagation()}
-        className={`hidden w-[380px] shrink-0 flex-col border-l border-white/10 bg-black/80 text-white/90 md:flex transition-all duration-300 ease-out ${
+        className={`hidden w-[380px] shrink-0 flex-col border-l border-white/10 bg-sidebar-foreground text-white/90 md:flex transition-all duration-300 ease-out ${
           shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-6'
         }`}
       >
