@@ -82,3 +82,13 @@ migrates auth db dont forget lul
 
 Milestone:
 Login doesent have cors errors anymore yippeeeee 16/5/2026
+
+
+list of slop to do - 9/11/26
+think of playlists and live
+make videos page
+make posts work/remove placeholders
+make profile customization work
+make proper colour scheme
+make db not archaic
+fix calling and think about making the ui for in call in the chat again

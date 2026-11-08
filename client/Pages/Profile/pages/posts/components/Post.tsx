@@ -22,6 +22,7 @@ import {
   Share2,
   ThumbsDown,
 } from 'lucide-react'
+import { Lightbox } from '../../util/Lightbok'
 
 const fmt = (n) =>
   new Intl.NumberFormat('en', {
@@ -240,10 +241,10 @@ export function PostCard({
                     : 'flex justify-center overflow-hidden bg-black'
                 }
               >
-                {imgs.map((src, i) => (
+                {imgs.map((img, i) => (
                   <img
                     key={i}
-                    src={src}
+                    src={img.url}
                     alt={altFor(i)}
                     loading="lazy"
                     onLoad={updateScroll}
@@ -411,6 +412,14 @@ export function PostCard({
       </article>
 
       {open && count > 0 && (
+        <Lightbox
+          photos={imgs}
+          index={index}
+          onIndexChange={setIndex}
+          onClose={() => setOpen(false)}
+        />
+
+        /*
         <div
           onClick={() => setOpen(false)}
           onTouchStart={multi ? onTouchStart : undefined}
@@ -456,6 +465,7 @@ export function PostCard({
             </>
           )}
         </div>
+*/
       )}
     </div>
   )

@@ -30,10 +30,22 @@ export function Posts() {
           body={item.the_post}
           date={item.post_date}
           images={[
-            'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small',
-            'https://pbs.twimg.com/media/HVDIemuXgAALitQ?format=jpg&name=small',
-            'https://pbs.twimg.com/media/HVFWAm2XAAAHBB5?format=jpg&name=small',
-            'https://pbs.twimg.com/media/HVDvNrNXkAAEPGS?format=jpg&name=small',
+            {
+              id: 1,
+              url: 'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small',
+            },
+            {
+              id: 2,
+              url: 'https://pbs.twimg.com/media/HVDIemuXgAALitQ?format=jpg&name=small',
+            },
+            {
+              id: 3,
+              url: 'https://pbs.twimg.com/media/HVFWAm2XAAAHBB5?format=jpg&name=small',
+            },
+            {
+              id: 4,
+              url: 'https://pbs.twimg.com/media/HVDvNrNXkAAEPGS?format=jpg&name=small',
+            },
           ]}
           alt={
             'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small'
