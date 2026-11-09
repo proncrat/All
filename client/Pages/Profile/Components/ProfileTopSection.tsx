@@ -1,7 +1,5 @@
 import { useNavigate } from 'react-router'
 import { useSession } from '@/lib/auth'
-//import { useCookies } from 'react-cookie'
-import { Usesessionid } from '@/client/hooks'
 import {
   useAddFollow,
   useDeleteFollow,
@@ -10,20 +8,6 @@ import {
 import { useFetchId } from '@/client/hooks/useId'
 
 function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
-  //const [banner, setbanner] = useState(true)
-  //const [banner2, setbanner2] = useState(true)
-  //const [text, settext] = useState(true)
-  /*
-  const [cookies, setCookie, removeCookie] = useCookies(['id'])
-  try {
-    console.log(cookies.id)
-  } catch {
-    console.log('Hmmm')
-  }
-    */
-  //sets cookie test
-  //setCookie('id', 1, { path: '/' })
-
   const addFollow = useAddFollow()
   const unFollow = useDeleteFollow()
 
@@ -37,9 +21,6 @@ function ProfileTopSection({ data, isPending, isError, error, isSuccess }) {
     userId,
     !leLoading,
   )
-
-  //console.log(userId)
-  //console.log(followersthing)
 
   let followstatus = false
 

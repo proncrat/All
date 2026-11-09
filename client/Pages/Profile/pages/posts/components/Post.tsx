@@ -418,54 +418,6 @@ export function PostCard({
           onIndexChange={setIndex}
           onClose={() => setOpen(false)}
         />
-
-        /*
-        <div
-          onClick={() => setOpen(false)}
-          onTouchStart={multi ? onTouchStart : undefined}
-          onTouchEnd={multi ? onTouchEnd : undefined}
-          className="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/90 p-4"
-        >
-          <img
-            src={imgs[current]}
-            alt={altFor(current)}
-            onClick={(e) => e.stopPropagation()}
-            className="max-h-full max-w-full cursor-default object-contain"
-          />
-
-          {multi && (
-            <>
-              <button
-                type="button"
-                aria-label="Previous image"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  prev()
-                }}
-                disabled={current === 0}
-                className={`${chevronClass} left-4 h-11 w-11`}
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <button
-                type="button"
-                aria-label="Next image"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  next()
-                }}
-                disabled={current === count - 1}
-                className={`${chevronClass} right-4 h-11 w-11`}
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-sm text-white">
-                {current + 1} / {count}
-              </div>
-            </>
-          )}
-        </div>
-*/
       )}
     </div>
   )

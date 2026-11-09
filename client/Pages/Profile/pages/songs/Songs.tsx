@@ -1,6 +1,7 @@
 import { useParams } from 'react-router'
 import { useUserData } from '@/client/hooks'
 import { usePlayer, type Song } from '@/client/Pages/Main/PlayerContext'
+import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 const PlayIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5 fill-white">
@@ -39,7 +40,7 @@ export function SongList() {
   const { current, playing, playSong } = usePlayer() // must be above the early returns
 
   if (isPending) {
-    return <div>Loading...</div>
+    return <Spinner />
   }
 
   if (isError) {

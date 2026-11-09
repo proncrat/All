@@ -16,7 +16,13 @@ import {
   ChevronRight,
   type LucideIcon,
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from 'react'
 import { createPortal } from 'react-dom'
 
 type Photo = {
@@ -44,9 +50,6 @@ const formatDate = (d: string | Date) =>
     month: 'short',
     day: 'numeric',
   })
-
-// Keep your existing imports and add `useRef` to the React import:
-// import { useCallback, useEffect, useRef, useState } from 'react'
 
 // ZOOM: config
 const MIN_SCALE = 1
@@ -89,6 +92,10 @@ export function Lightbox({
     originY: number
   } | null>(null)
 
+  // SLIDE: wrapper ref + last navigation direction
+  const slideRef = useRef<HTMLDivElement>(null)
+  const dirRef = useRef<1 | -1 | 0>(0) // 1 = next, -1 = prev
+
   useEffect(() => {
     const raf = requestAnimationFrame(() => setIsMounted(true))
     return () => cancelAnimationFrame(raf)
@@ -98,6 +105,22 @@ export function Lightbox({
   useEffect(() => {
     setZoom(INITIAL_ZOOM)
     zoomRef.current = INITIAL_ZOOM
+  }, [photo.id])
+
+  // SLIDE: slide the new photo in from the direction we navigated.
+  // useLayoutEffect runs before paint, so there's no flash at the final position.
+  useLayoutEffect(() => {
+    const el = slideRef.current
+    const dir = dirRef.current
+    dirRef.current = 0
+    if (!el || !dir) return
+    el.animate(
+      [
+        { transform: `translateX(${dir * 25}%)`, opacity: 0 },
+        { transform: 'translateX(0)', opacity: 1 },
+      ],
+      { duration: 300, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+    )
   }, [photo.id])
 
   // ZOOM: zoom to `nextScale`, keeping the point under the cursor fixed
@@ -201,14 +224,18 @@ export function Lightbox({
     date: photo.date,
   }
 
-  const prev = useCallback(
-    () => hasPrev && onIndexChange(index - 1),
-    [hasPrev, index, onIndexChange],
-  )
-  const next = useCallback(
-    () => hasNext && onIndexChange(index + 1),
-    [hasNext, index, onIndexChange],
-  )
+  // SLIDE: record direction before changing index
+  const prev = useCallback(() => {
+    if (!hasPrev) return
+    dirRef.current = -1
+    onIndexChange(index - 1)
+  }, [hasPrev, index, onIndexChange])
+
+  const next = useCallback(() => {
+    if (!hasNext) return
+    dirRef.current = 1
+    onIndexChange(index + 1)
+  }, [hasNext, index, onIndexChange])
 
   // Keyboard: Esc closes, arrows navigate (ignored while typing in the comment box)
   useEffect(() => {
@@ -274,31 +301,38 @@ export function Lightbox({
           </NavButton>
         )}
 
-        <img
-          ref={imgRef}
-          key={photo.id}
-          src={photo.url}
-          alt={photo.describe}
-          draggable={false}
-          onClick={(e) => e.stopPropagation()}
-          onDoubleClick={onDoubleClick}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          className={`max-h-full max-w-full select-none rounded-lg object-contain shadow-2xl transition-all ease-out ${
-            shown ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{
-            transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${
-              zoom.scale * (shown ? 1 : 0.95)
-            })`,
-            // slow for open/close, quick for wheel zoom, none while dragging
-            transitionDuration: dragging ? '0ms' : shown ? '120ms' : '300ms',
-            cursor: isZoomed ? (dragging ? 'grabbing' : 'grab') : 'zoom-in',
-            touchAction: isZoomed ? 'none' : 'auto',
-          }}
-        />
+        {/* SLIDE: wrapper carries the slide animation so it doesn't
+            conflict with the img's inline zoom transform */}
+        <div
+          ref={slideRef}
+          className="flex h-full w-full items-center justify-center"
+        >
+          <img
+            ref={imgRef}
+            key={photo.id}
+            src={photo.url}
+            alt={photo.describe}
+            draggable={false}
+            onClick={(e) => e.stopPropagation()}
+            onDoubleClick={onDoubleClick}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            className={`max-h-full max-w-full select-none rounded-lg object-contain shadow-2xl transition-all ease-out ${
+              shown ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{
+              transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${
+                zoom.scale * (shown ? 1 : 0.95)
+              })`,
+              // slow for open/close, quick for wheel zoom, none while dragging
+              transitionDuration: dragging ? '0ms' : shown ? '120ms' : '300ms',
+              cursor: isZoomed ? (dragging ? 'grabbing' : 'grab') : 'zoom-in',
+              touchAction: isZoomed ? 'none' : 'auto',
+            }}
+          />
+        </div>
 
         {hasNext && (
           <NavButton side="right" label="Next photo" onClick={next}>

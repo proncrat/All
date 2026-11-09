@@ -1,7 +1,6 @@
 import { useUserData } from '@/client/hooks'
 import { Link, useParams } from 'react-router'
 import { ProfileComments } from './Comments'
-import { AiOutlineLoading } from 'react-icons/ai'
 import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 export function About() {

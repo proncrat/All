@@ -2,13 +2,14 @@ import { useUserData } from '@/client/hooks'
 import { useParams } from 'react-router'
 import { PostCard } from './components/Post'
 import { post } from '@/client/models/post'
+import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 export function Posts() {
   const { id } = useParams()
   const { data, isPending, isError, error } = useUserData(id ?? '', 'posts')
 
   if (isPending) {
-    return <div>Loading...</div>
+    return <Spinner />
   }
 
   if (isError) {

@@ -145,6 +145,8 @@ router.post('/', handleUpload, async (req, res, next) => {
       thumburl: `/images/${path.basename(thumbPath)}`,
       author_id: user.id,
       uploaded_at: new Date(),
+      name: req.body.name,
+      describe: req.body.describe,
     })
 
     return res.status(201).json({ url })
