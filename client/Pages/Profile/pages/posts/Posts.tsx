@@ -5,6 +5,25 @@ import { post } from '@/client/models/post'
 import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 export function Posts() {
+  /*
+  const { data, isPending, isError, error } = useComments(id, 'profile')
+
+  const addcomment = useAddComment()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const data = {
+      link_type: 'profile',
+      link_id: id,
+      author_id: 1,
+      body_text: e.target.text.value,
+      post_date: new Date(),
+    }
+
+    await addcomment.mutateAsync(data)
+  }
+*/
   const { id } = useParams()
   const { data, isPending, isError, error } = useUserData(id ?? '', 'posts')
 
@@ -25,6 +44,7 @@ export function Posts() {
       {data.map((item: post) => (
         <PostCard
           key={item.id}
+          id={item.id}
           title={item.title}
           handle={'God'}
           avatar={'/images/janedoe2.jpg'}
@@ -51,23 +71,6 @@ export function Posts() {
           alt={
             'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small'
           }
-          comments={[
-            {
-              id: 1,
-              handle: 'bob',
-              avatar:
-                'https://dk2dv4ezy246u.cloudfront.net/widgets/sSoFDYe3ZbPQ_large.jpg',
-              date: '2026-03-24T14:30:00Z',
-              body: 'nice one\nsecond line',
-            },
-            {
-              id: 2,
-              handle: 'alice',
-              avatar: '/images/4cc1d0f3-a346-4359-91ca-6d1a76db487f.png',
-              date: '2026-03-25T09:10:00Z',
-              body: 'agreed',
-            },
-          ]}
         />
       ))}
     </div>

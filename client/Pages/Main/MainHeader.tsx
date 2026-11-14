@@ -56,6 +56,13 @@ function useHideOnScroll(
     return () => window.removeEventListener('scroll', onScroll)
   }, [headerRef, threshold])
 
+  useEffect(() => {
+    document.documentElement.dataset.headerHidden = String(hidden)
+    return () => {
+      delete document.documentElement.dataset.headerHidden
+    }
+  }, [hidden])
+
   return hidden
 }
 

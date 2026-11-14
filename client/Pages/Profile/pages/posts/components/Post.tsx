@@ -1,16 +1,3 @@
-/*
-export function PostCard(props) {
-  return (
-    <div className="rounded-xl bg-[#0a0a0a] p-4 ">
-      <h2 className="text-2xl mb-2">{props.title}</h2>
-      <p className="mb-2">{props.the_post}</p>
-      <p>{new Date(props.post_date).toLocaleDateString()}</p>
-      <img src="https://pbs.twimg.com/media/HVD3YYbawAAMKjE?format=jpg&name=small"></img>
-    </div>
-  )
-}
-*/
-
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Bookmark,
@@ -23,6 +10,8 @@ import {
   ThumbsDown,
 } from 'lucide-react'
 import { Lightbox } from '../../util/Lightbok'
+import { useComments } from '@/client/hooks'
+import { ReactionBar } from '@/client/Pages/Util/Action'
 
 const fmt = (n) =>
   new Intl.NumberFormat('en', {
@@ -64,6 +53,7 @@ function ActionButton({
 }
 
 export function PostCard({
+  id,
   title,
   handle,
   avatar,
@@ -73,13 +63,28 @@ export function PostCard({
   images, // array of image URLs; takes priority over `image`
   alt, // string, or array of strings matching `images`
   sensitive = false,
-  comments = [],
+
   initialLikes = 0,
   initialDislikes = 0,
   initialVote = null, // "like" | "dislike" | null
   initialReposts = null,
   initialSaves = null,
 }) {
+  let comments = []
+
+  const {
+    data: comments_got,
+    isPending,
+    isError,
+    error,
+  } = useComments(id, 'post')
+
+  console.log(comments_got)
+
+  if (comments_got != null) {
+    comments = comments_got
+  }
+
   const [revealed, setRevealed] = useState(!sensitive)
   const [open, setOpen] = useState(false)
   const [index, setIndex] = useState(0)
@@ -301,71 +306,9 @@ export function PostCard({
           )}
 
           {/* ACTION BAR */}
-          <footer className="mt-4 flex items-center justify-between border-t border-white/[.08] pt-2">
-            <ActionButton
-              icon={MessageCircle}
-              count={comments.length}
-              label="Comments"
-              hover="hover:text-sky-400"
-            />
 
-            <ActionButton
-              icon={Repeat2}
-              count={reposts}
-              label="Repost"
-              active={reposted}
-              activeColor="text-emerald-400"
-              hover="hover:text-emerald-400"
-              onClick={() => {
-                setReposted(!reposted)
-                setReposts(reposts + (reposted ? -1 : 1))
-              }}
-            />
-
-            <ActionButton
-              icon={Heart}
-              count={likes}
-              label="Like"
-              active={vote === 'like'}
-              activeColor="text-pink-500"
-              hover="hover:text-pink-500"
-              fill
-              onClick={() => handleVote('like')}
-            />
-
-            <ActionButton
-              icon={ThumbsDown}
-              count={dislikes}
-              label="Dislike"
-              active={vote === 'dislike'}
-              activeColor="text-orange-400"
-              hover="hover:text-orange-400"
-              fill
-              onClick={() => handleVote('dislike')}
-            />
-
-            <ActionButton
-              icon={Bookmark}
-              count={saves}
-              label="Save"
-              active={saved}
-              activeColor="text-sky-400"
-              hover="hover:text-sky-400"
-              fill
-              onClick={() => {
-                setSaved(!saved)
-                setSaves(saves + (saved ? -1 : 1))
-              }}
-            />
-
-            <ActionButton
-              icon={Share2}
-              label="Share"
-              hover="hover:text-sky-400"
-              onClick={() =>
-                navigator.clipboard.writeText(window.location.href)
-              }
-            />
+          <footer className="mt-4 border-t border-white/[.08] pt-2">
+            <ReactionBar photo={{}} />
           </footer>
         </div>
 
@@ -382,26 +325,26 @@ export function PostCard({
               )}
               {comments.map((c) => (
                 <li key={c.id} className="flex gap-2">
-                  {c.avatar ? (
+                  {c.pfp ? (
                     <img
-                      src={c.avatar}
+                      src={c.pfp}
                       alt=""
                       className="h-8 w-8 shrink-0 rounded-full object-cover"
                     />
                   ) : (
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
-                      {c.handle?.[0] ?? '?'}
+                      {c.name?.[0] ?? '?'}
                     </div>
                   )}
                   <div className="min-w-0 text-sm">
                     <div>
-                      <span className="font-semibold">@{c.handle}</span>{' '}
+                      <span className="font-semibold">@{c.name}</span>{' '}
                       <span className="text-xs text-neutral-500">
-                        {new Date(c.date).toLocaleDateString()}
+                        {new Date(c.post_date).toLocaleDateString()}
                       </span>
                     </div>
                     <p className="whitespace-pre-line break-words text-neutral-200">
-                      {c.body}
+                      {c.body_text}
                     </p>
                   </div>
                 </li>
@@ -413,6 +356,8 @@ export function PostCard({
 
       {open && count > 0 && (
         <Lightbox
+          mode="post"
+          postid={id}
           photos={imgs}
           index={index}
           onIndexChange={setIndex}

@@ -92,7 +92,7 @@ export function Headerpfp() {
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-2 w-64 origin-top-right overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900/95 shadow-2xl backdrop-blur"
+          className="absolute right-0 top-full z-100 mt-2 w-64 origin-top-right overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900/95 shadow-2xl backdrop-blur"
         >
           {user && (
             <div className="flex items-center gap-3 p-4">

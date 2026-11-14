@@ -76,7 +76,7 @@ function ProfileHeader() {
   }, [measure])
 
   return (
-    <div className="sticky top-[48px] z-20 backdrop-blur-md bg-sidebar">
+    <div className="sticky top-[48px] z-60 backdrop-blur-md bg-sidebar transition-[top] duration-300 max-md:[html[data-header-hidden=true]_&]:top-0">
       <div
         ref={containerRef}
         className="relative flex gap-3 mb-2 overflow-x-auto whitespace-nowrap [&>*]:shrink-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden snap-x border-t border-b border-b-zinc-400 border-t-zinc-800 px-4 pt-2"

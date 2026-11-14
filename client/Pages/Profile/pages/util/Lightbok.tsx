@@ -2,14 +2,10 @@ import { Usesessionid, useComments, useUserData } from '@/client/hooks'
 import { useAddComment, useDeleteComment } from '@/client/hooks/usecomments'
 import { useDeletePhoto } from '@/client/hooks/useuploadphoto'
 import { comment } from '@/client/models/comment'
+import { ReactionBar } from '@/client/Pages/Util/Action'
 import { useSession } from '@/lib/auth'
 import {
-  Bookmark,
-  Repeat2,
   Send,
-  Share2,
-  ThumbsUp,
-  ThumbsDown,
   Trash2,
   X,
   ChevronLeft,
@@ -63,11 +59,15 @@ const clamp = (v: number, min: number, max: number) =>
 export function Lightbox({
   photos,
   index,
+  mode = 'photo',
+  postid,
   onIndexChange,
   onClose,
 }: {
   photos: Photo[]
   index: number
+  mode?: 'photo' | 'post'
+  postid?: string | number
   onIndexChange: (i: number) => void
   onClose: () => void
 }) {
@@ -275,7 +275,7 @@ export function Lightbox({
       role="dialog"
       aria-modal="true"
       aria-label={photo.describe || 'Photo viewer'}
-      className={`fixed inset-0 z-50 flex bg-sidebar-foreground backdrop-blur-sm transition-opacity duration-300 ${
+      className={`fixed inset-0 z-80 flex bg-sidebar-foreground backdrop-blur-sm transition-opacity duration-300 ${
         shown ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={handleClose}
@@ -399,9 +399,16 @@ export function Lightbox({
             {photo.describe}
           </p>
         )}
+        <div className="border-b border-white/10 px-5 py-2">
+          <ReactionBar key={`reactions-${photo.id}`} photo={photo} />
+        </div>
 
-        <ReactionBar key={`reactions-${photo.id}`} photo={photo} />
-        <PhotoComments key={`comments-${photo.id}`} photoId={photo.id} />
+        <PhotoComments
+          mode={mode}
+          key={`comments-${photo.id}`}
+          photoId={photo.id}
+          postId={postid}
+        />
       </aside>
     </div>,
     document.body,
@@ -515,12 +522,28 @@ function MoreOptionsMenu({ onDeletePhoto }) {
   )
 }
 
-function PhotoComments({ photoId }: { photoId: string | number }) {
+function PhotoComments({
+  photoId,
+  mode,
+  postId,
+}: {
+  photoId: string | number
+  mode: string
+  postId: string | number | undefined
+}) {
   const addComment = useAddComment()
   const deleteComment = useDeleteComment()
   const { data: session } = useSession()
   const { data: currentUser } = Usesessionid(session?.session.userId)
-  const { data, isPending, isError, error } = useComments(photoId, 'photo')
+  let chosenid: string | number
+
+  if (mode == 'photo') {
+    chosenid = photoId
+  } else if (mode == 'post') {
+    chosenid = postId
+  }
+
+  const { data, isPending, isError, error } = useComments(chosenid, mode)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -531,8 +554,8 @@ function PhotoComments({ photoId }: { photoId: string | number }) {
     if (!text) return
 
     await addComment.mutateAsync({
-      link_type: 'photo',
-      link_id: photoId,
+      link_type: mode,
+      link_id: chosenid,
       author_id: currentUser?.id,
       body_text: text,
       post_date: new Date(),
@@ -654,143 +677,5 @@ function NavButton({
     >
       {children}
     </button>
-  )
-}
-
-const fmt = (n: number) =>
-  new Intl.NumberFormat('en', {
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  }).format(n)
-
-function ActionButton({
-  icon: Icon,
-  count,
-  label,
-  active,
-  hover,
-  activeColor,
-  fill,
-  onClick,
-}: {
-  icon: LucideIcon
-  count?: number
-  label: string
-  active?: boolean
-  hover: string
-  activeColor?: string
-  fill?: boolean
-  onClick?: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      aria-pressed={active}
-      className={`group flex items-center gap-1 text-[13px] transition-colors ${
-        active ? activeColor : `text-neutral-500 ${hover}`
-      }`}
-    >
-      <span className="flex h-8 w-8 items-center justify-center rounded-full transition-colors group-hover:bg-current/10">
-        <Icon
-          size={18}
-          strokeWidth={1.75}
-          className={active && fill ? 'fill-current' : ''}
-        />
-      </span>
-      {count !== undefined && (
-        <span className="min-w-[3ch] text-left tabular-nums">{fmt(count)}</span>
-      )}
-    </button>
-  )
-}
-
-function ReactionBar({ photo }: { photo: Photo }) {
-  const [vote, setVote] = useState<'like' | 'dislike' | null>(
-    photo.vote ?? null,
-  )
-  const [likes, setLikes] = useState(photo.likes ?? 0)
-  const [dislikes, setDislikes] = useState(photo.dislikes ?? 0)
-
-  const [reposted, setReposted] = useState(photo.reposted ?? false)
-  const [reposts, setReposts] = useState(photo.reposts ?? 0)
-  const [saved, setSaved] = useState(photo.saved ?? false)
-  const [saves, setSaves] = useState(photo.saves ?? 0)
-
-  function handleVote(type: 'like' | 'dislike') {
-    let nextLikes = likes - (vote === 'like' ? 1 : 0)
-    let nextDislikes = dislikes - (vote === 'dislike' ? 1 : 0)
-    let nextVote: 'like' | 'dislike' | null = null
-
-    if (vote !== type) {
-      nextVote = type
-      if (type === 'like') nextLikes += 1
-      else nextDislikes += 1
-    }
-
-    setVote(nextVote)
-    setLikes(nextLikes)
-    setDislikes(nextDislikes)
-  }
-
-  return (
-    <div className="flex items-center justify-between border-b border-white/10 px-5 py-2">
-      <ActionButton
-        icon={Repeat2}
-        count={reposts}
-        label="Repost"
-        active={reposted}
-        activeColor="text-emerald-400"
-        hover="hover:text-emerald-400"
-        onClick={() => {
-          setReposted(!reposted)
-          setReposts(reposts + (reposted ? -1 : 1))
-        }}
-      />
-
-      <ActionButton
-        icon={ThumbsUp}
-        count={likes}
-        label="Like"
-        active={vote === 'like'}
-        activeColor="text-pink-500"
-        hover="hover:text-pink-500"
-        fill
-        onClick={() => handleVote('like')}
-      />
-
-      <ActionButton
-        icon={ThumbsDown}
-        count={dislikes}
-        label="Dislike"
-        active={vote === 'dislike'}
-        activeColor="text-orange-400"
-        hover="hover:text-orange-400"
-        fill
-        onClick={() => handleVote('dislike')}
-      />
-
-      <ActionButton
-        icon={Bookmark}
-        count={saves}
-        label="Save"
-        active={saved}
-        activeColor="text-sky-400"
-        hover="hover:text-sky-400"
-        fill
-        onClick={() => {
-          setSaved(!saved)
-          setSaves(saves + (saved ? -1 : 1))
-        }}
-      />
-
-      <ActionButton
-        icon={Share2}
-        label="Share"
-        hover="hover:text-sky-400"
-        onClick={() => navigator.clipboard.writeText(window.location.href)}
-      />
-    </div>
   )
 }

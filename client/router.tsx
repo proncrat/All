@@ -7,10 +7,7 @@ import {
 import Profilepage from './Pages/Profile/Profilepage'
 import SearchPage from './Pages/search/SearchPage'
 import HomePage from './Pages/Home/HomePage'
-
 import App from './Pages/Util/App'
-import Home from './Pages/Profile/Home'
-import { Live } from './Pages/Profile/Components/ProfInner'
 import Video from './Pages/Video/VideoPage'
 import { SignInForm } from './Pages/Auth/SignInPage'
 import { SignUpForm } from './Pages/Auth/SignUpPage'
@@ -33,6 +30,7 @@ import { Shortz } from './Pages/short/shortz'
 import { SongList } from './Pages/Profile/pages/songs/Songs'
 import Market from './Pages/market/market'
 import { Playlist } from './Pages/Profile/pages/playlist/Playlists'
+import { Home } from './Pages/Profile/Home'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>

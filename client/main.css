@@ -51,23 +51,6 @@ img {
   object-position: top;
 }
 
-/*
-.THEHEADER button {
-  all: unset;
-  padding: 2px 10px;
-  border: 1px solid white;
-  border-radius: 5px;
-  font-size: large;
-  transition: 0.2s all;
-}
-
-.THEHEADER button:hover {
-  box-shadow: 0px 0px 8px 0px rgb(255 255 255 / 75%);
-  cursor: pointer;
-  color: black;
-  background-color: white;
-}
-*/
 .abutton {
   padding: 2px 10px;
   border: 1px solid white;
@@ -139,6 +122,21 @@ ul#images {
 
 /*Cool gallery thing end*/
 
+:root {
+  --app-radius: 8px;
+  --app-radius-full: 9999px;
+}
+
+@theme {
+  --radius-xs: calc(var(--app-radius, 8px) * 0.25);
+  --radius-sm: calc(var(--app-radius, 8px) * 0.5);
+  --radius-md: calc(var(--app-radius, 8px) * 0.75);
+  --radius-lg: var(--app-radius, 8px);
+  --radius-xl: calc(var(--app-radius, 8px) * 1.5);
+  --radius-2xl: calc(var(--app-radius, 8px) * 2);
+  --radius-full: var(--app-radius-full);
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
@@ -173,13 +171,6 @@ ul#images {
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
@@ -208,7 +199,6 @@ ul#images {
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
   --sidebar: oklab(1 0 0 / 0.3);
   --sidebar-foreground: oklab(1 0 0 / 0.5);
   --sidebar-primary: oklch(0.205 0 0);
