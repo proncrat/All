@@ -57,6 +57,7 @@ export function SongList() {
     title: s.name,
     artist: s.author,
     src: s.url,
+    cover: s.cover,
   }))
 
   return (

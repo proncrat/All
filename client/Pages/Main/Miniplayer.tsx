@@ -6,10 +6,12 @@ import {
   IoVolumeHighSharp,
   IoShuffle,
   IoClose,
+  IoExpandSharp,
 } from 'react-icons/io5'
 import { Link } from 'react-router'
 import { useEffect, useRef, useState } from 'react'
 import { usePlayer } from './PlayerContext'
+import FullscreenPlayer from '../singlepages/FullscreenPlayer'
 
 function fmt(s) {
   if (!Number.isFinite(s)) return '0:00'
@@ -43,9 +45,15 @@ export function Miniplayer({ width }) {
   const [cur, setCur] = useState(0)
   const [dur, setDur] = useState(0)
   const [isScrubbing, setIsScrubbing] = useState(false)
+  const [fullscreen, setFullscreen] = useState(false)
 
   // progress is derived from state, so it survives the bar unmounting/remounting
   const progress = dur ? Math.min(100, (cur / dur) * 100) : 0
+
+  // fullscreen is songs only: close it if a video takes over
+  useEffect(() => {
+    if (mode === 'video') setFullscreen(false)
+  }, [mode])
 
   // stop the <video> when the video is closed or replaced by a song
   useEffect(() => {
@@ -316,8 +324,24 @@ export function Miniplayer({ width }) {
               <IoVolumeHighSharp size={'20px'} />
             </button>
           </div>
+
+          {/* fullscreen: songs only */}
+          {mode === 'song' && !isCollapsed && (
+            <button
+              onClick={() => setFullscreen(true)}
+              disabled={!current}
+              aria-label="Fullscreen"
+              className="cursor-pointer p-2 text-gray-400 hover:text-white disabled:opacity-30"
+            >
+              <IoExpandSharp size={'20px'} />
+            </button>
+          )}
         </div>
       </div>
+
+      {fullscreen && mode === 'song' && (
+        <FullscreenPlayer onClose={() => setFullscreen(false)} />
+      )}
     </div>
   )
 }

@@ -1,9 +1,7 @@
 export function Home() {
   return (
     <div>
-      <div className="flex justify-center bg-red-600 text-2xl">
-        <h2>Construction ongoing</h2>
-      </div>
+      <Marquee />
       <ProfileGrid />
     </div>
   )
@@ -17,6 +15,76 @@ import {
   useRef,
   useState,
 } from 'react'
+
+export function Marquee({
+  items = [
+    'Construction ongoing',
+    'Force beanvid work force to work harder',
+    'Construction ongoing',
+    'get more cereal',
+  ],
+  speed = 50,
+  skew = 15,
+  pauseOnHover = true,
+}) {
+  // Repeat the set so a single half is always wider than the screen.
+  const group = [...items, ...items, ...items, ...items]
+
+  const Group = ({ hidden }) => (
+    <ul
+      className="flex shrink-0 items-center"
+      aria-hidden={hidden || undefined}
+    >
+      {group.map((text, i) => (
+        <li
+          key={i}
+          className="mr-3 whitespace-nowrap border-x-4 border-white bg-red-600 px-8 py-2"
+          style={{ transform: `skewX(-${skew}deg)` }}
+        >
+          <span
+            className="block text-sm font-semibold tracking-wide text-white sm:text-base"
+            style={{ transform: `skewX(${skew}deg)` }}
+          >
+            {text}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+
+  return (
+    <>
+      <style>{`
+        @keyframes marquee-scroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          animation: marquee-scroll var(--marquee-speed, 50s) linear infinite;
+        }
+        .marquee-root.pause-hover:hover .marquee-track {
+          animation-play-state: paused;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .marquee-track { animation-duration: 120s; }
+        }
+      `}</style>
+
+      <div
+        className={`bg-black marquee-root w-full overflow-hidden py-2 ${
+          pauseOnHover ? 'pause-hover' : ''
+        }`}
+        style={{ '--marquee-speed': `${speed}s` }}
+        role="marquee"
+      >
+        <div className="marquee-track flex w-max">
+          <Group />
+          <Group hidden />
+        </div>
+      </div>
+    </>
+  )
+}
 
 /* ------------------------------------------------------------------
    ITEM SHAPES (what your API should return)

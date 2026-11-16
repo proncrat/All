@@ -31,6 +31,8 @@ import { SongList } from './Pages/Profile/pages/songs/Songs'
 import Market from './Pages/market/market'
 import { Playlist } from './Pages/Profile/pages/playlist/Playlists'
 import { Home } from './Pages/Profile/Home'
+import { PostFull } from './Pages/singlepages/Post'
+import NotFound from './Pages/Util/Le404page'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -69,6 +71,10 @@ const routes = createRoutesFromElements(
     <Route path="/help" element={<AboutHome />} />
     <Route path="/about" element={<AboutHome />} />
     <Route path="/market" element={<Market />} />
+
+    <Route path="/posts/:id" element={<PostFull />} />
+
+    <Route path="*" element={<NotFound />} />
   </Route>,
 )
 

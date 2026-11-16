@@ -1,60 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  Bookmark,
-  ChevronLeft,
-  ChevronRight,
-  Heart,
-  MessageCircle,
-  Repeat2,
-  Share2,
-  ThumbsDown,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Lightbox } from '../../util/Lightbok'
 import { useComments } from '@/client/hooks'
 import { ReactionBar } from '@/client/Pages/Util/Action'
-
-const fmt = (n) =>
-  new Intl.NumberFormat('en', {
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  }).format(n)
-
-function ActionButton({
-  icon: Icon,
-  count,
-  label,
-  active,
-  hover,
-  activeColor,
-  fill,
-  onClick,
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      aria-pressed={active}
-      className={`group flex items-center gap-1 text-[13px] transition-colors ${
-        active ? activeColor : `text-neutral-500 ${hover}`
-      }`}
-    >
-      <span className="flex h-8 w-8 items-center justify-center rounded-full transition-colors group-hover:bg-current/10">
-        <Icon
-          size={18}
-          strokeWidth={1.75}
-          className={active && fill ? 'fill-current' : ''}
-        />
-      </span>
-      {count !== undefined && (
-        <span className="min-w-[3ch] text-left tabular-nums">{fmt(count)}</span>
-      )}
-    </button>
-  )
-}
+import { CommentList } from './Comments'
+import { Link, useNavigate } from 'react-router'
 
 export function PostCard({
   id,
   title,
+  username, // display name, shown above the @handle
   handle,
   avatar,
   date,
@@ -63,12 +18,7 @@ export function PostCard({
   images, // array of image URLs; takes priority over `image`
   alt, // string, or array of strings matching `images`
   sensitive = false,
-
-  initialLikes = 0,
-  initialDislikes = 0,
-  initialVote = null, // "like" | "dislike" | null
-  initialReposts = null,
-  initialSaves = null,
+  single = false, // true = standalone post page: one column, comments underneath
 }) {
   let comments = []
 
@@ -79,8 +29,6 @@ export function PostCard({
     error,
   } = useComments(id, 'post')
 
-  console.log(comments_got)
-
   if (comments_got != null) {
     comments = comments_got
   }
@@ -89,43 +37,14 @@ export function PostCard({
   const [open, setOpen] = useState(false)
   const [index, setIndex] = useState(0)
 
-  const [vote, setVote] = useState(initialVote)
-  const [likes, setLikes] = useState(initialLikes)
-  const [dislikes, setDislikes] = useState(initialDislikes)
-
-  const [reposted, setReposted] = useState(false)
-  const [reposts, setReposts] = useState(initialReposts) // add initialReposts = 0 to props
-  const [saved, setSaved] = useState(false)
-  const [saves, setSaves] = useState(initialSaves) // add initialSaves = 0 to props
-
   const d = new Date(date)
+  const displayName = username || handle
 
   // ---- images ----
   const imgs = images?.length ? images : image ? [image] : []
   const count = imgs.length
   const multi = count > 1
-  const current = Math.min(index, Math.max(count - 1, 0))
   const altFor = (i) => (Array.isArray(alt) ? alt[i] : alt) ?? ''
-
-  const prev = useCallback(() => setIndex((i) => Math.max(i - 1, 0)), [])
-  const next = useCallback(
-    () => setIndex((i) => Math.min(i + 1, count - 1)),
-    [count],
-  )
-
-  // swipe support (carousel + lightbox)
-  const touchX = useRef(null)
-  const onTouchStart = (e) => {
-    touchX.current = e.touches[0].clientX
-  }
-  const onTouchEnd = (e) => {
-    if (touchX.current == null) return
-    const dx = e.changedTouches[0].clientX - touchX.current
-    touchX.current = null
-    if (Math.abs(dx) < 40) return
-    if (dx < 0) next()
-    else prev()
-  }
 
   // side-by-side carousel scrolling
   const scrollRef = useRef(null)
@@ -154,41 +73,28 @@ export function PostCard({
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' })
   }
 
-  // keyboard nav while lightbox is open
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e) => {
-      if (e.key === 'Escape') setOpen(false)
-      else if (e.key === 'ArrowLeft') prev()
-      else if (e.key === 'ArrowRight') next()
+  const navigate = useNavigate()
+  const postHref = `/posts/${id}`
+  const profileHref = `/profile/${handle}`
+
+  // Click anywhere on the card (list mode only) to open the post,
+  // unless the click was on something interactive.
+  function handleCardClick(e) {
+    if (single) return
+    if (e.defaultPrevented) return
+    // ignore links, buttons, images (lightbox), form fields, and opted-out areas
+    if (
+      e.target.closest('a, button, img, input, textarea, select, [data-no-nav]')
+    )
+      return
+    // don't navigate if the user was selecting text
+    if (window.getSelection()?.toString()) return
+
+    if (e.metaKey || e.ctrlKey) {
+      window.open(postHref, '_blank')
+    } else {
+      navigate(postHref)
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, prev, next])
-
-  function handleVote(type) {
-    const prevState = { vote, likes, dislikes }
-
-    // remove existing vote
-    let nextLikes = likes - (vote === 'like' ? 1 : 0)
-    let nextDislikes = dislikes - (vote === 'dislike' ? 1 : 0)
-    let nextVote = null
-
-    // apply new vote unless it was a toggle-off
-    if (vote !== type) {
-      nextVote = type
-      if (type === 'like') nextLikes += 1
-      else nextDislikes += 1
-    }
-
-    setVote(nextVote)
-    setLikes(nextLikes)
-    setDislikes(nextDislikes)
-
-    // TODO: call your API here, and roll back on failure:
-    // api.vote(postId, nextVote).catch(() => {
-    //   setVote(prevState.vote); setLikes(prevState.likes); setDislikes(prevState.dislikes);
-    // });
   }
 
   const chevronClass =
@@ -196,23 +102,42 @@ export function PostCard({
 
   return (
     <div className="w-full min-w-0">
-      <article className="grid w-full rounded-0 md:rounded-2xl  border border-white/8 backdrop-blur-md bg-black/30 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-4">
-        {/* LEFT: header, text, image, actions */}
+      <article
+        onClick={handleCardClick}
+        className={`grid w-full p-4 sm:p-6 ${
+          single
+            ? 'border border-zinc-800'
+            : 'cursor-pointer transition hover:bg-black/40 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-4 md:rounded-2xl border border-white/8 backdrop-blur-md bg-black/30'
+        }`}
+      >
+        {/* MAIN: header, text, image, actions (+ comments when single) */}
         <div className="min-w-0">
           <header className="mb-4 flex items-center gap-3">
-            {avatar ? (
-              <img
-                src={avatar}
-                alt=""
-                className="h-12 w-12 shrink-0 rounded-full object-cover"
-              />
-            ) : (
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg font-semibold uppercase">
-                {handle?.[0] ?? '?'}
-              </div>
-            )}
+            <Link to={profileHref} className="shrink-0">
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt=""
+                  className="h-12 w-12 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg font-semibold uppercase">
+                  {displayName?.[0] ?? '?'}
+                </div>
+              )}
+            </Link>
             <div className="min-w-0 leading-tight">
-              <div className="truncate font-semibold">@{handle}</div>
+              <Link
+                to={profileHref}
+                className="flex min-w-0 items-baseline gap-2 hover:underline"
+              >
+                <span className="truncate font-semibold">{displayName}</span>
+                {username && handle && (
+                  <span className="truncate text-sm text-neutral-400">
+                    @{handle}
+                  </span>
+                )}
+              </Link>
               <time
                 dateTime={d.toISOString()}
                 className="text-sm text-neutral-500"
@@ -222,11 +147,18 @@ export function PostCard({
                   month: 'short',
                   day: 'numeric',
                 })}
+                {' at '}
+                {d.toLocaleTimeString(undefined, {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })}
               </time>
             </div>
           </header>
 
-          <div className="rounded-xl bg-white/[.04] p-4">
+          <div
+            className={`${single ? 'border-t border-zinc-800 pt-2' : 'rounded-xl bg-white/[.04] p-4'}`}
+          >
             {title && <h2 className="mb-1 text-xl font-semibold">{title}</h2>}
             <p className="whitespace-pre-line break-words leading-relaxed">
               {body}
@@ -306,52 +238,35 @@ export function PostCard({
           )}
 
           {/* ACTION BAR */}
-
           <footer className="mt-4 border-t border-white/[.08] pt-2">
             <ReactionBar photo={{}} />
           </footer>
+
+          {/* SINGLE MODE: comments underneath, always visible */}
+          {single && (
+            <section className="mt-4 rounded-xl border border-white/[.08] bg-white/[.03] p-4">
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
+                Comments ({comments.length})
+              </h3>
+              <CommentList comments={comments} single />
+            </section>
+          )}
         </div>
 
-        {/* RIGHT: comments (hidden below lg) */}
-        <aside className="relative hidden rounded-xl border border-white/[.08] bg-white/[.03] lg:block">
-          <div className="flex flex-col p-4 lg:absolute lg:inset-0">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
-              Comments ({comments.length})
-            </h3>
-
-            <ul className="flex-1 space-y-4 overflow-y-auto pr-1">
-              {comments.length === 0 && (
-                <li className="text-sm text-neutral-500">No comments yet.</li>
-              )}
-              {comments.map((c) => (
-                <li key={c.id} className="flex gap-2">
-                  {c.pfp ? (
-                    <img
-                      src={c.pfp}
-                      alt=""
-                      className="h-8 w-8 shrink-0 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold uppercase">
-                      {c.name?.[0] ?? '?'}
-                    </div>
-                  )}
-                  <div className="min-w-0 text-sm">
-                    <div>
-                      <span className="font-semibold">@{c.name}</span>{' '}
-                      <span className="text-xs text-neutral-500">
-                        {new Date(c.post_date).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="whitespace-pre-line break-words text-neutral-200">
-                      {c.body_text}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+        {/* LIST MODE: comments in a side column (hidden below lg) */}
+        {!single && (
+          <aside
+            data-no-nav
+            className="relative hidden rounded-xl border border-white/[.08] bg-white/[.03] lg:block"
+          >
+            <div className="flex flex-col p-4 lg:absolute lg:inset-0">
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
+                Comments ({comments.length})
+              </h3>
+              <CommentList comments={comments} single={false} />
+            </div>
+          </aside>
+        )}
       </article>
 
       {open && count > 0 && (
