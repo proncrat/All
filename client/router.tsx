@@ -33,6 +33,8 @@ import { Playlist } from './Pages/Profile/pages/playlist/Playlists'
 import { Home } from './Pages/Profile/Home'
 import { PostFull } from './Pages/singlepages/Post'
 import NotFound from './Pages/Util/Le404page'
+import { LibraryPage } from './Pages/Library/Library'
+import { PlaylistPage } from './Pages/Playlist/PlaylistPage'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -71,6 +73,8 @@ const routes = createRoutesFromElements(
     <Route path="/help" element={<AboutHome />} />
     <Route path="/about" element={<AboutHome />} />
     <Route path="/market" element={<Market />} />
+    <Route path="/library" element={<LibraryPage />} />
+    <Route path="/playlist/:id" element={<PlaylistPage />} />
 
     <Route path="/posts/:id" element={<PostFull />} />
 

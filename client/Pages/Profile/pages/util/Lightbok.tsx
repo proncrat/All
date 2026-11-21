@@ -400,7 +400,11 @@ export function Lightbox({
           </p>
         )}
         <div className="border-b border-white/10 px-5 py-2">
-          <ReactionBar key={`reactions-${photo.id}`} photo={photo} />
+          <ReactionBar
+            key={`reactions-${photo.id}`}
+            type={mode === 'post' ? 'post' : 'photo'}
+            id={mode === 'post' ? postid : photo.id}
+          />
         </div>
 
         <PhotoComments

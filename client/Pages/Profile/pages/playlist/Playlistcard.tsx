@@ -203,9 +203,9 @@ export function PlaylistCard({
   )
 
   return href ? (
-    <a href={href} className={shell}>
+    <Link to={href} className={shell}>
       {body}
-    </a>
+    </Link>
   ) : (
     <button type="button" onClick={onClick} className={shell}>
       {body}

@@ -112,7 +112,7 @@ function Video() {
           </div>
         </Link>
         <div className="flex gap-3 ml-auto">
-          <ReactionBar photo={{}} />
+          <ReactionBar type="video" id={id} />
         </div>
       </div>
 

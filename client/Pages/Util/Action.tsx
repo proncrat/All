@@ -1,5 +1,6 @@
 import {
   Bookmark,
+  ListPlus,
   Repeat2,
   Share2,
   ThumbsUp,
@@ -8,6 +9,11 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { AddToPlaylistModal } from '../Playlist/AddToPlaylist'
+import { useSession } from '@/lib/auth'
+import { useReactions } from '@/client/hooks/usereactions'
+import type { ReactionTarget, Vote } from '@/client/apis/reactionsapi'
 
 const fmt = (n: number) =>
   new Intl.NumberFormat('en', {
@@ -58,35 +64,43 @@ function ActionButton({
   )
 }
 
-export function ReactionBar({ photo }: { photo: Photo }) {
-  const [vote, setVote] = useState<'like' | 'dislike' | null>(
-    photo.vote ?? null,
-  )
-  const [likes, setLikes] = useState(photo.likes ?? 0)
-  const [dislikes, setDislikes] = useState(photo.dislikes ?? 0)
+/**
+ * Like / dislike / repost / save bar for any video, post, photo or song.
+ * Counts and the viewer's own state come from /api/v1/reactions and are
+ * saved there; signed-out users are sent to the sign-in page.
+ */
+export function ReactionBar({
+  type,
+  id,
+}: {
+  type: ReactionTarget
+  id: string | number | undefined | null
+}) {
+  const { data, act } = useReactions(type, id)
+  const { data: session } = useSession()
+  const navigate = useNavigate()
+  const [playlistOpen, setPlaylistOpen] = useState(false)
 
-  const [reposted, setReposted] = useState(photo.reposted ?? false)
-  const [reposts, setReposts] = useState(photo.reposts ?? 0)
-  const [saved, setSaved] = useState(photo.saved ?? false)
-  const [saves, setSaves] = useState(photo.saves ?? 0)
+  const vote = data?.vote ?? null
+  const likes = data?.likes ?? 0
+  const dislikes = data?.dislikes ?? 0
+  const reposted = data?.reposted ?? false
+  const reposts = data?.reposts ?? 0
+  const saved = data?.saved ?? false
+  const saves = data?.saves ?? 0
+  const comments = data?.comments ?? 0
 
-  const [comments, setComments] = useState(photo.comments ?? 0)
-
-  function handleVote(type: 'like' | 'dislike') {
-    let nextLikes = likes - (vote === 'like' ? 1 : 0)
-    let nextDislikes = dislikes - (vote === 'dislike' ? 1 : 0)
-    let nextVote: 'like' | 'dislike' | null = null
-
-    if (vote !== type) {
-      nextVote = type
-      if (type === 'like') nextLikes += 1
-      else nextDislikes += 1
+  /** Runs the action if signed in, otherwise goes to sign-in. */
+  const ifSignedIn = (fn: () => void) => () => {
+    if (!session) {
+      navigate('/signin')
+      return
     }
-
-    setVote(nextVote)
-    setLikes(nextLikes)
-    setDislikes(nextDislikes)
+    if (data) fn()
   }
+
+  const handleVote = (next: Vote) =>
+    act({ kind: 'vote', vote: vote === next ? null : next })
 
   return (
     <div className="flex items-center justify-between">
@@ -104,10 +118,7 @@ export function ReactionBar({ photo }: { photo: Photo }) {
         active={reposted}
         activeColor="text-emerald-400"
         hover="hover:text-emerald-400"
-        onClick={() => {
-          setReposted(!reposted)
-          setReposts(reposts + (reposted ? -1 : 1))
-        }}
+        onClick={ifSignedIn(() => act({ kind: 'repost', active: !reposted }))}
       />
 
       <ActionButton
@@ -118,7 +129,7 @@ export function ReactionBar({ photo }: { photo: Photo }) {
         activeColor="text-pink-500"
         hover="hover:text-pink-500"
         fill
-        onClick={() => handleVote('like')}
+        onClick={ifSignedIn(() => handleVote('like'))}
       />
 
       <ActionButton
@@ -129,7 +140,7 @@ export function ReactionBar({ photo }: { photo: Photo }) {
         activeColor="text-orange-400"
         hover="hover:text-orange-400"
         fill
-        onClick={() => handleVote('dislike')}
+        onClick={ifSignedIn(() => handleVote('dislike'))}
       />
 
       <ActionButton
@@ -140,11 +151,23 @@ export function ReactionBar({ photo }: { photo: Photo }) {
         activeColor="text-sky-400"
         hover="hover:text-sky-400"
         fill
-        onClick={() => {
-          setSaved(!saved)
-          setSaves(saves + (saved ? -1 : 1))
-        }}
+        onClick={ifSignedIn(() => act({ kind: 'save', active: !saved }))}
       />
+
+      <ActionButton
+        icon={ListPlus}
+        label="Add to playlist"
+        hover="hover:text-lime-300"
+        onClick={ifSignedIn(() => setPlaylistOpen(true))}
+      />
+
+      {playlistOpen && id != null && (
+        <AddToPlaylistModal
+          type={type}
+          targetId={id}
+          onClose={() => setPlaylistOpen(false)}
+        />
+      )}
 
       <ActionButton
         icon={Share2}

@@ -5,6 +5,7 @@ import {
   getPhotoById,
   getPhotoByUserId,
   getPhotosByUser,
+  getPhotoWithAuthor,
 } from '../database'
 import { getLinkId } from './imguploadtest'
 import { authMiddlewarenoerror } from '../middleware/enpointauth'
@@ -65,6 +66,21 @@ function decodeCursor(encoded: string): Cursor | null {
     return null // Returns null safely instead of crashing
   }
 }
+
+// GET /api/v1/photo/single/:photoId  one photo (for direct links / lightbox)
+router.get('/single/:photoId', async (req, res, next) => {
+  try {
+    const photoId = Number(req.params.photoId)
+    if (!Number.isInteger(photoId) || photoId <= 0) {
+      return res.status(400).json({ error: 'Invalid photo id' })
+    }
+    const photo = await getPhotoWithAuthor(photoId)
+    if (!photo) return res.status(404).json({ error: 'Photo not found' })
+    res.json(photo)
+  } catch (err) {
+    next(err)
+  }
+})
 
 // GET /api/users/:id/photos?limit=30&cursor=eyJ0Ijoi...
 router.get('/improv/:id', async (req, res, next) => {

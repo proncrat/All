@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { PhotoUpload } from './components/Photo'
+import { VideoUpload } from './components/VideoUpload'
+import { SongUpload } from './components/SongUpload'
+import { SignInNotice } from './components/uploadui'
 import Headerbutton from '../Util/Headerbutton'
 import NewPost from './components/Post'
 import { useSession } from '@/lib/auth'
@@ -36,6 +39,28 @@ export function PostPage() {
           </div>
         ))}
       </div>
+      {searchoption == 'Video' && (
+        <div className=" max-w-7xl m-auto p-4">
+          {user ? (
+            <VideoUpload />
+          ) : (
+            !isPending && <SignInNotice what="videos" />
+          )}
+        </div>
+      )}
+      {searchoption == 'Song' && (
+        <div className=" max-w-7xl m-auto p-4">
+          {user ? (
+            <SongUpload
+              defaultArtist={
+                (user as { username?: string }).username ?? user.name
+              }
+            />
+          ) : (
+            !isPending && <SignInNotice what="songs" />
+          )}
+        </div>
+      )}
       {searchoption == 'Photo' && (
         <div className=" max-w-7xl m-auto p-4">
           <PhotoUpload />
@@ -43,7 +68,16 @@ export function PostPage() {
       )}
       {searchoption == 'Post' && (
         <div className=" max-w-7xl m-auto p-4">
-          <NewPost user={{ name: user.username, avatar: user.image }} />
+          {user ? (
+            <NewPost
+              user={{
+                name: (user as { username?: string }).username ?? user.name,
+                avatar: user.image,
+              }}
+            />
+          ) : (
+            !isPending && <SignInNotice what="posts" />
+          )}
         </div>
       )}
     </div>

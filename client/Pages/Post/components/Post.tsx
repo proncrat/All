@@ -1,22 +1,32 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { card, field } from './uploadui'
+
+interface NewPostProps {
+  user?: { name?: string | null; avatar?: string | null }
+  onSubmit?: (post: {
+    title: string
+    body: string
+    files: File[]
+  }) => Promise<unknown> | void
+}
 
 /**
- * "New post" content area for the /post page (Post tab) — Tailwind version.
+ * "New post" content area for the /post page (Post tab).
  * Left: live preview of the post as it will appear on a profile.
- * Right: form card (title, text, images).
- *
- * Props:
- *   user     { name: "God", avatar: "/avatar.png" }
- *   onSubmit ({ title, body, files }) => Promise|void
+ * Right: form card (title, text, images), styled like the other upload tabs.
  */
-export default function NewPost({ user = { name: '', avatar: '' }, onSubmit }) {
+export default function NewPost({
+  user = { name: '', avatar: '' },
+  onSubmit,
+}: NewPostProps) {
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
-  const [files, setFiles] = useState([])
+  const [files, setFiles] = useState<File[]>([])
   const [dragging, setDragging] = useState(false)
   const [busy, setBusy] = useState(false)
-  const inputRef = useRef(null)
-  const trackRef = useRef(null)
+  const [error, setError] = useState<string | null>(null)
+  const [posted, setPosted] = useState(false)
+  const trackRef = useRef<HTMLDivElement>(null)
 
   const previews = useMemo(
     () => files.map((f) => ({ file: f, url: URL.createObjectURL(f) })),
@@ -27,26 +37,40 @@ export default function NewPost({ user = { name: '', avatar: '' }, onSubmit }) {
     [previews],
   )
 
-  const addFiles = (list) => {
-    const imgs = Array.from(list || []).filter((f) =>
+  // Hide the success message after 3 seconds
+  useEffect(() => {
+    if (!posted) return
+    const t = setTimeout(() => setPosted(false), 3000)
+    return () => clearTimeout(t)
+  }, [posted])
+
+  const addFiles = (list: FileList | null) => {
+    const imgs = Array.from(list ?? []).filter((f) =>
       f.type.startsWith('image/'),
     )
     if (imgs.length) setFiles((prev) => [...prev, ...imgs])
   }
-  const removeFile = (i) =>
+  const removeFile = (i: number) =>
     setFiles((prev) => prev.filter((_, idx) => idx !== i))
 
-  const canPost = (title.trim() || body.trim() || files.length) && !busy
+  const hasAnything = Boolean(title.trim() || body.trim() || files.length)
+  // No backend for posts yet: keep the button disabled until onSubmit is wired
+  const canPost = hasAnything && !busy && Boolean(onSubmit)
 
-  const submit = async (e) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!canPost) return
     setBusy(true)
+    setError(null)
+    setPosted(false)
     try {
       await onSubmit?.({ title: title.trim(), body: body.trim(), files })
       setTitle('')
       setBody('')
       setFiles([])
+      setPosted(true)
+    } catch {
+      setError('Posting failed. Please try again.')
     } finally {
       setBusy(false)
     }
@@ -63,26 +87,21 @@ export default function NewPost({ user = { name: '', avatar: '' }, onSubmit }) {
     year: 'numeric',
   })
 
-  const hasAnything = title.trim() || body.trim() || previews.length
-
-  const field =
-    'w-full mb-5 rounded-[14px] border border-[#2c2c2c] bg-black px-4 py-3.5 text-[15px] text-[#f2f2f2] placeholder:text-[#6d6d6d] outline-none focus-visible:border-[#8a8a8a]'
-
   return (
-    <div className="mx-auto grid max-w-[1440px] grid-cols-1 items-start gap-[30px] px-4 py-6 font-[Poppins,system-ui,sans-serif] text-[#f2f2f2] lg:grid-cols-[minmax(0,1fr)_480px] lg:px-10 lg:py-[60px]">
-      {/* ---------- Preview ---------- */}
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 py-4 sm:py-8 lg:flex-row lg:items-start lg:justify-center">
+      {/* Preview */}
       <section
         aria-label="Post preview"
-        className="order-2 flex min-h-[360px] items-start rounded-3xl border border-[#2c2c2c] bg-black p-7 lg:order-1 lg:min-h-[896px]"
+        className="flex min-h-[24rem] min-w-0 flex-1 items-start overflow-hidden rounded-2xl border border-white/20 bg-black p-4 sm:p-6"
       >
         {!hasAnything ? (
-          <p className="m-auto text-[15px] font-medium text-[#8a8a8a]">
+          <p className="m-auto text-sm text-white/40">
             Your post preview will appear here
           </p>
         ) : (
-          <article className="w-full rounded-[22px] border border-[#2c2c2c] bg-[#14141a] p-5">
-            <header className="mb-4 flex items-center gap-3.5">
-              <div className="h-[60px] w-[60px] flex-none overflow-hidden rounded-full bg-[#2a2a33]">
+          <article className="w-full rounded-xl border border-white/20 bg-neutral-900 p-4">
+            <header className="mb-4 flex items-center gap-3">
+              <div className="h-12 w-12 flex-none overflow-hidden rounded-full bg-white/10">
                 {user.avatar && (
                   <img
                     src={user.avatar}
@@ -92,18 +111,18 @@ export default function NewPost({ user = { name: '', avatar: '' }, onSubmit }) {
                 )}
               </div>
               <div>
-                <div className="text-[17px] font-semibold">@{user.name}</div>
-                <div className="text-sm text-[#8a8a8a]">{today}</div>
+                <div className="text-sm font-semibold">@{user.name}</div>
+                <div className="text-xs text-white/50">{today}</div>
               </div>
             </header>
 
             {(title.trim() || body.trim()) && (
-              <div className="mb-4 rounded-2xl bg-white/[0.06] px-5 py-[18px]">
+              <div className="mb-4 rounded-lg bg-white/5 px-4 py-3">
                 {title.trim() && (
-                  <h3 className="mb-1.5 text-xl font-semibold">{title}</h3>
+                  <h3 className="mb-1 text-lg font-semibold">{title}</h3>
                 )}
                 {body.trim() && (
-                  <p className="whitespace-pre-wrap break-words text-[15px] font-medium leading-relaxed">
+                  <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
                     {body}
                   </p>
                 )}
@@ -121,7 +140,7 @@ export default function NewPost({ user = { name: '', avatar: '' }, onSubmit }) {
                       key={p.url}
                       src={p.url}
                       alt=""
-                      className="h-[300px] w-auto max-w-full flex-none snap-start rounded-2xl bg-[#222] object-cover lg:h-[420px]"
+                      className="h-72 w-auto max-w-full flex-none snap-start rounded-lg bg-white/5 object-cover lg:h-96"
                     />
                   ))}
                 </div>
@@ -130,11 +149,11 @@ export default function NewPost({ user = { name: '', avatar: '' }, onSubmit }) {
                     type="button"
                     onClick={scrollNext}
                     aria-label="Next image"
-                    className="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-[rgba(60,60,66,0.85)] text-white hover:bg-[rgba(90,90,96,0.95)]"
+                    className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white/30 bg-black/70 text-white hover:border-white"
                   >
                     <svg
-                      width="18"
-                      height="18"
+                      width="16"
+                      height="16"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -152,106 +171,125 @@ export default function NewPost({ user = { name: '', avatar: '' }, onSubmit }) {
         )}
       </section>
 
-      {/* ---------- Form ---------- */}
-      <form
-        onSubmit={submit}
-        className="order-1 flex flex-col rounded-3xl border border-[#2c2c2c] bg-[#181818] p-[30px] shadow-[0_0_60px_10px_rgba(255,255,255,0.025)] lg:order-2"
-      >
-        <h2 className="mb-[22px] text-2xl font-semibold">New post</h2>
+      {/* Form */}
+      <form onSubmit={submit} className={card}>
+        <h1 className="text-xl font-semibold">New post</h1>
 
-        <label htmlFor="np-title" className="mb-2 text-[15px] font-medium">
-          Title
-        </label>
-        <input
-          id="np-title"
-          className={field}
-          placeholder="Give it a title"
-          value={title}
-          maxLength={120}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        <label htmlFor="np-body" className="mb-2 text-[15px] font-medium">
-          Text
-        </label>
-        <textarea
-          id="np-body"
-          className={`${field} min-h-[140px] resize-y`}
-          placeholder="What's on your mind?"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-        />
-
-        <span className="mb-2 text-[15px] font-medium">Images</span>
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => inputRef.current?.click()}
-          onKeyDown={(e) =>
-            (e.key === 'Enter' || e.key === ' ') && inputRef.current?.click()
-          }
-          onDragOver={(e) => {
-            e.preventDefault()
-            setDragging(true)
-          }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault()
-            setDragging(false)
-            addFiles(e.dataTransfer.files)
-          }}
-          className={`flex min-h-[150px] cursor-pointer flex-col items-center justify-center gap-1 rounded-[18px] border border-dashed text-center outline-none transition-colors focus-visible:border-[#8a8a8a] ${
-            dragging
-              ? 'border-[#6a6a6a] bg-white/[0.04]'
-              : 'border-[#3a3a3a] hover:border-[#6a6a6a] hover:bg-white/[0.04]'
-          }`}
-        >
-          <strong className="text-base font-medium">Tap to add photos</strong>
-          <small className="text-[13px] text-[#8a8a8a]">
-            or drag and drop them here
-          </small>
+        <div className="space-y-1.5">
+          <label htmlFor="np-title" className="text-sm font-medium">
+            Title
+          </label>
           <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            hidden
-            onChange={(e) => {
-              addFiles(e.target.files)
-              e.target.value = ''
-            }}
+            id="np-title"
+            type="text"
+            autoComplete="off"
+            maxLength={120}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Give it a title"
+            className={field}
           />
         </div>
 
-        {previews.length > 0 && (
-          <ul className="mt-3.5 flex flex-wrap gap-2.5">
-            {previews.map((p, i) => (
-              <li key={p.url} className="relative h-[76px] w-[76px]">
-                <img
-                  src={p.url}
-                  alt=""
-                  className="h-full w-full rounded-xl object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeFile(i)}
-                  aria-label={`Remove image ${i + 1}`}
-                  className="absolute -right-1.5 -top-1.5 h-[22px] w-[22px] rounded-full border border-[#2c2c2c] bg-black text-[15px] leading-none text-white"
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="space-y-1.5">
+          <label htmlFor="np-body" className="text-sm font-medium">
+            Text
+          </label>
+          <textarea
+            id="np-body"
+            rows={4}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="What's on your mind?"
+            className={`${field} resize-none`}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="text-sm font-medium">Images</span>
+          <div
+            onDragOver={(e) => {
+              e.preventDefault()
+              setDragging(true)
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault()
+              setDragging(false)
+              addFiles(e.dataTransfer.files)
+            }}
+            className={`relative flex h-28 w-full items-center justify-center overflow-hidden rounded-xl
+              border border-dashed transition-colors hover:border-white
+              ${dragging ? 'border-white bg-white/5' : 'border-white/30'}`}
+          >
+            <div className="pointer-events-none px-4 text-center">
+              <p className="text-sm font-medium">Tap to add photos</p>
+              <p className="mt-1 text-xs text-white/50">
+                or drag and drop them here
+              </p>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              aria-label="Add photos"
+              onChange={(e) => {
+                addFiles(e.target.files)
+                e.target.value = ''
+              }}
+              className="absolute inset-0 cursor-pointer opacity-0"
+            />
+          </div>
+
+          {previews.length > 0 && (
+            <ul className="flex flex-wrap gap-2 pt-2">
+              {previews.map((p, i) => (
+                <li key={p.url} className="relative h-16 w-16">
+                  <img
+                    src={p.url}
+                    alt=""
+                    className="h-full w-full rounded-lg object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFile(i)}
+                    aria-label={`Remove image ${i + 1}`}
+                    className="absolute -right-1.5 -top-1.5 grid h-5 w-5 cursor-pointer place-items-center rounded-full border border-white/30 bg-black text-sm leading-none text-white hover:border-white"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <button
           type="submit"
           disabled={!canPost}
-          className="mt-7 h-[54px] rounded-[14px] bg-[#e0e0e0] text-base font-semibold text-black hover:enabled:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+          className="min-h-11 w-full cursor-pointer rounded-lg bg-white px-5 text-sm font-semibold text-black
+            transition-colors hover:bg-white/85 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? 'Posting…' : 'Post'}
         </button>
+
+        {!onSubmit && (
+          <p className="text-xs text-white/40">
+            Posting isn&apos;t connected yet.
+          </p>
+        )}
+
+        {posted && (
+          <p role="status" className="text-sm text-green-400">
+            Post published!
+          </p>
+        )}
+
+        {error && (
+          <p role="alert" className="text-sm text-red-400">
+            {error}
+          </p>
+        )}
       </form>
     </div>
   )

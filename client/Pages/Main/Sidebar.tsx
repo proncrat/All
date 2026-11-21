@@ -11,7 +11,7 @@ import { useState } from 'react'
 
 const links = [
   { to: '/coms', label: 'Comunication', Icon: LuMessagesSquare },
-  { to: '/comss', label: 'Library', Icon: IoAlbumsOutline },
+  { to: '/library', label: 'Library', Icon: IoAlbumsOutline },
   { to: '/post', label: 'Post', Icon: IoAddCircleOutline },
   //{ to: '/Info', label: 'Information', Icon: IoInformationCircleOutline },
 ]

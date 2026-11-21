@@ -239,7 +239,7 @@ export function PostCard({
 
           {/* ACTION BAR */}
           <footer className="mt-4 border-t border-white/[.08] pt-2">
-            <ReactionBar photo={{}} />
+            <ReactionBar type="post" id={id} />
           </footer>
 
           {/* SINGLE MODE: comments underneath, always visible */}

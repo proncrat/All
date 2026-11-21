@@ -1,8 +1,13 @@
-import { useParams } from 'react-router'
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router'
 import { Lightbox } from '../util/Lightbok'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo } from 'react'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useInfiniteScroll } from '../util/Infinitebok'
 import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
@@ -54,6 +59,21 @@ function useUserPhotosInfinite(id: string | undefined) {
   })
 }
 
+function useSinglePhoto(photoId: string | null) {
+  return useQuery({
+    queryKey: ['photo', photoId],
+    queryFn: async () => {
+      const res = await fetch(
+        `/api/v1/photo/single/${encodeURIComponent(photoId!)}`,
+      )
+      if (!res.ok) throw new Error('Photo not found')
+      return res.json() as Promise<Photo>
+    },
+    enabled: photoId != null,
+    retry: false,
+  })
+}
+
 export function Photos() {
   const { id } = useParams()
   const {
@@ -67,14 +87,62 @@ export function Photos() {
     isFetchNextPageError,
   } = useUserPhotosInfinite(id)
 
-  const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const close = useCallback(() => setActiveIndex(null), [])
-
   // Flatten pages into one array, so the grid and Lightbox work as before
   const photos = useMemo(
     () => data?.pages.flatMap((page) => page.items) ?? [],
     [data],
   )
+
+  // Lightbox state lives in the URL (?photo=<id>) so photos can be linked to
+  // directly and the back button closes the lightbox.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const photoParam = searchParams.get('photo')
+  const openedFromGrid = Boolean(
+    (location.state as { lightbox?: boolean } | null)?.lightbox,
+  )
+
+  const listIndex = photoParam
+    ? photos.findIndex((p) => String(p.id) === photoParam)
+    : -1
+  const activeIndex = listIndex === -1 ? null : listIndex
+
+  // A linked photo that isn't in the loaded pages (yet) is fetched on its own
+  const single = useSinglePhoto(
+    photoParam && !isPending && listIndex === -1 ? photoParam : null,
+  )
+
+  const setPhotoParam = useCallback(
+    (photoId: string | number | null, opts: { replace: boolean }) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          if (photoId == null) next.delete('photo')
+          else next.set('photo', String(photoId))
+          return next
+        },
+        {
+          replace: opts.replace,
+          preventScrollReset: true,
+          // remember the lightbox was opened from the grid, so closing can go back
+          state:
+            photoId == null
+              ? null
+              : { lightbox: opts.replace ? openedFromGrid : true },
+        },
+      )
+    },
+    [setSearchParams, openedFromGrid],
+  )
+
+  const open = (i: number) => setPhotoParam(photos[i].id, { replace: false })
+  const setActiveIndex = (i: number) =>
+    photos[i] && setPhotoParam(photos[i].id, { replace: true })
+  const close = useCallback(() => {
+    if (openedFromGrid) navigate(-1)
+    else setPhotoParam(null, { replace: true })
+  }, [openedFromGrid, navigate, setPhotoParam])
   // Auto-load only when more exists, nothing is in flight, and the last
   // attempt didn't fail (avoids a retry loop on a broken endpoint)
   const canLoadMore =
@@ -95,10 +163,13 @@ export function Photos() {
     }
   }, [activeIndex, photos.length, canLoadMore, fetchNextPage])
 
-  // Lightbox: close if the open photo disappears (e.g. it was just deleted)
+  // Lightbox: close if the linked photo doesn't exist (bad link, or deleted)
   useEffect(() => {
-    if (activeIndex !== null && activeIndex >= photos.length) close()
-  }, [activeIndex, photos.length, close])
+    if (photoParam && single.isError) close()
+  }, [photoParam, single.isError, close])
+
+  const lightboxPhotos =
+    activeIndex !== null ? photos : single.data ? [single.data] : null
 
   if (isPending) return <Spinner />
   if (isError) return <div>Error: {error.message}</div>
@@ -110,7 +181,7 @@ export function Photos() {
         {photos.map((item, i) => (
           <li
             key={item.id}
-            onClick={() => setActiveIndex(i)}
+            onClick={() => open(i)}
             className="group aspect-square cursor-pointer overflow-hidden bg-white/5 hover:shadow-2xl shadow-black transition-shadow duration-300 hover:z-20"
           >
             <img
@@ -130,10 +201,10 @@ export function Photos() {
 
       {isFetchNextPageError && <p>Could not load more.</p>}
 
-      {activeIndex !== null && photos[activeIndex] && (
+      {lightboxPhotos && (
         <Lightbox
-          photos={photos}
-          index={activeIndex}
+          photos={lightboxPhotos}
+          index={activeIndex ?? 0}
           onIndexChange={setActiveIndex}
           onClose={close}
         />
