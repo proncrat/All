@@ -42,15 +42,3 @@ export function Switch({
     </label>
   )
 }
-
-// Demo / example usage
-export default function Demo() {
-  const [market, setMarket] = useState(false)
-
-  return (
-    <div className="min-h-screen bg-black p-12 text-white">
-      <h2 className="mb-5 text-2xl font-normal">Filter</h2>
-      <Switch checked={market} onChange={setMarket} label="Theme market" />
-    </div>
-  )
-}

@@ -171,15 +171,3 @@ export function ColorPicker({
     </div>
   )
 }
-
-// Demo / example usage
-export default function Demo() {
-  const [color, setColor] = useState('#ff3b3b')
-
-  return (
-    <div className="min-h-screen bg-black p-12">
-      <h2 className="mb-5 text-2xl font-normal text-white">Customize</h2>
-      <ColorPicker label="Accent color" value={color} onChange={setColor} />
-    </div>
-  )
-}

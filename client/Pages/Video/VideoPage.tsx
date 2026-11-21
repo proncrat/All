@@ -1,10 +1,9 @@
 import { Link, useParams } from 'react-router'
 import { useVideo } from '../../hooks'
-import { AiFillLike, AiFillDislike } from 'react-icons/ai'
-
 import { useEffect, useRef } from 'react'
 import { usePlayer } from '../Main/PlayerContext'
 import { useSearchParams } from 'react-router'
+import { ReactionBar } from '../Util/Action'
 
 type VideoData = { video_link: string; name: string }
 
@@ -112,11 +111,8 @@ function Video() {
             </div>
           </div>
         </Link>
-        <div className="flex gap-3">
-          <AiFillLike size={'25px'} />
-          <p>{data.likes}</p>
-          <AiFillDislike size={'25px'} />
-          <p>{data.dislikes}</p>
+        <div className="flex gap-3 ml-auto">
+          <ReactionBar photo={{}} />
         </div>
       </div>
 

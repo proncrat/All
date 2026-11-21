@@ -55,8 +55,6 @@ function Layout() {
 function App() {
   const queryClient = new QueryClient()
 
-  //document.documentElement.classList.add('dark')
-
   useEffect(() => {
     const theme = localStorage.getItem('theme')
 
@@ -66,13 +64,6 @@ function App() {
       document.documentElement.classList.add('dark')
     }
   }, [])
-  /*
-  const { data: session, isPending: seshpend } = useSession()
-
-  useEffect(() => {
-    ...your commented-out SSE code...
-  }, [seshpend, session])
-*/
 
   return (
     <PlayerProvider>
