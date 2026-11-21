@@ -49,8 +49,8 @@ npx auth@latest migrate --config ./server/lib/auth.ts -y   # create/update bette
 - Data fetching: superagent API functions + TanStack Query hooks. Older ones are in `client/api.ts` / `client/hooks.ts`; newer ones are split into `client/apis/*` and `client/hooks/*`. Requests go to `/api/v1/...` (Vite proxies `/api` to `localhost:3000` in dev). Some newer API files hardcode `http://localhost:3000` — prefer relative URLs.
 - Auth client: `lib/auth.ts` (root, not `client/lib`) exports better-auth React helpers (`useSession`, `signIn`, ...).
 - Socket client: `client/lib/socket.ts` (`autoConnect: false`, `VITE_SOCKET_URL`), used by `hooks/useMessageSocket.ts`, `useChat.ts`, `useCall.ts`.
-- UI: Tailwind v4 (`client/main.css`) + shadcn/ui (radix) components in root `components/ui`, `cn()` in root `lib/utils.ts`. Add components with the shadcn CLI (`components.json`).
-- Path aliases: `@/` → repo root (so `@/components/ui/...`, `@/lib/...`); `@server/` → `server/`.
+- UI: Tailwind v4 (`client/main.css`, theme tokens like `border-input` / `ring` / `muted-foreground` defined there) + custom components in `client/components/` (e.g. `TextInput` with `start`/`end` slots). No shadcn/radix.
+- Path aliases: `@/` → repo root (so `@/client/components/...`, `@/lib/...`); `@server/` → `server/`.
 
 ### Other
 - `trashcan/` is gitignored scratch/old code — ignore it.

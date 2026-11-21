@@ -3,11 +3,7 @@ import { Link } from 'react-router'
 import { useSession } from '@/lib/auth'
 
 import { Search } from 'lucide-react'
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@/components/ui/input-group'
+import { TextInput } from '@/client/components/TextInput'
 
 import { IoSearch } from 'react-icons/io5'
 
@@ -94,18 +90,14 @@ export function THEHEADER({ sidebar }) {
         <Link to={'/'}>BEANVID</Link>
       </div>
       <form onSubmit={searchHandler} className="flex gap-3">
-        <InputGroup>
-          <InputGroupInput
-            spellCheck="false"
-            type="text"
-            autoComplete="off"
-            name="query"
-            placeholder="Search..."
-          />
-          <InputGroupAddon>
-            <Search />
-          </InputGroupAddon>
-        </InputGroup>
+        <TextInput
+          start={<Search />}
+          spellCheck="false"
+          type="text"
+          autoComplete="off"
+          name="query"
+          placeholder="Search..."
+        />
         <button>
           <IoSearch />
         </button>

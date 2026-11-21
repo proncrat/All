@@ -1,5 +1,5 @@
 import { useSendMessage } from '@/client/hooks/usemessages'
-import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
+import { TextInput } from '@/client/components/TextInput'
 import { useState } from 'react'
 import { useParams } from 'react-router'
 import { FaFileUpload } from 'react-icons/fa'
@@ -92,22 +92,21 @@ export function Sendbox() {
         <button className="bg-gray-700 w-8 aspect-square rounded flex justify-center items-center cursor-pointer">
           <FaMicrophone size={'20px'} />
         </button>
-        <InputGroup className="w-full">
-          {mutationstate == 'pending' && (
-            <div className="w-3">
-              <Spinner />
-            </div>
-          )}
-
-          <InputGroupInput
-            value={text}
-            onChange={handler}
-            spellCheck="false"
-            type="text"
-            autoComplete="off"
-            name={'text'}
-          />
-        </InputGroup>
+        <TextInput
+          start={
+            mutationstate == 'pending' && (
+              <div className="w-3">
+                <Spinner />
+              </div>
+            )
+          }
+          value={text}
+          onChange={handler}
+          spellCheck="false"
+          type="text"
+          autoComplete="off"
+          name={'text'}
+        />
       </div>
     </form>
   )

@@ -4,7 +4,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { CookiesProvider } from 'react-cookie'
 import { THEHEADER } from '../Main/MainHeader'
 import { Outlet } from 'react-router'
-import { Toaster } from '@/components/ui/sonner'
 import { SideBar } from '../Main/Sidebar'
 import { CallingStuffs } from './Calls'
 import { NthParentContext } from './call/Context'
@@ -70,7 +69,6 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <CookiesProvider>
           <ColorFilterProvider>
-            <Toaster />
             <Layout />
           </ColorFilterProvider>
         </CookiesProvider>

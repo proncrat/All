@@ -1,4 +1,4 @@
-import { InputGroup, InputGroupInput } from '@/components/ui/input-group'
+import { TextInput } from '@/client/components/TextInput'
 import { useMemo, useState } from 'react'
 import { updateUser } from '@/lib/auth'
 
@@ -50,28 +50,24 @@ export function LinksEditor({
             </div>
 
             <p className="mb-1 text-sm text-zinc-400">Name</p>
-            <InputGroup>
-              <InputGroupInput
-                onChange={(e) => update(index, 'name', e.target.value)}
-                value={link.name}
-                placeholder="website"
-                spellCheck="false"
-                type="text"
-                autoComplete="off"
-              />
-            </InputGroup>
+            <TextInput
+              onChange={(e) => update(index, 'name', e.target.value)}
+              value={link.name}
+              placeholder="website"
+              spellCheck="false"
+              type="text"
+              autoComplete="off"
+            />
 
             <p className="mb-1 mt-4 text-sm text-zinc-400">Link</p>
-            <InputGroup>
-              <InputGroupInput
-                onChange={(e) => update(index, 'link', e.target.value)}
-                value={link.link}
-                placeholder="website.com"
-                spellCheck="false"
-                type="text"
-                autoComplete="off"
-              />
-            </InputGroup>
+            <TextInput
+              onChange={(e) => update(index, 'link', e.target.value)}
+              value={link.link}
+              placeholder="website.com"
+              spellCheck="false"
+              type="text"
+              autoComplete="off"
+            />
           </div>
         ))}
 
@@ -149,42 +145,36 @@ export function CustomizeForm({ initialdata }) {
         <h2 className="text-2xl">Profile</h2>
         <div>
           <p className="mb-1">Name</p>
-          <InputGroup>
-            <InputGroupInput
-              onChange={formHandler}
-              value={form.name}
-              spellCheck="false"
-              type="text"
-              autoComplete="off"
-              name="name"
-            />
-          </InputGroup>
+          <TextInput
+            onChange={formHandler}
+            value={form.name}
+            spellCheck="false"
+            type="text"
+            autoComplete="off"
+            name="name"
+          />
         </div>
         <div>
           <p className="mb-1">Describe</p>
-          <InputGroup>
-            <InputGroupInput
-              onChange={formHandler}
-              value={form.describe}
-              spellCheck="false"
-              type="text"
-              autoComplete="off"
-              name="describe"
-            />
-          </InputGroup>
+          <TextInput
+            onChange={formHandler}
+            value={form.describe}
+            spellCheck="false"
+            type="text"
+            autoComplete="off"
+            name="describe"
+          />
         </div>
         <div>
           <p className="mb-1">Description</p>
-          <InputGroup>
-            <InputGroupInput
-              onChange={formHandler}
-              value={form.description}
-              spellCheck="false"
-              type="text"
-              autoComplete="off"
-              name="description"
-            />
-          </InputGroup>
+          <TextInput
+            onChange={formHandler}
+            value={form.description}
+            spellCheck="false"
+            type="text"
+            autoComplete="off"
+            name="description"
+          />
         </div>
 
         <LinksEditor
