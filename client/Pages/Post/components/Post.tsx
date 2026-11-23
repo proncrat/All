@@ -1,5 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { card, field } from './uploadui'
+
+// Keep in sync with server/Routes/mediaupload.ts
+const MAX_IMAGES = 10
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024
+const IMAGE_TYPES = /^image\/(jpeg|png|webp|gif)$/
 
 interface NewPostProps {
   user?: { name?: string | null; avatar?: string | null }
@@ -28,14 +34,32 @@ export default function NewPost({
   const [posted, setPosted] = useState(false)
   const trackRef = useRef<HTMLDivElement>(null)
 
-  const previews = useMemo(
-    () => files.map((f) => ({ file: f, url: URL.createObjectURL(f) })),
-    [files],
-  )
-  useEffect(
-    () => () => previews.forEach((p) => URL.revokeObjectURL(p.url)),
-    [previews],
-  )
+  // Object URLs are created and revoked in the same effect so they can never
+  // be revoked while still on screen
+  const [previews, setPreviews] = useState<{ file: File; url: string }[]>([])
+  useEffect(() => {
+    const next = files.map((f) => ({ file: f, url: URL.createObjectURL(f) }))
+    setPreviews(next)
+    return () => next.forEach((p) => URL.revokeObjectURL(p.url))
+  }, [files])
+
+  // Carousel arrows, shown only when there is somewhere to scroll
+  const [canLeft, setCanLeft] = useState(false)
+  const [canRight, setCanRight] = useState(false)
+  const updateScroll = useCallback(() => {
+    const el = trackRef.current
+    if (!el) return
+    setCanLeft(el.scrollLeft > 4)
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4)
+  }, [])
+  useEffect(() => {
+    updateScroll()
+    const el = trackRef.current
+    if (!el) return
+    const ro = new ResizeObserver(updateScroll)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [updateScroll, previews])
 
   // Hide the success message after 3 seconds
   useEffect(() => {
@@ -45,16 +69,22 @@ export default function NewPost({
   }, [posted])
 
   const addFiles = (list: FileList | null) => {
-    const imgs = Array.from(list ?? []).filter((f) =>
-      f.type.startsWith('image/'),
-    )
-    if (imgs.length) setFiles((prev) => [...prev, ...imgs])
+    const all = Array.from(list ?? []).filter((f) => IMAGE_TYPES.test(f.type))
+    const imgs = all.filter((f) => f.size <= MAX_IMAGE_BYTES)
+    if (imgs.length < all.length) setError('Images must be under 10 MB')
+    else setError(null)
+    if (imgs.length)
+      setFiles((prev) => {
+        const next = [...prev, ...imgs]
+        if (next.length > MAX_IMAGES)
+          setError(`You can add up to ${MAX_IMAGES} images`)
+        return next.slice(0, MAX_IMAGES)
+      })
   }
   const removeFile = (i: number) =>
     setFiles((prev) => prev.filter((_, idx) => idx !== i))
 
   const hasAnything = Boolean(title.trim() || body.trim() || files.length)
-  // No backend for posts yet: keep the button disabled until onSubmit is wired
   const canPost = hasAnything && !busy && Boolean(onSubmit)
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
@@ -69,17 +99,25 @@ export default function NewPost({
       setBody('')
       setFiles([])
       setPosted(true)
-    } catch {
-      setError('Posting failed. Please try again.')
+    } catch (err) {
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : 'Posting failed. Please try again.',
+      )
     } finally {
       setBusy(false)
     }
   }
 
-  const scrollNext = () => {
+  const scrollByPage = (dir: 1 | -1) => {
     const el = trackRef.current
-    if (el) el.scrollBy({ left: el.clientWidth * 0.7, behavior: 'smooth' })
+    if (el)
+      el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' })
   }
+  const multi = previews.length > 1
+  const arrowClass =
+    'absolute top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white/30 bg-black/70 text-white hover:border-white'
 
   const today = new Date().toLocaleDateString('en-US', {
     month: 'short',
@@ -130,39 +168,50 @@ export default function NewPost({
             )}
 
             {previews.length > 0 && (
-              <div className="relative">
+              <div className="relative overflow-hidden rounded-xl">
+                {/* Same layout as PostCard: one image centered, several in a
+                    side-scrolling strip, never cropped */}
                 <div
                   ref={trackRef}
-                  className="flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  onScroll={updateScroll}
+                  className={
+                    multi
+                      ? 'flex snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+                      : 'flex justify-center overflow-hidden bg-black'
+                  }
                 >
                   {previews.map((p) => (
                     <img
                       key={p.url}
                       src={p.url}
                       alt=""
-                      className="h-72 w-auto max-w-full flex-none snap-start rounded-lg bg-white/5 object-cover lg:h-96"
+                      onLoad={updateScroll}
+                      className={`block bg-black object-contain ${
+                        multi
+                          ? 'h-72 w-auto max-w-none shrink-0 snap-start rounded-xl lg:h-96'
+                          : 'max-h-[500px] w-auto max-w-full'
+                      }`}
                     />
                   ))}
                 </div>
-                {previews.length > 1 && (
+                {multi && canLeft && (
                   <button
                     type="button"
-                    onClick={scrollNext}
-                    aria-label="Next image"
-                    className="absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white/30 bg-black/70 text-white hover:border-white"
+                    onClick={() => scrollByPage(-1)}
+                    aria-label="Previous image"
+                    className={`${arrowClass} left-3`}
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 6l6 6-6 6" />
-                    </svg>
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                )}
+                {multi && canRight && (
+                  <button
+                    type="button"
+                    onClick={() => scrollByPage(1)}
+                    aria-label="Next image"
+                    className={`${arrowClass} right-3`}
+                  >
+                    <ChevronRight className="h-5 w-5" />
                   </button>
                 )}
               </div>

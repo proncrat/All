@@ -23,7 +23,7 @@ export function SettingsPage() {
     <div className="max-w-375 m-auto pt-2">
       <div className="m-7 ">
         <div className="flex gap-30">
-          <div className="flex flex-col">
+          <div className="flex flex-col sticky top-16 self-start shrink-0">
             <h2 className="text-3xl mb-5">Settings</h2>
             <SubHeaderLink link={'/settings'} text="Debug"></SubHeaderLink>
             <SubHeaderLink link={'customize'} text="Customize"></SubHeaderLink>

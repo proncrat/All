@@ -1,4 +1,4 @@
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import { useUserData } from '@/client/hooks'
 import { usePlayer, type Song } from '@/client/Pages/Main/PlayerContext'
 import { Spinner } from '@/client/Pages/Util/SpinnerBox'
@@ -34,6 +34,17 @@ const PlayingIcon = ({ isPlaying }: { isPlaying: boolean }) => (
   </div>
 )
 
+/** Link to a song's album; doesn't trigger the row's play handler. */
+const AlbumLink = ({ id, title }: { id: number; title: string | null }) => (
+  <Link
+    to={`/album/${id}`}
+    onClick={(e) => e.stopPropagation()}
+    className="hover:text-white hover:underline"
+  >
+    {title ?? 'Album'}
+  </Link>
+)
+
 export function SongList() {
   const { id } = useParams()
   const { data, isPending, isError, error } = useUserData(id, 'songs')
@@ -62,7 +73,7 @@ export function SongList() {
 
   return (
     <div>
-      <ul className="flex flex-col gap-2 px-4 pb-4">
+      <ul className="flex flex-col gap-2 px-4 py-4">
         {data.map((song, i) => {
           const isActive = current?.id === song.id
 
@@ -100,12 +111,24 @@ export function SongList() {
                 <p className="truncate font-medium text-white">{song.name}</p>
                 <p className="truncate text-sm text-white/60 md:hidden">
                   {song.author}
+                  {song.album_id && (
+                    <>
+                      {' · '}
+                      <AlbumLink id={song.album_id} title={song.album_title} />
+                    </>
+                  )}
                 </p>
               </div>
 
               {/* Author column (desktop only) */}
               <span className="hidden truncate text-sm text-white/60 md:block">
                 {song.author}
+                {song.album_id && (
+                  <>
+                    {' · '}
+                    <AlbumLink id={song.album_id} title={song.album_title} />
+                  </>
+                )}
               </span>
 
               {/* Runtime */}

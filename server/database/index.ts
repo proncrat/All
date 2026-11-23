@@ -1,5 +1,5 @@
 //import { sendDataToClient } from '../Routes/test.ts'
-import { sendDataToClient } from '../socket.ts'
+import { emitToUser, sendDataToClient } from '../socket.ts'
 import db from './connection.ts'
 
 //auth utilitys
@@ -26,8 +26,50 @@ export async function getVideosByUser(userId: string) {
   return await db('videos').where('author_id', userId).select()
 }
 
+export interface PostImage {
+  id: number
+  url: string
+}
+
+/** Attaches each post's images (in order) as `images`. */
+async function withPostImages<T extends { id: number }>(
+  posts: T[],
+): Promise<(T & { images: PostImage[] })[]> {
+  if (posts.length === 0) return []
+  const rows = await db('post_images')
+    .whereIn(
+      'post_id',
+      posts.map((p) => p.id),
+    )
+    .orderBy(['post_id', 'position', 'id'])
+    .select('id', 'post_id', 'url')
+  const byPost = new Map<number, PostImage[]>()
+  for (const r of rows) {
+    const list = byPost.get(Number(r.post_id)) ?? []
+    list.push({ id: r.id, url: r.url })
+    byPost.set(Number(r.post_id), list)
+  }
+  return posts.map((p) => ({ ...p, images: byPost.get(Number(p.id)) ?? [] }))
+}
+
 export async function getPostsByUser(userId: string) {
-  return await db('posts').where('author_id', userId).select()
+  const posts = await db('posts')
+    .where('author_id', userId)
+    .orderBy('post_date', 'desc')
+    .select()
+  return await withPostImages(posts)
+}
+
+/** One post with its images and author handle/avatar. */
+export async function getPostById(id: number) {
+  const post = await db('posts')
+    .leftJoin('profiledata', 'profiledata.id', 'posts.author_id')
+    .where('posts.id', id)
+    .select('posts.*', 'profiledata.name as handle', 'profiledata.pfp as avatar')
+    .first()
+  if (!post) return undefined
+  const [full] = await withPostImages([post])
+  return full
 }
 
 export async function getPhotosByUser(userId: string) {
@@ -42,6 +84,21 @@ export async function getPhotosByUser(userId: string) {
     )
 }
 
+export interface ProfileUpdate {
+  name?: string
+  describe?: string
+  description?: string
+  links?: string
+  pfp?: string
+  bg?: string
+  banner?: string
+}
+
+export async function updateProfile(id: number, data: ProfileUpdate) {
+  await db('profiledata').where('id', id).update(data)
+  return await db('profiledata').where('id', id).select().first()
+}
+
 export async function getDescriptionByUser(userId: string) {
   return await db('profiledata')
     .where('id', userId)
@@ -49,8 +106,26 @@ export async function getDescriptionByUser(userId: string) {
     .first()
 }
 
+/** Song columns, with the album's cover used when a song has none. */
+const SONG_COLUMNS = [
+  'songs.id',
+  'songs.name',
+  'songs.url',
+  'songs.runtime',
+  'songs.author',
+  'songs.author_id',
+  'songs.album_id',
+  'songs.track_number',
+  'albums.title as album_title',
+  db.raw('coalesce(songs.cover, albums.cover) as cover'),
+]
+
 export async function getSongsByUser(userId: string) {
-  return await db('songs').where('author_id', userId).select()
+  return await db('songs')
+    .leftJoin('albums', 'songs.album_id', 'albums.id')
+    .where('songs.author_id', userId)
+    .select(SONG_COLUMNS)
+    .orderBy('songs.id', 'asc')
 }
 
 //video get
@@ -83,42 +158,341 @@ export async function getVideoById(Id: string) {
 
 //messaging get
 
-const get_chats_schema = [
-  'chats.chatid',
-  'profiledata.name',
-  'profiledata.pfp',
-  'profiledata.link_id',
-]
+// Chats are `conversations` with any number of `conversation_members`.
+// Leaving a chat removes only the leaver's member row; messages are kept.
 
-export async function getchats(ownerid: string) {
-  return await db('chats')
-    .where('ownerid', ownerid)
-    .select(get_chats_schema)
-    .join('profiledata', 'chats.recieverid', 'profiledata.id')
+export interface ChatMember {
+  id: number
+  name: string
+  pfp: string | null
+  link_id: string
 }
 
-export async function newchat(data) {
-  const result = await db('chats').max('chatid as number').first()
-  const newId = result.number + 1
+export interface ChatSummary {
+  chatid: number
+  name: string | null // custom name, null = use member names
+  members: ChatMember[] // everyone except the viewer
+  last_message_id: number | null
+}
 
-  const { ownerid, recieverid } = data
+const MAX_CHAT_MEMBERS = 50
 
-  const chat1 = {
-    chatid: newId,
-    ownerid: ownerid,
-    recieverid: recieverid,
-    start_date: new Date(),
+/** Profile ids -> auth ids for socket rooms. */
+async function linkIdsFor(profileIds: number[]): Promise<string[]> {
+  if (profileIds.length === 0) return []
+  const rows = await db('profiledata')
+    .whereIn('id', profileIds)
+    .whereNotNull('link_id')
+    .select('link_id')
+  return rows.map((r) => r.link_id)
+}
+
+/** Tells these profiles to refetch their chat list / member lists. */
+async function notifyChatUpdate(profileIds: number[], chatid: number) {
+  for (const linkId of await linkIdsFor(profileIds)) {
+    emitToUser(linkId, 'chat:update', { chatid })
+  }
+}
+
+export async function getChatMemberIds(chatId: number): Promise<number[]> {
+  const rows = await db('conversation_members')
+    .where('conversation_id', chatId)
+    .select('profile_id')
+  return rows.map((r) => Number(r.profile_id))
+}
+
+export async function isChatMember(chatId: number, profileId: number) {
+  const row = await db('conversation_members')
+    .where({ conversation_id: chatId, profile_id: profileId })
+    .first('id')
+  return Boolean(row)
+}
+
+/** Members in join order; `is_creator` marks who can remove people. */
+export async function getChatMembers(
+  chatId: number,
+): Promise<(ChatMember & { is_creator: boolean })[]> {
+  const chat = await db('conversations').where('id', chatId).first('created_by')
+  const rows = await db('conversation_members')
+    .join('profiledata', 'profiledata.id', 'conversation_members.profile_id')
+    .where('conversation_members.conversation_id', chatId)
+    // member row ids grow with each join (joined_at mixes formats in SQLite)
+    .orderBy('conversation_members.id', 'asc')
+    .select(
+      'profiledata.id',
+      'profiledata.name',
+      'profiledata.pfp',
+      'profiledata.link_id',
+    )
+  return rows.map((m) => ({
+    ...m,
+    is_creator: chat?.created_by != null && Number(chat.created_by) === m.id,
+  }))
+}
+
+/** The longest-standing member takes over as creator (or null if empty). */
+async function passCreatorOn(chatId: number) {
+  const next = await db('conversation_members')
+    .where('conversation_id', chatId)
+    .orderBy('id', 'asc')
+    .first('profile_id')
+  await db('conversations')
+    .where('id', chatId)
+    .update({ created_by: next?.profile_id ?? null })
+}
+
+/**
+ * The chat's creator removes someone else. Their messages stay; they just
+ * can't see or post in the chat any more.
+ */
+export async function removeChatMember(
+  chatId: number,
+  actorId: number,
+  targetId: number,
+) {
+  if (actorId === targetId)
+    throw new ChatError(400, 'Use delete chat to leave it yourself')
+  const chat = await db('conversations').where('id', chatId).first('created_by')
+  if (!chat || !(await isChatMember(chatId, actorId)))
+    throw new ChatError(403, 'You are not in this chat')
+  if (Number(chat.created_by) !== actorId)
+    throw new ChatError(403, 'Only the person who made the chat can remove people')
+
+  const removed = await db('conversation_members')
+    .where({ conversation_id: chatId, profile_id: targetId })
+    .del()
+  if (!removed) throw new ChatError(404, 'That person is not in this chat')
+
+  await systemMessage(
+    chatId,
+    actorId,
+    `${await profileName(actorId)} removed ${await profileName(targetId)}`,
+  )
+  const remaining = await getChatMemberIds(chatId)
+  await notifyChatUpdate([targetId, ...remaining], chatId)
+}
+
+/** Every chat the profile is in, most recently active first. */
+export async function getChatsForProfile(
+  profileId: number,
+): Promise<ChatSummary[]> {
+  const chats = await db('conversations')
+    .join(
+      'conversation_members',
+      'conversation_members.conversation_id',
+      'conversations.id',
+    )
+    .where('conversation_members.profile_id', profileId)
+    .select('conversations.id', 'conversations.name')
+  if (chats.length === 0) return []
+  const ids = chats.map((c) => c.id)
+
+  const members = await db('conversation_members')
+    .join('profiledata', 'profiledata.id', 'conversation_members.profile_id')
+    .whereIn('conversation_members.conversation_id', ids)
+    .whereNot('conversation_members.profile_id', profileId)
+    .orderBy('conversation_members.id', 'asc')
+    .select(
+      'conversation_members.conversation_id as chatid',
+      'profiledata.id',
+      'profiledata.name',
+      'profiledata.pfp',
+      'profiledata.link_id',
+    )
+
+  const last = await db('messages')
+    .whereIn('chatid', ids)
+    .groupBy('chatid')
+    .select('chatid')
+    .max('id as last_id')
+
+  const membersBy = new Map<number, ChatMember[]>()
+  for (const { chatid, ...m } of members) {
+    const list = membersBy.get(Number(chatid)) ?? []
+    list.push(m)
+    membersBy.set(Number(chatid), list)
+  }
+  const lastBy = new Map(last.map((r) => [Number(r.chatid), Number(r.last_id)]))
+
+  return chats
+    .map((c) => ({
+      chatid: Number(c.id),
+      name: c.name ?? null,
+      members: membersBy.get(Number(c.id)) ?? [],
+      last_message_id: lastBy.get(Number(c.id)) ?? null,
+    }))
+    .sort(
+      (a, b) =>
+        (b.last_message_id ?? 0) - (a.last_message_id ?? 0) ||
+        b.chatid - a.chatid,
+    )
+}
+
+/** Only people the actor follows can be added to a chat. */
+async function followedSubset(
+  actorId: number,
+  profileIds: number[],
+): Promise<number[]> {
+  if (profileIds.length === 0) return []
+  // follows: followed_user_id = the follower, following_user_id = who they follow
+  const rows = await db('follows')
+    .where('followed_user_id', actorId)
+    .whereIn('following_user_id', profileIds)
+    .select('following_user_id')
+  return [...new Set(rows.map((r) => Number(r.following_user_id)))]
+}
+
+async function profileName(id: number) {
+  const row = await db('profiledata').where('id', id).first('name')
+  return (row?.name as string) ?? 'Someone'
+}
+
+/** Inserts a "X added Y" style notice into the chat and pushes it out. */
+async function systemMessage(chatId: number, actorId: number, text: string) {
+  return await newmessage({
+    chatid: chatId,
+    senderid: actorId,
+    type: 'system',
+    text: text.slice(0, 255),
+    send_date: new Date(),
+  })
+}
+
+export class ChatError extends Error {
+  status: number
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+
+/**
+ * Starts a chat with the given people (who must be followed by the creator).
+ * A 1:1 chat with someone you already have an active 1:1 chat with is reused.
+ */
+export async function createChat(
+  creatorId: number,
+  memberIds: number[],
+  name?: string | null,
+) {
+  const wanted = [...new Set(memberIds.map(Number))].filter(
+    (id) => Number.isInteger(id) && id !== creatorId,
+  )
+  const allowed = await followedSubset(creatorId, wanted)
+  if (allowed.length === 0)
+    throw new ChatError(400, 'Pick at least one person you follow')
+  if (allowed.length + 1 > MAX_CHAT_MEMBERS)
+    throw new ChatError(400, `Chats are limited to ${MAX_CHAT_MEMBERS} people`)
+
+  if (allowed.length === 1 && !name) {
+    const existing = await findDirectChat(creatorId, allowed[0])
+    if (existing != null) return { chatid: existing, created: false }
   }
 
-  const chat2 = {
-    chatid: newId,
-    ownerid: recieverid,
-    recieverid: ownerid,
-    start_date: new Date(),
-  }
+  const chatid = await db.transaction(async (trx) => {
+    const rows = await trx('conversations')
+      .insert({
+        name: name?.trim().slice(0, 100) || null,
+        created_by: creatorId,
+        created_at: new Date(),
+      })
+      .returning('id')
+    const id = insertedId(rows)!
+    await trx('conversation_members').insert(
+      [creatorId, ...allowed].map((profile_id) => ({
+        conversation_id: id,
+        profile_id,
+        joined_at: new Date(),
+      })),
+    )
+    return id
+  })
 
-  await db('chats').insert({ ...chat1 })
-  await db('chats').insert({ ...chat2 })
+  await notifyChatUpdate([creatorId, ...allowed], chatid)
+  return { chatid, created: true }
+}
+
+/** An unnamed chat whose only members are exactly these two people. */
+async function findDirectChat(a: number, b: number) {
+  const rows = await db('conversation_members as m')
+    .join('conversations as c', 'c.id', 'm.conversation_id')
+    .whereNull('c.name')
+    .whereIn(
+      'm.conversation_id',
+      db('conversation_members')
+        .where('profile_id', a)
+        .select('conversation_id'),
+    )
+    .groupBy('m.conversation_id')
+    .select(
+      'm.conversation_id as id',
+      db.raw('COUNT(*) as total'),
+      db.raw('SUM(CASE WHEN m.profile_id IN (?, ?) THEN 1 ELSE 0 END) as hits', [
+        a,
+        b,
+      ]),
+    )
+  const match = rows.find((r) => Number(r.total) === 2 && Number(r.hits) === 2)
+  return match ? Number(match.id) : null
+}
+
+/** Adds people the actor follows to a chat the actor is in. */
+export async function addChatMembers(
+  chatId: number,
+  actorId: number,
+  profileIds: number[],
+) {
+  if (!(await isChatMember(chatId, actorId)))
+    throw new ChatError(403, 'You are not in this chat')
+
+  const current = await getChatMemberIds(chatId)
+  const fresh = (await followedSubset(actorId, profileIds)).filter(
+    (id) => !current.includes(id),
+  )
+  if (fresh.length === 0) return { added: [] as number[] }
+  if (current.length + fresh.length > MAX_CHAT_MEMBERS)
+    throw new ChatError(400, `Chats are limited to ${MAX_CHAT_MEMBERS} people`)
+
+  await db('conversation_members').insert(
+    fresh.map((profile_id) => ({
+      conversation_id: chatId,
+      profile_id,
+      joined_at: new Date(),
+    })),
+  )
+
+  const names = await db('profiledata').whereIn('id', fresh).select('name')
+  await systemMessage(
+    chatId,
+    actorId,
+    `${await profileName(actorId)} added ${names.map((n) => n.name).join(', ')}`,
+  )
+  await notifyChatUpdate([...current, ...fresh], chatId)
+  return { added: fresh }
+}
+
+/**
+ * Removes the profile from the chat ("delete chat" from their side). The
+ * conversation and every message stay, so the other members keep the chat.
+ */
+export async function leaveChat(chatId: number, profileId: number) {
+  const removed = await db('conversation_members')
+    .where({ conversation_id: chatId, profile_id: profileId })
+    .del()
+  if (!removed) throw new ChatError(404, 'You are not in this chat')
+
+  const chat = await db('conversations').where('id', chatId).first('created_by')
+  if (chat && Number(chat.created_by) === profileId) await passCreatorOn(chatId)
+
+  const remaining = await getChatMemberIds(chatId)
+  if (remaining.length) {
+    await systemMessage(
+      chatId,
+      profileId,
+      `${await profileName(profileId)} left the chat`,
+    )
+  }
+  await notifyChatUpdate([profileId, ...remaining], chatId)
 }
 
 const get_messages_schema = [
@@ -137,7 +511,7 @@ export async function getmessages(chatId: string) {
   return await db('messages')
     .where('chatid', chatId)
     .select(get_messages_schema)
-    .join('profiledata', 'messages.senderid', 'profiledata.id')
+    .leftJoin('profiledata', 'messages.senderid', 'profiledata.id')
     .orderBy([{ column: 'messages.id', order: 'asc' }])
 }
 
@@ -163,23 +537,12 @@ export async function newmessage(data) {
     .insert({ ...data })
     .returning('*')
 
-  // 2. everyone in this chat (both users, including the sender)
-  const members = await db('chats') // <- your chats table name
-    .where({ chatid: data.chatid })
-    .distinct('ownerid')
-
-  // 3. internal user id -> auth id (link_id), then emit to each user's room
-  await Promise.all(
-    members.map(async ({ ownerid }) => {
-      const u = await getUnIdMatch(ownerid)
-      if (!u?.link_id) {
-        console.warn('[newmessage] no link_id for user', ownerid)
-        return
-      }
-      console.log('[newmessage] emitting to user', ownerid, '->', u.link_id)
-      sendDataToClient(u.link_id, saved)
-    }),
-  )
+  // 2. everyone currently in this chat (including the sender's other tabs),
+  //    internal profile id -> auth id (link_id) -> their socket room
+  const members = await getChatMemberIds(Number(data.chatid))
+  for (const linkId of await linkIdsFor(members)) {
+    sendDataToClient(linkId, saved)
+  }
 
   return saved
 }
@@ -192,6 +555,7 @@ export async function editMessage(
   return await db('messages')
     .where('id', messageId)
     .andWhere('senderid', requesterId)
+    .andWhereNot('type', 'system')
     .update({ is_edited: true, text: newText })
 }
 
@@ -199,6 +563,7 @@ export async function deleteMessage(messageId: number, requesterId: number) {
   return await db('messages')
     .where('id', messageId)
     .andWhere('senderid', requesterId)
+    .andWhereNot('type', 'system')
     .del()
 }
 
@@ -362,11 +727,42 @@ export interface NewSong {
   url: string
   runtime: string
   cover: string | null
+  album_id?: number | null
+  track_number?: number | null
 }
 
 export async function newSong(data: NewSong) {
   const rows = await db('songs').insert(data).returning('id')
   return insertedId(rows)
+}
+
+export interface NewPost {
+  title: string
+  the_post: string
+  author_id: number
+  images: string[] // /images/xxx.webp, in display order
+}
+
+export async function newPost({ images, ...data }: NewPost) {
+  return await db.transaction(async (trx) => {
+    const rows = await trx('posts')
+      .insert({
+        ...data,
+        views: 0,
+        likes: 0,
+        dislikes: 0,
+        shares: 0,
+        post_date: new Date(),
+      })
+      .returning('id')
+    const id = insertedId(rows)
+    if (id != null && images.length) {
+      await trx('post_images').insert(
+        images.map((url, position) => ({ post_id: id, url, position })),
+      )
+    }
+    return id
+  })
 }
 
 //Follows
@@ -601,6 +997,8 @@ export interface LibraryItem {
   text?: string | null // post body
   media?: string | null // song audio url / video file
   runtime?: string | null // songs
+  posted_at?: string | number | Date | null // posts
+  author_avatar?: string | null // posts
   reacted_at: string | number | Date
 }
 
@@ -643,8 +1041,10 @@ async function libraryDetails(
         'posts.id',
         'posts.title',
         'posts.the_post',
+        'posts.post_date',
         'posts.author_id',
         'profiledata.name as author',
+        'profiledata.pfp as author_avatar',
       )
     ).map((r) => ({
       type,
@@ -652,6 +1052,8 @@ async function libraryDetails(
       title: r.title,
       image: null,
       text: r.the_post,
+      posted_at: r.post_date,
+      author_avatar: r.author_avatar,
       author: r.author,
       author_id: r.author_id,
     }))
@@ -675,15 +1077,17 @@ async function libraryDetails(
     }))
   } else {
     rows = (
-      await base.select(
-        'songs.id',
-        'songs.name',
-        'songs.cover',
-        'songs.url',
-        'songs.runtime',
-        'songs.author',
-        'songs.author_id',
-      )
+      await base
+        .leftJoin('albums', 'songs.album_id', 'albums.id')
+        .select(
+          'songs.id',
+          'songs.name',
+          db.raw('coalesce(songs.cover, albums.cover) as cover'),
+          'songs.url',
+          'songs.runtime',
+          'songs.author',
+          'songs.author_id',
+        )
     ).map((r) => ({
       type,
       id: r.id,
@@ -741,6 +1145,49 @@ export async function getLibrary(
     if (item) list.push({ ...item, reacted_at: r.created_at })
   }
   return library
+}
+
+/**
+ * Things a profile has reposted (optionally one content type), newest first,
+ * with card details. Public — shown on the profile's "Reposts" tab.
+ */
+export async function getProfileReposts(
+  userId: number,
+  type?: ReactionTarget,
+  limit = 200,
+): Promise<LibraryItem[]> {
+  const query = db('reactions')
+    .where({ user_id: userId, kind: 'repost' })
+    .whereIn('target_type', type ? [type] : Object.keys(REACTION_TARGETS))
+    .select('target_type', 'target_id', 'created_at')
+    .orderBy('created_at', 'desc')
+    .orderBy('id', 'desc')
+    .limit(limit)
+  const reactions: {
+    target_type: ReactionTarget
+    target_id: number
+    created_at: string | number | Date
+  }[] = await query
+
+  const idsByType = new Map<ReactionTarget, number[]>()
+  for (const r of reactions) {
+    if (!idsByType.has(r.target_type)) idsByType.set(r.target_type, [])
+    idsByType.get(r.target_type)!.push(Number(r.target_id))
+  }
+  const details = new Map(
+    await Promise.all(
+      [...idsByType].map(
+        async ([t, ids]) => [t, await libraryDetails(t, ids)] as const,
+      ),
+    ),
+  )
+
+  const items: LibraryItem[] = []
+  for (const r of reactions) {
+    const item = details.get(r.target_type)?.get(Number(r.target_id))
+    if (item) items.push({ ...item, reacted_at: r.created_at })
+  }
+  return items
 }
 
 //Playlists
@@ -978,4 +1425,173 @@ export async function getPlaylistIdsContaining(
     })
     .pluck('playlists.id')
   return ids.map(Number)
+}
+
+//Albums
+
+export interface AlbumRow {
+  id: number
+  author_id: number
+  title: string
+  description: string | null
+  cover: string | null
+  release_date: string | null
+  created_at: string | number | Date
+}
+
+export interface AlbumSummary extends AlbumRow {
+  author_name: string | null
+  track_count: number
+}
+
+export interface AlbumTrack {
+  id: number
+  name: string
+  url: string
+  runtime: string
+  author: string
+  author_id: number
+  album_id: number
+  track_number: number | null
+  album_title: string
+  cover: string | null
+}
+
+export interface AlbumDetail extends AlbumSummary {
+  tracks: AlbumTrack[]
+}
+
+export interface AlbumFields {
+  title?: string
+  description?: string | null
+  cover?: string | null
+  release_date?: string | null
+}
+
+const normaliseAlbum = (row: Record<string, any>): AlbumSummary =>
+  ({
+    ...row,
+    id: Number(row.id),
+    author_id: Number(row.author_id),
+    track_count: Number(row.track_count ?? 0),
+  }) as AlbumSummary
+
+function albumQuery() {
+  const counts = db('songs')
+    .whereNotNull('album_id')
+    .groupBy('album_id')
+    .select('album_id', db.raw('count(*) as track_count'))
+    .as('counts')
+  return db('albums')
+    .leftJoin('profiledata', 'albums.author_id', 'profiledata.id')
+    .leftJoin(counts, 'counts.album_id', 'albums.id')
+    .select(
+      'albums.*',
+      'profiledata.name as author_name',
+      db.raw('coalesce(counts.track_count, 0) as track_count'),
+    )
+}
+
+/** A user's albums, newest release first. */
+export async function getAlbumsByUser(
+  authorId: number,
+): Promise<AlbumSummary[]> {
+  const rows = await albumQuery()
+    .where('albums.author_id', authorId)
+    // Dated releases first, newest first; then undated ones, newest first
+    .orderByRaw('case when albums.release_date is null then 1 else 0 end')
+    .orderBy('albums.release_date', 'desc')
+    .orderBy('albums.id', 'desc')
+  return rows.map(normaliseAlbum)
+}
+
+export async function getAlbumRow(id: number): Promise<AlbumRow | null> {
+  const row = await db('albums').where('id', id).first()
+  return row
+    ? { ...row, id: Number(row.id), author_id: Number(row.author_id) }
+    : null
+}
+
+/** An album with its tracks in order. */
+export async function getAlbum(id: number): Promise<AlbumDetail | null> {
+  const row = await albumQuery().where('albums.id', id).first()
+  if (!row) return null
+  const tracks = await db('songs')
+    .leftJoin('albums', 'songs.album_id', 'albums.id')
+    .where('songs.album_id', id)
+    .select(SONG_COLUMNS)
+    .orderByRaw('coalesce(songs.track_number, 999999) asc')
+    .orderBy('songs.id', 'asc')
+  return { ...normaliseAlbum(row), tracks }
+}
+
+export async function createAlbum(
+  data: AlbumFields & { author_id: number; title: string },
+): Promise<number> {
+  const rows = await db('albums')
+    .insert({
+      author_id: data.author_id,
+      title: data.title,
+      description: data.description ?? null,
+      cover: data.cover ?? null,
+      release_date: data.release_date ?? null,
+      created_at: new Date(),
+    })
+    .returning('id')
+  return Number(insertedId(rows))
+}
+
+export async function updateAlbum(id: number, data: AlbumFields) {
+  if (Object.keys(data).length) await db('albums').where('id', id).update(data)
+}
+
+/** Deletes an album. Its songs stay, as singles. */
+export async function deleteAlbum(id: number) {
+  await db.transaction(async (trx) => {
+    await trx('songs')
+      .where('album_id', id)
+      .update({ album_id: null, track_number: null })
+    await trx('albums').where('id', id).del()
+  })
+}
+
+/** Track number for a song appended to the end of an album. */
+export async function nextTrackNumber(albumId: number): Promise<number> {
+  const row = await db('songs')
+    .where('album_id', albumId)
+    .max({ n: 'track_number' })
+    .first()
+  return Number(row?.n ?? 0) + 1
+}
+
+/** How many of these song ids belong to the author. */
+export async function countSongsOwnedBy(
+  authorId: number,
+  songIds: number[],
+): Promise<number> {
+  if (!songIds.length) return 0
+  const row = await db('songs')
+    .where('author_id', authorId)
+    .whereIn('id', songIds)
+    .count({ n: '*' })
+    .first()
+  return Number(row?.n ?? 0)
+}
+
+/**
+ * Makes `songIds` the album's full tracklist, in that order. Songs that were
+ * in the album but aren't listed become singles; listed songs are moved out
+ * of whatever album they were in. Callers must check the songs are the author's.
+ */
+export async function setAlbumTracks(albumId: number, songIds: number[]) {
+  await db.transaction(async (trx) => {
+    const dropped = trx('songs').where('album_id', albumId)
+    if (songIds.length) dropped.whereNotIn('id', songIds)
+    await dropped.update({ album_id: null, track_number: null })
+    for (const [i, id] of songIds.entries()) {
+      await trx('songs')
+        .where('id', id)
+        .update({ album_id: albumId, track_number: i + 1 })
+    }
+  })
 }

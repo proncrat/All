@@ -47,3 +47,12 @@ export function uploadVideo(data: FormData, onProgress?: ProgressFn) {
 export function uploadSong(data: FormData, onProgress?: ProgressFn) {
   return upload<SongUploadResult>('song', data, onProgress)
 }
+
+export interface PostUploadResult {
+  id: number
+  images: string[]
+}
+
+export function uploadPost(data: FormData, onProgress?: ProgressFn) {
+  return upload<PostUploadResult>('post', data, onProgress)
+}

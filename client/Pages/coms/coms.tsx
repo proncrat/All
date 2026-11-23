@@ -1,6 +1,9 @@
 import { useChats, Usesessionid, useUserData } from '@/client/hooks'
 import { useSession } from '@/lib/auth'
-import { NavLink, Outlet, useParams } from 'react-router'
+import { NavLink, Outlet, useNavigate, useParams } from 'react-router'
+import { useChatUpdates, useLeaveChat } from '@/client/hooks/useChat'
+import type { ChatSummary } from '@/client/apis/messagesapi'
+import { ChatAvatar, chatTitle } from './components/ChatAvatar'
 import { useNthParent } from '../Util/call/Context'
 import { RxCross1 } from 'react-icons/rx'
 
@@ -45,6 +48,25 @@ export function Coms() {
 
   const { data, isPending, isError } = useChats(userid, !idpend)
 
+  // keep the list fresh when chats are created/joined/left elsewhere
+  useChatUpdates()
+
+  const navigate = useNavigate()
+  const leaveChat = useLeaveChat()
+
+  function deleteChat(chat: ChatSummary) {
+    const ok = window.confirm(
+      `Delete "${chatTitle(chat)}"? You'll leave the chat. Everyone else keeps it and its messages.`,
+    )
+    if (!ok) return
+    leaveChat.mutate(chat.chatid, {
+      onSuccess: () => {
+        if (String(chat.chatid) === id) navigate('/coms')
+      },
+      onError: (err) => window.alert(err.message),
+    })
+  }
+
   return (
     <div className="flex h-full">
       <div
@@ -71,9 +93,15 @@ export function Coms() {
 
         {isError && <p>Something exploded</p>}
 
-        {data?.map((person, index) => (
+        {data?.length === 0 && (
+          <p className="text-sm text-zinc-500">
+            No chats yet. Start one from Friends.
+          </p>
+        )}
+
+        {data?.map((chat: ChatSummary) => (
           <div
-            key={index}
+            key={chat.chatid}
             className="animate-gradient-bg bg-linear-160 from-green-500 via-gray-700 to-gray-700 rounded-lg p-px"
           >
             <div className="rounded-lg bg-black w-full p-1 ">
@@ -81,18 +109,26 @@ export function Coms() {
                 className={
                   ' text-gray-500! hover:text-white! [&.active]:text-white! active:bg-position-[100%_30%] hover:bg-position-[100%_50%] bg-linear-to-br [&.active]:bg-position-[100%_70%] rounded-sm block from-black from-60% to-slate-600 bg-size-[200%_200%] bg-position-[100%_0%] transition-all'
                 }
-                to={'/coms/' + person.chatid}
+                to={'/coms/' + chat.chatid}
               >
-                <div className="flex justify-between pr-4 ">
-                  <div className="flex items-center gap-4  rounded-lg cursor-pointer p-1 ">
-                    <img
-                      className="rounded-full w-9 aspect-square"
-                      alt="some pfp"
-                      src={person.pfp}
-                    />
-                    <p className="text-lg">{person.name}</p>
+                <div className="flex justify-between items-center pr-4 gap-2">
+                  <div className="flex items-center gap-4 min-w-0 rounded-lg cursor-pointer p-1 ">
+                    <ChatAvatar members={chat.members} />
+                    <p className="text-lg truncate">{chatTitle(chat)}</p>
                   </div>
-                  <button className="cursor-pointer">
+                  <button
+                    type="button"
+                    aria-label={`Delete chat ${chatTitle(chat)}`}
+                    title="Delete chat"
+                    disabled={leaveChat.isPending}
+                    onClick={(e) => {
+                      // the button sits inside the link; don't open the chat
+                      e.preventDefault()
+                      e.stopPropagation()
+                      deleteChat(chat)
+                    }}
+                    className="cursor-pointer shrink-0"
+                  >
                     <RxCross1 className="hover:text-red-500" size={'18px'} />
                   </button>
                 </div>

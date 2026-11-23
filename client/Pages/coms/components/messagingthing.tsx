@@ -11,6 +11,9 @@ import { FaChevronDown } from 'react-icons/fa'
 import { useMessageSocket } from '@/client/hooks/useMessageSocket'
 import { Link } from 'react-router'
 import { FaChevronLeft } from 'react-icons/fa6'
+import { useChatMembers } from '@/client/hooks/useChat'
+import { ChatMenu } from './ChatMenu'
+import { ChatAvatar, chatTitle } from './ChatAvatar'
 
 // mirrors a real message: avatar, name + timestamp line, then text (or an image)
 function MessageSkeleton({
@@ -62,6 +65,10 @@ export function Messagebox() {
 
   const userid = leId.userid
 
+  const { data: members, isError: notMember } = useChatMembers(id)
+  const others = (members ?? []).filter((m) => m.id !== userid)
+  const title = members ? chatTitle({ name: null, members: others }) : ''
+
   const { handleChildAction } = useNthParent()
 
   const test_data = {
@@ -109,13 +116,38 @@ export function Messagebox() {
           <FaChevronLeft size={'20px'} />
         </Link>
 
+        {members && (
+          <div className="flex items-center gap-2 min-w-0">
+            <ChatAvatar members={others} size="w-8" />
+            <p className="truncate font-medium">{title}</p>
+          </div>
+        )}
+
         <button
           onClick={() => handleChildAction({ name: 'test', userId: '...' })}
-          className="cursor-pointer"
+          className="cursor-pointer ml-2 shrink-0"
         >
           <FaPhone className="hover:fill-gray-500" size={'20px'} />
         </button>
+
+        {id && members && (
+          <ChatMenu
+            chatId={id}
+            title={title}
+            members={members}
+            myId={userid}
+          />
+        )}
       </div>
+
+      {notMember && (
+        <p className="p-8 text-center text-zinc-400">
+          You&apos;re not in this chat.{' '}
+          <Link to="/coms" className="text-sky-400 hover:underline">
+            Back to chats
+          </Link>
+        </p>
+      )}
       <div className="flex-1 h-0 relative">
         <div
           ref={containerRef}

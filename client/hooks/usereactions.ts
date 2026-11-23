@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getLibrary,
+  getProfileReposts,
   getMyReactions,
   getReactions,
   setFlag,
@@ -69,6 +70,7 @@ export function useReactions(
       queryClient.setQueryData(queryKey, summary)
       queryClient.invalidateQueries({ queryKey: ['myReactions'] })
       queryClient.invalidateQueries({ queryKey: ['library'] })
+      queryClient.invalidateQueries({ queryKey: ['profileReposts'] })
     },
   })
 
@@ -92,5 +94,17 @@ export function useLibrary(enabled = true) {
     queryKey: ['library'],
     queryFn: getLibrary,
     enabled,
+  })
+}
+
+/** A profile's reposts (public), optionally one content type. */
+export function useProfileReposts(
+  profileId: string | undefined,
+  type?: ReactionTarget,
+) {
+  return useQuery({
+    queryKey: ['profileReposts', profileId, type ?? 'all'],
+    queryFn: () => getProfileReposts(profileId!, type),
+    enabled: !!profileId,
   })
 }

@@ -2,7 +2,7 @@ import { useSession } from '@/lib/auth'
 import { Usesessionid } from '@/client/hooks'
 import { useGetFollowing } from '@/client/hooks/useFollow'
 import { useNewChat } from '@/client/hooks/useChat'
-import { NavLink } from 'react-router'
+import { NavLink, useNavigate } from 'react-router'
 
 export function People() {
   const { data: session, isPending: seshpend } = useSession()
@@ -23,8 +23,15 @@ export function People() {
 
   const newChat = useNewChat()
 
-  async function makeNewChat(data) {
-    await newChat.mutateAsync(data)
+  const navigate = useNavigate()
+
+  async function makeNewChat(personId: number) {
+    try {
+      const { chatid } = await newChat.mutateAsync({ memberIds: [personId] })
+      navigate(`/coms/${chatid}`)
+    } catch (err) {
+      window.alert((err as Error).message)
+    }
   }
 
   if (followpending) {
@@ -52,7 +59,7 @@ export function People() {
               <div className="flex items-center mr-2">
                 <button
                   onClick={() =>
-                    makeNewChat({ ownerid: userId, recieverid: person.id })
+                    makeNewChat(person.id)
                   }
                   className="border pl-3 pr-3 p-1 rounded-sm cursor-pointer transition-all hover:[box-shadow:0px_0px_4px_1px_rgba(255,255,255,0.74)_inset]"
                 >

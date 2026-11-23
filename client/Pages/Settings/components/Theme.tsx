@@ -39,7 +39,7 @@ export function Theme() {
 
   // ---- corners ----
   const [cornersEnabled, setCornersEnabled] = useState(() =>
-    readStored('corners-enabled', true),
+    readStored('corners-enabled', false),
   )
   const [radius, setRadius] = useState(() => readStored('corners-radius', 8))
 
@@ -48,8 +48,15 @@ export function Theme() {
     localStorage.setItem('corners-radius', JSON.stringify(radius))
 
     const root = document.documentElement.style
-    root.setProperty('--app-radius', cornersEnabled ? `${radius}px` : '0px')
-    root.setProperty('--app-radius-full', cornersEnabled ? '9999px' : '0px')
+    if (cornersEnabled) {
+      // Custom: slider controls the radius; 0 also squares off pill shapes
+      root.setProperty('--app-radius', `${radius}px`)
+      root.setProperty('--app-radius-full', radius === 0 ? '0px' : '9999px')
+    } else {
+      // Off: drop overrides so the default radii from main.css apply
+      root.removeProperty('--app-radius')
+      root.removeProperty('--app-radius-full')
+    }
   }, [cornersEnabled, radius])
 
   return (

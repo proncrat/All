@@ -61,7 +61,7 @@ export async function getmessagesbyid(chatId: string) {
 
 export async function getchatsbyid(userId: string) {
   return request
-    .get(`${rootURL}/coms/chats/${userId}`)
+    .get(`${rootURL}/coms/chats`)
     .then((res) => res.body)
     .catch(logError)
 }

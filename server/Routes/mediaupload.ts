@@ -5,7 +5,14 @@ import fs from 'fs/promises'
 import sharp from 'sharp'
 import { randomUUID } from 'crypto'
 
-import { getIdMatch, newSong, newVideo } from '../database'
+import {
+  getAlbumRow,
+  getIdMatch,
+  newPost,
+  newSong,
+  newVideo,
+  nextTrackNumber,
+} from '../database'
 import { authMiddleware } from '../middleware/enpointauth'
 
 const router = express.Router()
@@ -25,6 +32,7 @@ const FIELDS: Record<string, { dir: string; types: RegExp }> = {
   audio: { dir: 'audio', types: AUDIO_TYPES },
   thumbnail: { dir: 'images', types: IMAGE_TYPES },
   cover: { dir: 'images', types: IMAGE_TYPES },
+  images: { dir: 'images', types: IMAGE_TYPES }, // post attachments
 }
 
 const MAX_NAME = 200
@@ -32,19 +40,19 @@ const MAX_DESCRIPTION = 5000
 
 // ---------- helpers ----------
 
-type Files = Record<string, Express.Multer.File[] | undefined>
+export type Files = Record<string, Express.Multer.File[] | undefined>
 
-function allFiles(req: express.Request): Express.Multer.File[] {
+export function allFiles(req: express.Request): Express.Multer.File[] {
   return Object.values((req.files ?? {}) as Files).flatMap((f) => f ?? [])
 }
 
 /** Best-effort file deletion; never throws. */
-async function cleanup(paths: string[]) {
+export async function cleanup(paths: string[]) {
   await Promise.all(paths.map((p) => fs.unlink(p).catch(() => {})))
 }
 
 /** Converts an uploaded image to a resized webp and removes the original. */
-async function toWebp(srcPath: string, width: number): Promise<string> {
+export async function toWebp(srcPath: string, width: number): Promise<string> {
   const { dir, name } = path.parse(srcPath)
   const outPath = path.join(dir, `${name}.webp`)
   const tmpPath = path.join(dir, `${name}.tmp.webp`)
@@ -58,7 +66,7 @@ async function toWebp(srcPath: string, width: number): Promise<string> {
   return outPath
 }
 
-function text(value: unknown, max: number): string {
+export function text(value: unknown, max: number): string {
   return typeof value === 'string' ? value.trim().slice(0, max) : ''
 }
 
@@ -80,10 +88,15 @@ const storage = multer.diskStorage({
   },
 })
 
-function makeUpload(fields: string[]): express.RequestHandler {
+/** `maxCounts` lets a field take several files (default 1 each). */
+export function makeUpload(
+  fields: string[],
+  maxCounts: Record<string, number> = {},
+): express.RequestHandler {
+  const total = fields.reduce((n, f) => n + (maxCounts[f] ?? 1), 0)
   const upload = multer({
     storage,
-    limits: { fileSize: MAX_FILE_SIZE, files: fields.length },
+    limits: { fileSize: MAX_FILE_SIZE, files: total },
     fileFilter: (req, file, cb) => {
       const rule = FIELDS[file.fieldname]
       if (!rule || !fields.includes(file.fieldname)) {
@@ -96,7 +109,7 @@ function makeUpload(fields: string[]): express.RequestHandler {
       }
       cb(null, true)
     },
-  }).fields(fields.map((name) => ({ name, maxCount: 1 })))
+  }).fields(fields.map((name) => ({ name, maxCount: maxCounts[name] ?? 1 })))
 
   // Bad uploads return a 400 with a message instead of a generic 500
   return (req, res, next) => {
@@ -189,6 +202,17 @@ router.post('/song', makeUpload(['audio', 'cover']), async (req, res, next) => {
     const profile = await getIdMatch(res.locals.session.session.userId)
     if (!profile) return fail('No profile for this account')
 
+    // Optional: upload straight into one of the uploader's albums
+    let album_id: number | null = null
+    let track_number: number | null = null
+    if (req.body.album_id) {
+      const album = await getAlbumRow(Number(req.body.album_id))
+      if (!album || album.author_id !== Number(profile.id))
+        return fail('Album not found')
+      album_id = album.id
+      track_number = await nextTrackNumber(album.id)
+    }
+
     let coverUrl: string | null = null
     if (cover) {
       const out = await toWebp(cover.path, 600)
@@ -210,6 +234,8 @@ router.post('/song', makeUpload(['audio', 'cover']), async (req, res, next) => {
       url,
       runtime,
       cover: coverUrl,
+      album_id,
+      track_number,
     })
 
     return res.status(201).json({ id, url, cover: coverUrl })
@@ -219,5 +245,56 @@ router.post('/song', makeUpload(['audio', 'cover']), async (req, res, next) => {
     next(err)
   }
 })
+
+// ---------- posts ----------
+
+const MAX_POST_IMAGES = 10
+const MAX_TITLE = 120
+const MAX_POST_BODY = 5000
+
+router.post(
+  '/post',
+  makeUpload(['images'], { images: MAX_POST_IMAGES }),
+  async (req, res, next) => {
+    const images = (req.files as Files).images ?? []
+    const created = allFiles(req).map((f) => f.path)
+
+    const fail = async (message: string) => {
+      await cleanup(created)
+      return res.status(400).json({ message })
+    }
+
+    try {
+      const title = text(req.body.title, MAX_TITLE)
+      const body = text(req.body.body, MAX_POST_BODY)
+      if (!title && !body && images.length === 0)
+        return fail('A post needs a title, text or an image')
+
+      const profile = await getIdMatch(res.locals.session.session.userId)
+      if (!profile) return fail('No profile for this account')
+
+      // Convert sequentially so a big batch does not spike memory
+      const urls: string[] = []
+      for (const img of images) {
+        const out = await toWebp(img.path, 1600)
+        created.push(out)
+        urls.push(`/images/${path.basename(out)}`)
+      }
+
+      const id = await newPost({
+        title,
+        the_post: body,
+        author_id: profile.id,
+        images: urls,
+      })
+
+      return res.status(201).json({ id, images: urls })
+    } catch (err) {
+      console.error('post upload failed:', err)
+      await cleanup(created)
+      next(err)
+    }
+  },
+)
 
 export default router

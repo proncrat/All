@@ -79,7 +79,8 @@ export function useChats(userId: string, enable = true) {
 
 export function useComments(linkId: string, LinkType: string) {
   const query = useQuery({
-    queryKey: ['comments'],
+    // Include the target so each post/video/profile gets its own cache entry
+    queryKey: ['comments', LinkType, String(linkId)],
     queryFn: () => API.getCommentsByLinkClient(linkId, LinkType),
   })
 

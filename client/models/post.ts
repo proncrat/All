@@ -1,3 +1,8 @@
+export interface PostImage {
+  id: number
+  url: string
+}
+
 export interface post {
   id: number
   title: string
@@ -8,4 +13,8 @@ export interface post {
   likes: number
   dislikes: number
   shares: number
+  images?: PostImage[]
+  // only on GET /api/v1/post/:id
+  handle?: string
+  avatar?: string | null
 }

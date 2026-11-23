@@ -35,7 +35,15 @@ const TYPE_ICON = Object.fromEntries(TYPES.map((t) => [t.type, t.Icon]))
 /* Card                                                                */
 /* ------------------------------------------------------------------ */
 
-function Card({ item, queue }: { item: LibraryItem; queue: LibraryItem[] }) {
+export function Card({
+  item,
+  queue,
+  className = 'w-48 shrink-0 snap-start sm:w-56',
+}: {
+  item: LibraryItem
+  queue: LibraryItem[]
+  className?: string
+}) {
   const { current, playing, playSong, toggle } = usePlayer()
   const href = hrefFor(item)
   const Icon = TYPE_ICON[item.type]
@@ -84,7 +92,7 @@ function Card({ item, queue }: { item: LibraryItem; queue: LibraryItem[] }) {
   )
 
   return (
-    <article className="group w-48 shrink-0 snap-start sm:w-56">
+    <article className={`group ${className}`}>
       {item.type === 'song' ? (
         <div className="relative">
           {media}

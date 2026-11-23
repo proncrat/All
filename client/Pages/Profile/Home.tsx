@@ -7,6 +7,7 @@ export function Home() {
   )
 }
 
+import { Link as RouterLink } from 'react-router'
 import {
   createContext,
   useContext,
@@ -204,15 +205,10 @@ const PLACEHOLDER_ITEMS = [
 
 /* ------------------------------------------------------------------
    LINKS
-   Tiles render a plain <a href> by default. If you use React Router,
-   pass a custom link component:
-
-   <ProfileGrid
-     items={items}
-     linkComponent={({ href, ...p }) => <Link to={href} {...p} />}
-   />
+   Tiles render a React Router <Link> by default (client-side navigation).
+   Pass `linkComponent` to ProfileGrid to override it.
 ------------------------------------------------------------------- */
-const DefaultLink = ({ href, ...props }) => <a href={href} {...props} />
+const DefaultLink = ({ href, ...props }) => <RouterLink to={href} {...props} />
 const LinkContext = createContext(DefaultLink)
 
 /* ------------------------------------------------------------------

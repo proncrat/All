@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useUploadSong } from '@/client/hooks/usemediaupload'
+import { useUserAlbums } from '@/client/hooks/usealbums'
+import { useFetchId } from '@/client/hooks/useId'
 import {
   card,
   DropZone,
@@ -23,7 +25,11 @@ export function SongUpload({ defaultArtist }: { defaultArtist?: string }) {
   const [unreadable, setUnreadable] = useState(false)
   const [name, setName] = useState('')
   const [artist, setArtist] = useState('')
+  const [albumId, setAlbumId] = useState('')
   const [inputKey, setInputKey] = useState(0)
+
+  const { data: viewer } = useFetchId()
+  const { data: albums } = useUserAlbums(viewer.userid)
 
   const audioUrl = useObjectUrl(audioFile)
   const coverUrl = useObjectUrl(cover)
@@ -44,6 +50,7 @@ export function SongUpload({ defaultArtist }: { defaultArtist?: string }) {
     formData.append('name', name)
     formData.append('author', artist)
     formData.append('runtime', runtime)
+    if (albumId) formData.append('album_id', albumId)
     formData.append('audio', audioFile)
     if (cover) formData.append('cover', cover)
 
@@ -195,6 +202,30 @@ export function SongUpload({ defaultArtist }: { defaultArtist?: string }) {
           />
           <p className="text-xs text-white/40">
             Leave empty to use your username.
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="song-album" className="text-sm font-medium">
+            Album
+          </label>
+          <select
+            id="song-album"
+            value={albumId}
+            onChange={(e) => setAlbumId(e.target.value)}
+            className={`${field} scheme-dark`}
+          >
+            <option value="">None (single)</option>
+            {albums?.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.title}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-white/40">
+            {albums?.length
+              ? 'Added as the album’s last track. Without a cover, it uses the album’s.'
+              : 'Create albums from the Albums tab on your profile.'}
           </p>
         </div>
 

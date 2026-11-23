@@ -6,6 +6,7 @@ import { SignInNotice } from './components/uploadui'
 import Headerbutton from '../Util/Headerbutton'
 import NewPost from './components/Post'
 import { useSession } from '@/lib/auth'
+import { useUploadPost } from '@/client/hooks/usemediaupload'
 
 export function PostPage() {
   //const { id } = useParams()
@@ -14,6 +15,7 @@ export function PostPage() {
   const user = session?.user
 
   const [searchoption, setsearchoption] = useState('Photo')
+  const uploadPost = useUploadPost()
 
   function clickhandler(e) {
     setsearchoption(e.target.textContent)
@@ -73,6 +75,13 @@ export function PostPage() {
               user={{
                 name: (user as { username?: string }).username ?? user.name,
                 avatar: user.image,
+              }}
+              onSubmit={({ title, body, files }) => {
+                const data = new FormData()
+                data.append('title', title)
+                data.append('body', body)
+                files.forEach((f) => data.append('images', f))
+                return uploadPost.mutateAsync(data)
               }}
             />
           ) : (

@@ -86,6 +86,15 @@ export function ShownMessage({ data, userId }) {
   const isOwner = userId == message.senderid && !message.pending
   const canEdit = message.type == 'text'
 
+  // "Jean added Goth" / "Jean left the chat"
+  if (message.type == 'system') {
+    return (
+      <p className="text-center text-xs text-zinc-500">
+        {message.text} · {new Date(message.date).toLocaleString()}
+      </p>
+    )
+  }
+
   return (
     <div
       className={`group flex justify-between gap-4 rounded-md px-2 py-1 transition-colors hover:bg-white/[0.03] ${

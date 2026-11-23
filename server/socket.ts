@@ -80,3 +80,8 @@ export function initSocket(httpServer: HttpServer) {
 export function sendDataToClient(targetUserId: string, message: unknown) {
   io?.to(`user:${targetUserId}`).emit('message:new', message)
 }
+
+/** Emits any event to every tab/device of an auth user. */
+export function emitToUser(targetUserId: string, event: string, data: unknown) {
+  io?.to(`user:${targetUserId}`).emit(event, data)
+}

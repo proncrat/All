@@ -1,6 +1,6 @@
 import { TextInput } from '@/client/components/TextInput'
-import { useMemo, useState } from 'react'
-import { updateUser } from '@/lib/auth'
+import { useEffect, useMemo, useState } from 'react'
+import { useUpdateProfile } from '@/client/hooks/useCustomize'
 
 import { FiPlus, FiTrash2 } from 'react-icons/fi'
 
@@ -87,59 +87,152 @@ export function LinksEditor({
   )
 }
 
-export function CustomizeForm({ initialdata }) {
-  const [form, setform] = useState(initialdata)
+type ImageField = 'pfp' | 'bg' | 'banner'
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+export interface CustomizeData {
+  name: string
+  describe: string | null
+  description: string | null
+  links: string | LinkItem[] | null
+  pfp: string | null
+  bg: string | null
+  banner: string | null
+}
+
+// SQLite returns the json column as a string, Postgres as an array
+function parseLinks(raw: CustomizeData['links']): LinkItem[] {
+  if (Array.isArray(raw)) return raw
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+const FILE_INPUT_CLASS = `block w-full text-sm text-slate-500
+  file:mr-4 file:py-2 file:px-4
+  file:rounded-full file:border-0
+  file:text-sm file:font-semibold
+  file:bg-violet-50 file:text-violet-700
+  hover:file:bg-violet-100 file:cursor-pointer`
+
+function ImagePicker({
+  label,
+  name,
+  src,
+  imgClassName,
+  onPick,
+}: {
+  label: string
+  name: ImageField
+  src: string | null
+  imgClassName: string
+  onPick: (name: ImageField, file: File | null) => void
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p>{label}</p>
+      {src ? (
+        <img className={`${imgClassName} object-cover`} alt={name} src={src} />
+      ) : (
+        <div
+          className={`${imgClassName} flex items-center justify-center border border-dashed border-zinc-700 text-sm text-zinc-500`}
+        >
+          None
+        </div>
+      )}
+      <input
+        onChange={(e) => onPick(name, e.target.files?.[0] ?? null)}
+        name={name}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className={FILE_INPUT_CLASS}
+      />
+    </div>
+  )
+}
+
+export function CustomizeForm({ initialdata }: { initialdata: CustomizeData }) {
+  const [form, setform] = useState({
+    name: initialdata.name ?? '',
+    describe: initialdata.describe ?? '',
+    description: initialdata.description ?? '',
+  })
+  const [links, setLinks] = useState<LinkItem[]>(() =>
+    parseLinks(initialdata.links),
+  )
+  // Saved image urls from the server
+  const [saved, setSaved] = useState({
+    pfp: initialdata.pfp,
+    bg: initialdata.bg,
+    banner: initialdata.banner,
+  })
+  // Newly chosen files (not uploaded yet)
+  const [files, setFiles] = useState<Partial<Record<ImageField, File>>>({})
+  const [fileInputKey, setFileInputKey] = useState(0)
+
+  const { mutate, isPending, isSuccess, isError, error, reset } =
+    useUpdateProfile()
+
+  // Local preview urls for chosen files
+  const previews = useMemo(() => {
+    const out: Partial<Record<ImageField, string>> = {}
+    for (const [k, file] of Object.entries(files)) {
+      if (file) out[k as ImageField] = URL.createObjectURL(file)
+    }
+    return out
+  }, [files])
+
+  useEffect(
+    () => () => Object.values(previews).forEach((u) => URL.revokeObjectURL(u)),
+    [previews],
+  )
+
+  function formHandler(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target
+    setform((f) => ({ ...f, [name]: value }))
+    reset()
+  }
+
+  function pickImage(name: ImageField, file: File | null) {
+    setFiles((f) => {
+      const next = { ...f }
+      if (file) next[name] = file
+      else delete next[name]
+      return next
+    })
+    reset()
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const formEl = e.currentTarget
-    await updateUser({
-      image: formEl.image.value,
+    const data = new FormData()
+    data.append('name', form.name)
+    data.append('describe', form.describe)
+    data.append('description', form.description)
+    data.append('links', JSON.stringify(links))
+    for (const [k, file] of Object.entries(files)) {
+      if (file) data.append(k, file)
+    }
+
+    mutate(data, {
+      onSuccess: (updated) => {
+        setSaved({ pfp: updated.pfp, bg: updated.bg, banner: updated.banner })
+        setLinks(parseLinks(updated.links as CustomizeData['links']))
+        setFiles({})
+        setFileInputKey((k) => k + 1) // clear the file inputs
+      },
     })
   }
 
-  function formHandler(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value
-    const name = e.target.name
-    setform((f) => ({ ...f, [name]: value }))
-  }
-
-  function imgHandler(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const value = URL.createObjectURL(file)
-    const name = e.target.name
-    setform((f) => ({ ...f, [name]: value }))
-  }
-
-  // parse safely so empty/invalid JSON doesn't crash the page
-  const links: LinkItem[] = useMemo(() => {
-    try {
-      const parsed = JSON.parse(form.links)
-      return Array.isArray(parsed) ? parsed : []
-    } catch {
-      return []
-    }
-  }, [form.links])
+  const errorText =
+    (error as { response?: { text?: string } } | null)?.response?.text ||
+    error?.message
 
   return (
-    <div className="m-7 w-full">
-      <h1 className="text-3xl mb-6">Auth Image Test</h1>
-      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-        <input
-          className="p-2 border-b"
-          name="image"
-          type="text"
-          placeholder="imgurl"
-        />
-
-        <button
-          className="transition-all cursor-pointer hover:[box-shadow:0px_0px_4px_1px_rgba(255,255,255,0.74)_inset] rounded-sm p-1"
-          type="submit"
-        >
-          Submit
-        </button>
-      </form>
+    <form className="m-7 w-full" onSubmit={handleSubmit}>
       <h1 className="text-3xl mb-6">Customize Stuff</h1>
       <div className="flex flex-col gap-3">
         <h2 className="text-2xl">Profile</h2>
@@ -152,6 +245,8 @@ export function CustomizeForm({ initialdata }) {
             type="text"
             autoComplete="off"
             name="name"
+            maxLength={50}
+            required
           />
         </div>
         <div>
@@ -163,6 +258,7 @@ export function CustomizeForm({ initialdata }) {
             type="text"
             autoComplete="off"
             name="describe"
+            maxLength={200}
           />
         </div>
         <div>
@@ -174,68 +270,58 @@ export function CustomizeForm({ initialdata }) {
             type="text"
             autoComplete="off"
             name="description"
+            maxLength={5000}
           />
         </div>
 
         <LinksEditor
           links={links}
-          onChange={(next) =>
-            setform((f) => ({ ...f, links: JSON.stringify(next) }))
-          }
+          onChange={(next) => {
+            setLinks(next)
+            reset()
+          }}
         />
 
-        <p>Pfp</p>
-        <img
-          className="rounded-xl aspect-square w-44"
-          alt="pfp"
-          src={form.pfp}
-        />
-        <input
-          onChange={imgHandler}
-          name="pfp"
-          type="file"
-          className="block w-full text-sm text-slate-500
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-full file:border-0
-          file:text-sm file:font-semibold
-          file:bg-violet-50 file:text-violet-700
-          hover:file:bg-violet-100
-        "
-        />
-        <p>Bg</p>
-        <img className="rounded-xl w-100" alt="bg" src={form.bg} />
-        <input
-          onChange={imgHandler}
-          name="bg"
-          type="file"
-          className="block w-full text-sm text-slate-500
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-full file:border-0
-          file:text-sm file:font-semibold
-          file:bg-violet-50 file:text-violet-700
-          hover:file:bg-violet-100
-        "
-        />
-        <p>Banner</p>
-        <img
-          className="rounded-xl aspect-10/2 w-100"
-          alt="banner"
-          src={form.banner}
-        />
-        <input
-          onChange={imgHandler}
-          name="banner"
-          type="file"
-          className="block w-full text-sm text-slate-500
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-full file:border-0
-          file:text-sm file:font-semibold
-          file:bg-violet-50 file:text-violet-700
-          hover:file:bg-violet-100
-        "
-        />
-        <button>Save changes</button>
+        <div key={fileInputKey} className="flex flex-col gap-5">
+          <ImagePicker
+            label="Pfp"
+            name="pfp"
+            src={previews.pfp ?? saved.pfp}
+            imgClassName="rounded-xl aspect-square w-44 object-top"
+            onPick={pickImage}
+          />
+          <ImagePicker
+            label="Bg"
+            name="bg"
+            src={previews.bg ?? saved.bg}
+            imgClassName="rounded-xl aspect-video w-100"
+            onPick={pickImage}
+          />
+          <ImagePicker
+            label="Banner"
+            name="banner"
+            src={previews.banner ?? saved.banner}
+            imgClassName="rounded-xl aspect-10/2 w-100"
+            onPick={pickImage}
+          />
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={isPending}
+            className="cursor-pointer rounded-lg border border-zinc-700 px-4 py-2 transition-colors hover:border-zinc-400 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isPending ? 'Saving...' : 'Save changes'}
+          </button>
+          {isSuccess && <p className="text-sm text-green-400">Saved</p>}
+          {isError && (
+            <p className="text-sm text-red-400">
+              {errorText || 'Failed to save'}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </form>
   )
 }

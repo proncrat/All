@@ -79,6 +79,8 @@ export interface LibraryItem {
   text?: string | null
   media?: string | null
   runtime?: string | null
+  posted_at?: string | number | null // posts
+  author_avatar?: string | null // posts
   reacted_at: string | number
 }
 
@@ -87,5 +89,16 @@ export type Library = Record<LibraryKind, LibraryItem[]>
 
 export async function getLibrary(): Promise<Library> {
   const res = await request.get(`${rootURL}/library`).withCredentials()
+  return res.body
+}
+
+/** Everything a profile has reposted (public), optionally one type. */
+export async function getProfileReposts(
+  profileId: string | number,
+  type?: ReactionTarget,
+): Promise<LibraryItem[]> {
+  const res = await request
+    .get(`${rootURL}/user/${encodeURIComponent(profileId)}/reposts`)
+    .query(type ? { type } : {})
   return res.body
 }

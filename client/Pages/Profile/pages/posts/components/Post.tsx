@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Repeat2 } from 'lucide-react'
 import { Lightbox } from '../../util/Lightbok'
 import { useComments } from '@/client/hooks'
 import { ReactionBar } from '@/client/Pages/Util/Action'
@@ -19,6 +19,8 @@ export function PostCard({
   alt, // string, or array of strings matching `images`
   sensitive = false,
   single = false, // true = standalone post page: one column, comments underneath
+  reposted = false, // show a "Reposted" badge in the corner
+  profileId, // author's profile id for links; falls back to `handle`
 }) {
   let comments = []
 
@@ -75,7 +77,7 @@ export function PostCard({
 
   const navigate = useNavigate()
   const postHref = `/posts/${id}`
-  const profileHref = `/profile/${handle}`
+  const profileHref = `/profile/${profileId ?? handle}`
 
   // Click anywhere on the card (list mode only) to open the post,
   // unless the click was on something interactive.
@@ -111,7 +113,16 @@ export function PostCard({
         }`}
       >
         {/* MAIN: header, text, image, actions (+ comments when single) */}
-        <div className="min-w-0">
+        <div className="relative min-w-0">
+          {reposted && (
+            <span
+              title="Reposted"
+              className="pointer-events-none absolute right-0 top-0 flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] text-white/90"
+            >
+              <Repeat2 size={12} />
+              Reposted
+            </span>
+          )}
           <header className="mb-4 flex items-center gap-3">
             <Link to={profileHref} className="shrink-0">
               {avatar ? (
@@ -273,7 +284,13 @@ export function PostCard({
         <Lightbox
           mode="post"
           postid={id}
-          photos={imgs}
+          photos={imgs.map((img) => ({
+            ...img,
+            handle: img.handle ?? handle,
+            avatar: img.avatar ?? avatar,
+            date: img.date ?? date,
+            describe: img.describe ?? body,
+          }))}
           index={index}
           onIndexChange={setIndex}
           onClose={() => setOpen(false)}

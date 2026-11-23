@@ -19,6 +19,8 @@ import follow_route from './Routes/Follow'
 import media_upload_routes from './Routes/mediaupload'
 import reaction_routes from './Routes/reactions'
 import playlist_routes from './Routes/playlists'
+import customize_routes from './Routes/customize'
+import album_routes from './Routes/albums'
 
 import cors from 'cors'
 //DO NOT PUT IN PROD IDIOT
@@ -54,6 +56,8 @@ server.use('/api/v1/imgupload', test_routes_img)
 server.use('/api/v1/upload', media_upload_routes)
 server.use('/api/v1/reactions', reaction_routes)
 server.use('/api/v1/playlists', playlist_routes)
+server.use('/api/v1/customize', customize_routes)
+server.use('/api/v1/albums', album_routes)
 
 if (process.env.NODE_ENV === 'production') {
   server.use(express.static(Path.resolve('public')))

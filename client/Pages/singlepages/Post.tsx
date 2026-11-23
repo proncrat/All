@@ -1,41 +1,32 @@
 import { useParams } from 'react-router'
 import { PostCard } from '../Profile/pages/posts/components/Post'
+import { usePost } from '@/client/hooks/usepost'
+import { Spinner } from '@/client/Pages/Util/SpinnerBox'
 
 export function PostFull() {
   const { id } = useParams()
+  const { data: post, isPending, isError } = usePost(id)
+
+  if (isPending) return <Spinner />
+  if (isError || !post)
+    return <div className="p-8 text-center text-white/60">Post not found</div>
+
   return (
     <div className="flex justify-center">
-      <div className="max-w-375">
+      <div className="w-full max-w-375">
         <PostCard
           single
-          id={9}
-          title={'Beans'}
-          handle={'admin'}
-          username={'God'}
-          avatar={'/images/janedoe2.jpg'}
-          body={'Some bull shit'}
-          date={1235423623}
-          images={[
-            {
-              id: 1,
-              url: 'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small',
-            },
-            {
-              id: 2,
-              url: 'https://pbs.twimg.com/media/HVDIemuXgAALitQ?format=jpg&name=small',
-            },
-            {
-              id: 3,
-              url: 'https://pbs.twimg.com/media/HVFWAm2XAAAHBB5?format=jpg&name=small',
-            },
-            {
-              id: 4,
-              url: 'https://pbs.twimg.com/media/HVDvNrNXkAAEPGS?format=jpg&name=small',
-            },
-          ]}
-          alt={
-            'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small'
-          }
+          id={post.id}
+          title={post.title}
+          handle={post.handle ?? 'unknown'}
+          username={undefined}
+          image={undefined}
+          profileId={post.author_id}
+          avatar={post.avatar}
+          body={post.the_post}
+          date={post.post_date}
+          images={post.images ?? []}
+          alt={post.title ?? ''}
         />
       </div>
     </div>

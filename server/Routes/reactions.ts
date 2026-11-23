@@ -2,6 +2,7 @@ import express from 'express'
 import {
   getIdMatch,
   getLibrary,
+  getProfileReposts,
   getReactionSummary,
   getUserReactions,
   reactionTargetExists,
@@ -24,6 +25,7 @@ const router = express.Router()
 // PUT    /api/v1/reactions/:type/:id/repost   { active: boolean }
 // GET    /api/v1/reactions/me/:kind?type=...  the viewer's likes/dislikes/saves/reposts
 // GET    /api/v1/reactions/library            all four lists with card details
+// GET    /api/v1/reactions/user/:profileId/reposts?type=...  a profile's reposts (public)
 //
 // :type is one of video | post | photo | song
 
@@ -61,6 +63,22 @@ router.get('/library', authMiddleware, async (req, res, next) => {
     const userId = await viewerId(res)
     if (!userId) return res.status(400).json({ message: 'No profile' })
     res.json(await getLibrary(userId))
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.get('/user/:profileId/reposts', async (req, res, next) => {
+  try {
+    const profileId = Number(req.params.profileId)
+    const type = req.query.type
+    if (!Number.isInteger(profileId) || profileId <= 0) {
+      return res.status(400).json({ message: 'Invalid profile' })
+    }
+    if (type !== undefined && !isTarget(type)) {
+      return res.status(400).json({ message: 'Invalid type' })
+    }
+    res.json(await getProfileReposts(profileId, type))
   } catch (err) {
     next(err)
   }

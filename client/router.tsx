@@ -35,6 +35,9 @@ import { PostFull } from './Pages/singlepages/Post'
 import NotFound from './Pages/Util/Le404page'
 import { LibraryPage } from './Pages/Library/Library'
 import { PlaylistPage } from './Pages/Playlist/PlaylistPage'
+import { AlbumPage } from './Pages/Album/AlbumPage'
+import { Albums } from './Pages/Profile/pages/albums/Albums'
+import { Reposts } from './Pages/Profile/pages/reposts/Reposts'
 
 const routes = createRoutesFromElements(
   <Route path="/" element={<App />}>
@@ -54,9 +57,17 @@ const routes = createRoutesFromElements(
       <Route path="videos" element={<Videos />} />
       <Route path="Posts" element={<Posts />} />
       <Route path="Song" element={<SongList />} />
+      <Route path="albums" element={<Albums />} />
       <Route path="playlist" element={<Playlist />} />
       <Route path="Picture" element={<Photos />} />
       <Route path="About" element={<About />} />
+      <Route path="reposts">
+        <Route index element={<Reposts />} />
+        <Route path="videos" element={<Reposts key="video" type="video" />} />
+        <Route path="posts" element={<Reposts key="post" type="post" />} />
+        <Route path="songs" element={<Reposts key="song" type="song" />} />
+        <Route path="photos" element={<Reposts key="photo" type="photo" />} />
+      </Route>
     </Route>
     <Route path="/search/" element={<SearchPage />} />
 
@@ -75,6 +86,7 @@ const routes = createRoutesFromElements(
     <Route path="/market" element={<Market />} />
     <Route path="/library" element={<LibraryPage />} />
     <Route path="/playlist/:id" element={<PlaylistPage />} />
+    <Route path="/album/:id" element={<AlbumPage />} />
 
     <Route path="/posts/:id" element={<PostFull />} />
 
