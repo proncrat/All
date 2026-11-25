@@ -20,6 +20,12 @@ const MUSIC_TABS: Tab[] = [
   { text: 'Albums', link: 'albums' },
 ]
 
+/** Sub-tabs under "Videos": regular videos and vertical Shorts. */
+const VIDEO_TABS: Tab[] = [
+  { text: 'Videos', link: 'videos' },
+  { text: 'Shorts', link: 'videos/shorts' },
+]
+
 /** Sub-tabs under "Reposts" — one per repostable content type. */
 const REPOST_TABS: Tab[] = [
   { text: 'All', link: 'reposts' },
@@ -107,11 +113,12 @@ function ProfileHeader() {
   const segments = pathname.toLowerCase().split('/').filter(Boolean)
   const section = segments.at(-1)
   const inReposts = segments[2] === 'reposts' // /profile/:id/reposts/...
+  const inVideos = segments[2] === 'videos' // /profile/:id/videos/...
   const inMusic = !inReposts && MUSIC_TABS.some((t) => t.link === section)
 
   const tabs: Tab[] = [
     { text: 'Home', link: '/profile/' + id },
-    { text: 'Videos', link: 'videos' },
+    { text: 'Videos', link: 'videos', active: inVideos },
     { text: 'Posts', link: 'posts' },
     { text: 'Music', link: 'song', active: inMusic },
     { text: 'Playlists', link: 'playlist' },
@@ -123,6 +130,7 @@ function ProfileHeader() {
   return (
     <div className="sticky top-[48px] z-60 pb-2backdrop-blur-md bg-sidebar transition-[top] duration-300 max-md:[html[data-header-hidden=true]_&]:top-0">
       <TabBar tabs={tabs} className="border-t border-t-zinc-800" />
+      {inVideos && <TabBar tabs={VIDEO_TABS} />}
       {inMusic && <TabBar tabs={MUSIC_TABS} />}
       {inReposts && <TabBar tabs={REPOST_TABS} />}
     </div>

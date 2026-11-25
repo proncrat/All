@@ -40,7 +40,7 @@ function Layout() {
           style={{ '--sidebar-width': `${width}px` } as React.CSSProperties}
           className="
             transition-all pt-12 h-full
-            ml-0 pb-20
+            ml-0 pb-[calc(3.5rem+env(safe-area-inset-bottom))]
             md:ml-[var(--sidebar-width)] md:pb-0
           "
         >

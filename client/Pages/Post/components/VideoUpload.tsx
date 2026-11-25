@@ -34,6 +34,7 @@ export function VideoUpload() {
   const [duration, setDuration] = useState<number | null>(null)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [isShort, setIsShort] = useState(false)
   const [inputKey, setInputKey] = useState(0)
 
   const videoUrl = useObjectUrl(videoFile)
@@ -44,6 +45,7 @@ export function VideoUpload() {
     setVideoFile(file)
     setAutoThumb(null)
     setDuration(null)
+    setIsShort(false)
     if (file && !name) setName(titleFromFilename(file.name))
   }
 
@@ -52,6 +54,8 @@ export function VideoUpload() {
     const v = videoRef.current
     if (!v) return
     setDuration(v.duration)
+    // Vertical videos default to being a Short
+    setIsShort(v.videoHeight > v.videoWidth)
     v.currentTime = Math.min(1, v.duration / 4 || 0)
   }
   const onSeeked = async () => {
@@ -72,6 +76,7 @@ export function VideoUpload() {
     const formData = new FormData()
     formData.append('name', name)
     formData.append('description', description)
+    formData.append('is_short', String(isShort))
     formData.append('video', videoFile)
     const thumb = customThumb ?? autoThumb
     if (thumb) {
@@ -90,6 +95,7 @@ export function VideoUpload() {
       setDuration(null)
       setName('')
       setDescription('')
+      setIsShort(false)
       setInputKey((k) => k + 1)
     } catch {
       // Shown via upload.isError
@@ -183,13 +189,30 @@ export function VideoUpload() {
           />
         </div>
 
+        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-white/20 p-3 hover:border-white/40">
+          <input
+            type="checkbox"
+            checked={isShort}
+            onChange={(e) => setIsShort(e.target.checked)}
+            className="mt-0.5 h-4 w-4 accent-white"
+          />
+          <span>
+            <span className="block text-sm font-medium">Post as a Short</span>
+            <span className="block text-xs text-white/50">
+              Vertical video, shown under Videos → Shorts on your profile
+            </span>
+          </span>
+        </label>
+
         <div className="space-y-1.5">
           <span className="text-sm font-medium">Thumbnail</span>
           <DropZone
             accept="image/jpeg,image/png,image/webp,image/gif"
             onFile={setCustomThumb}
             inputKey={inputKey}
-            className="aspect-video bg-black"
+            className={
+              isShort ? 'mx-auto aspect-[9/16] max-h-72 bg-black' : 'aspect-video bg-black'
+            }
           >
             {thumbUrl ? (
               <>
@@ -233,7 +256,14 @@ export function VideoUpload() {
         {upload.isSuccess && (
           <p role="status" className="text-sm text-green-400">
             Video uploaded!{' '}
-            <Link to={`/video/${upload.data.id}`} className="underline">
+            <Link
+              to={
+                upload.variables?.get('is_short') === 'true'
+                  ? `/shortz/${upload.data.id}`
+                  : `/video/${upload.data.id}`
+              }
+              className="underline"
+            >
               Watch it
             </Link>
           </p>

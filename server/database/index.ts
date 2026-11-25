@@ -22,8 +22,12 @@ export async function getProfile(userId: string) {
   return await db('profiledata').where('id', userId).select().first()
 }
 
-export async function getVideosByUser(userId: string) {
-  return await db('videos').where('author_id', userId).select()
+/** A profile's regular videos, or with `shorts` its vertical shorts. */
+export async function getVideosByUser(userId: string, shorts = false) {
+  return await db('videos')
+    .where({ author_id: userId, is_short: shorts })
+    .select()
+    .orderBy('post_date', 'desc')
 }
 
 export interface PostImage {
@@ -146,6 +150,7 @@ const get_video_schema = [
   'videos.shares',
   'videos.video_link',
   'videos.thumbnail_link',
+  'videos.is_short',
 ]
 
 export async function getVideoById(Id: string) {
@@ -589,25 +594,89 @@ const get_comment_schema = [
   'profiledata.pfp',
   'comments.body_text',
   'comments.id',
+  'comments.parent_id',
   'profiledata.name',
   'profiledata.id as authorId',
 ]
 
-export async function getCommentsByLink(linkId: string, LinkType: string) {
-  return await db('comments')
+/**
+ * All comments (top-level and replies) on a target, newest first, each with
+ * like/dislike counts and the viewer's own vote.
+ */
+export async function getCommentsByLink(
+  linkId: string,
+  LinkType: string,
+  viewerId: number | null = null,
+) {
+  const rows = await db('comments')
     .join('profiledata', 'comments.author_id', 'profiledata.id')
     .where('comments.link_id', linkId)
     .andWhere('comments.link_type', LinkType)
     .select(get_comment_schema)
     .orderBy([{ column: 'comments.id', order: 'desc' }])
+  if (rows.length === 0) return []
+
+  const ids = rows.map((r) => r.id)
+  const counts = (await db('reactions')
+    .where('target_type', 'comment')
+    .whereIn('target_id', ids)
+    .whereIn('kind', ['like', 'dislike'])
+    .groupBy('target_id', 'kind')
+    .select('target_id', 'kind')
+    .count({ n: '*' })) as { target_id: number; kind: Vote; n: number | string }[]
+
+  const mine: { target_id: number; kind: Vote }[] = viewerId
+    ? await db('reactions')
+        .where({ target_type: 'comment', user_id: viewerId })
+        .whereIn('target_id', ids)
+        .whereIn('kind', ['like', 'dislike'])
+        .select('target_id', 'kind')
+    : []
+
+  const count = (id: number, kind: Vote) =>
+    Number(
+      counts.find((c) => Number(c.target_id) === id && c.kind === kind)?.n ??
+        0,
+    )
+
+  return rows.map((r) => ({
+    ...r,
+    id: Number(r.id),
+    authorId: Number(r.authorId),
+    parent_id: r.parent_id == null ? null : Number(r.parent_id),
+    likes: count(r.id, 'like'),
+    dislikes: count(r.id, 'dislike'),
+    vote: mine.find((m) => Number(m.target_id) === r.id)?.kind ?? null,
+  }))
 }
 
-export async function newCommentByLink(data) {
-  return await db('comments').insert({ ...data })
+export async function getCommentById(id: number) {
+  return await db('comments').where('id', id).first()
 }
 
+export async function newCommentByLink(data: {
+  link_type: string
+  link_id: number | string
+  author_id: number
+  body_text: string
+  parent_id?: number | null
+}) {
+  return await db('comments').insert({ ...data, post_date: new Date() })
+}
+
+/** Deletes a comment, its replies, and all their likes/dislikes. */
 export async function deleteCommentById(id: number) {
-  return await db('comments').where('id', id).del()
+  await db.transaction(async (trx) => {
+    const ids = [
+      id,
+      ...(await trx('comments').where('parent_id', id).pluck('id')),
+    ]
+    await trx('reactions')
+      .where('target_type', 'comment')
+      .whereIn('target_id', ids)
+      .del()
+    await trx('comments').whereIn('id', ids).del()
+  })
 }
 
 //Util to be replaced with auth usesession join?
@@ -704,6 +773,7 @@ export interface NewVideo {
   author_id: number
   video_link: string
   thumbnail_link: string | null
+  is_short?: boolean
 }
 
 export async function newVideo(data: NewVideo) {
@@ -920,7 +990,7 @@ export async function getReactionSummary(
 /** Sets (or clears, with null) the user's like/dislike on a target. */
 export async function setVote(
   userId: number,
-  type: ReactionTarget,
+  type: ReactionTarget | 'comment',
   id: number,
   vote: Vote | null,
 ) {

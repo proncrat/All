@@ -24,12 +24,7 @@ export function PostCard({
 }) {
   let comments = []
 
-  const {
-    data: comments_got,
-    isPending,
-    isError,
-    error,
-  } = useComments(id, 'post')
+  const { data: comments_got } = useComments(id, 'post')
 
   if (comments_got != null) {
     comments = comments_got
@@ -259,7 +254,7 @@ export function PostCard({
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
                 Comments ({comments.length})
               </h3>
-              <CommentList comments={comments} single />
+              <CommentList postId={id} single />
             </section>
           )}
         </div>
@@ -274,7 +269,7 @@ export function PostCard({
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
                 Comments ({comments.length})
               </h3>
-              <CommentList comments={comments} single={false} />
+              <CommentList postId={id} single={false} />
             </div>
           </aside>
         )}

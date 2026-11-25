@@ -1,12 +1,8 @@
-import { Usesessionid, useComments, useUserData } from '@/client/hooks'
-import { useAddComment, useDeleteComment } from '@/client/hooks/usecomments'
+import { useUserData } from '@/client/hooks'
+import { CommentSection } from '@/client/components/CommentSection'
 import { useDeletePhoto } from '@/client/hooks/useuploadphoto'
-import { comment } from '@/client/models/comment'
 import { ReactionBar } from '@/client/Pages/Util/Action'
-import { useSession } from '@/lib/auth'
 import {
-  Send,
-  Trash2,
   X,
   ChevronLeft,
   ChevronRight,
@@ -535,124 +531,13 @@ function PhotoComments({
   mode: string
   postId: string | number | undefined
 }) {
-  const addComment = useAddComment()
-  const deleteComment = useDeleteComment()
-  const { data: session } = useSession()
-  const { data: currentUser } = Usesessionid(session?.session.userId)
-  let chosenid: string | number
-
-  if (mode == 'photo') {
-    chosenid = photoId
-  } else if (mode == 'post') {
-    chosenid = postId
-  }
-
-  const { data, isPending, isError, error } = useComments(chosenid, mode)
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const form = e.currentTarget
-    const text = (
-      form.elements.namedItem('comment') as HTMLInputElement
-    ).value.trim()
-    if (!text) return
-
-    await addComment.mutateAsync({
-      link_type: mode,
-      link_id: chosenid,
-      author_id: currentUser?.id,
-      body_text: text,
-      post_date: new Date(),
-    })
-    form.reset()
-  }
-
-  async function handleDelete(id: number) {
-    await deleteComment.mutateAsync({ id })
-  }
-
   return (
-    <>
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        {isPending ? (
-          <p className="mt-6 text-center text-sm text-white/40">
-            Loading comments...
-          </p>
-        ) : isError ? (
-          <p className="mt-6 text-center text-sm text-red-400">
-            Error: {error.message}
-          </p>
-        ) : data.length === 0 ? (
-          <p className="mt-6 text-center text-sm text-white/40">No comments</p>
-        ) : (
-          <ul className="space-y-4">
-            {data.map((c: comment) => (
-              <li key={c.id} className="group flex gap-3 text-sm">
-                {c.pfp ? (
-                  <img
-                    src={c.pfp}
-                    alt=""
-                    className="h-9 w-9 shrink-0 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 font-semibold uppercase">
-                    {c.name?.[0] ?? '?'}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline gap-2">
-                    <span className="truncate font-semibold text-white">
-                      {c.name}
-                    </span>
-                    <time
-                      dateTime={new Date(c.post_date).toISOString()}
-                      className="shrink-0 text-xs text-neutral-500"
-                    >
-                      {formatDate(c.post_date)}
-                    </time>
-                  </div>
-                  <p className="mt-0.5 whitespace-pre-line break-words text-white/75">
-                    {c.body_text}
-                  </p>
-                </div>
-                {currentUser && currentUser.id === c.authorId && (
-                  <button
-                    type="button"
-                    aria-label="Delete comment"
-                    onClick={() => handleDelete(c.id)}
-                    disabled={deleteComment.isPending}
-                    className="h-fit shrink-0 rounded-full p-1.5 text-white/30 transition hover:bg-white/10 hover:text-red-400 disabled:opacity-50"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <form
-        className="flex items-center gap-2 border-t border-white/10 p-3"
-        onSubmit={handleSubmit}
-      >
-        <input
-          name="comment"
-          placeholder={currentUser ? 'Add a comment' : 'Sign in to comment'}
-          disabled={!currentUser}
-          autoComplete="off"
-          className="min-w-0 flex-1 rounded-full bg-white/5 px-4 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
-        />
-        <button
-          type="submit"
-          aria-label="Post comment"
-          disabled={!currentUser || addComment.isPending}
-          className="rounded-full p-2 text-white/60 transition hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-white/60"
-        >
-          <Send size={18} />
-        </button>
-      </form>
-    </>
+    <CommentSection
+      linkType={mode}
+      linkId={mode === 'post' ? postId : photoId}
+      className="flex-1"
+      listClassName="flex-1 overflow-y-auto px-5 py-4"
+    />
   )
 }
 

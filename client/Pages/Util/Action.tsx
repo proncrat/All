@@ -29,6 +29,7 @@ function ActionButton({
   hover,
   activeColor,
   fill,
+  vertical,
   onClick,
 }: {
   icon: LucideIcon
@@ -38,8 +39,40 @@ function ActionButton({
   hover: string
   activeColor?: string
   fill?: boolean
+  vertical?: boolean
   onClick?: () => void
 }) {
+  // Vertical: big round icon with the count underneath (shorts side rail)
+  if (vertical) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        aria-pressed={active}
+        className={`group flex flex-col items-center gap-1 text-xs font-semibold transition-colors ${
+          active ? activeColor : `text-white ${hover}`
+        }`}
+      >
+        {/* Dark, blurred backing so it stays readable over bright video */}
+        <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-white/20 shadow-md backdrop-blur-md transition-colors group-hover:bg-white/30">
+          <Icon
+            size={22}
+            strokeWidth={2}
+            className={`drop-shadow-[0_1px_2px_rgb(0_0_0/0.6)] ${
+              active && fill ? 'fill-current' : ''
+            }`}
+          />
+        </span>
+        {count !== undefined && (
+          <span className="tabular-nums [text-shadow:0_1px_3px_rgb(0_0_0/0.9)]">
+            {fmt(count)}
+          </span>
+        )}
+      </button>
+    )
+  }
+
   return (
     <button
       type="button"
@@ -72,9 +105,15 @@ function ActionButton({
 export function ReactionBar({
   type,
   id,
+  vertical = false,
+  onComments,
 }: {
   type: ReactionTarget
   id: string | number | undefined | null
+  /** Stack the buttons in a column (e.g. beside a short). */
+  vertical?: boolean
+  /** Called when the comments button is pressed. */
+  onComments?: () => void
 }) {
   const { data, act } = useReactions(type, id)
   const { data: session } = useSession()
@@ -103,15 +142,24 @@ export function ReactionBar({
     act({ kind: 'vote', vote: vote === next ? null : next })
 
   return (
-    <div className="flex items-center justify-between">
+    <div
+      className={
+        vertical
+          ? 'flex flex-col items-center gap-3 md:gap-4'
+          : 'flex items-center justify-between'
+      }
+    >
       <ActionButton
+        vertical={vertical}
         icon={MessageCircle}
         count={comments}
         label="Comments"
         hover="hover:text-sky-400"
+        onClick={onComments}
       />
 
       <ActionButton
+        vertical={vertical}
         icon={Repeat2}
         count={reposts}
         label="Repost"
@@ -122,6 +170,7 @@ export function ReactionBar({
       />
 
       <ActionButton
+        vertical={vertical}
         icon={ThumbsUp}
         count={likes}
         label="Like"
@@ -133,6 +182,7 @@ export function ReactionBar({
       />
 
       <ActionButton
+        vertical={vertical}
         icon={ThumbsDown}
         count={dislikes}
         label="Dislike"
@@ -144,6 +194,7 @@ export function ReactionBar({
       />
 
       <ActionButton
+        vertical={vertical}
         icon={Bookmark}
         count={saves}
         label="Save"
@@ -155,6 +206,7 @@ export function ReactionBar({
       />
 
       <ActionButton
+        vertical={vertical}
         icon={ListPlus}
         label="Add to playlist"
         hover="hover:text-lime-300"
@@ -170,6 +222,7 @@ export function ReactionBar({
       )}
 
       <ActionButton
+        vertical={vertical}
         icon={Share2}
         label="Share"
         hover="hover:text-sky-400"

@@ -170,6 +170,7 @@ router.post(
         author_id: profile.id,
         video_link,
         thumbnail_link,
+        is_short: req.body.is_short === 'true',
       })
 
       return res.status(201).json({ id, video_link, thumbnail_link })

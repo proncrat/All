@@ -97,6 +97,14 @@ router.get('/:id/videos', async (req, res, next) => {
   }
 })
 
+router.get('/:id/shorts', async (req, res, next) => {
+  try {
+    res.json(await getVideosByUser(req.params.id, true))
+  } catch (err) {
+    next(err)
+  }
+})
+
 router.get('/:id/songs', async (req, res, next) => {
   try {
     const userId = req.params.id

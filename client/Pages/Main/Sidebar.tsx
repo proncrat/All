@@ -44,15 +44,16 @@ export function SideBar({ width }) {
         <Miniplayer width={width} />
       </div>
 
-      <div className="flex flex-row md:flex-col items-center md:items-baseline justify-around md:justify-center p-2 gap-3 overflow-auto">
+      {/* Phone: a compact h-14 bar (App.tsx reserves the same height below the page) */}
+      <div className="flex flex-row md:flex-col items-center md:items-baseline justify-around md:justify-center h-14 md:h-auto px-2 md:p-2 gap-3 overflow-auto">
         {links.map(({ to, label, Icon }, i) => (
           <NavLink
             key={i}
             to={to}
-            className="[&.active]:bg-mist-800 p-2 rounded-sm md:w-full overflow-hidden"
+            className="[&.active]:bg-mist-800 px-3 py-1 md:p-2 rounded-sm md:w-full overflow-hidden"
           >
-            <div className="flex flex-col md:flex-row items-center gap-1 md:gap-5">
-              <Icon className="shrink-0" size={30} />
+            <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-5">
+              <Icon className="shrink-0 size-5.5 md:size-7.5" />
               <p className="text-[10px] md:text-lg">{label}</p>
             </div>
           </NavLink>
@@ -64,12 +65,12 @@ export function SideBar({ width }) {
           onClick={() => setPlayerOpen((o) => !o)}
           aria-expanded={playerOpen}
           aria-label="Toggle music player"
-          className={`md:hidden p-2 rounded-sm overflow-hidden ${
+          className={`md:hidden px-3 py-1 rounded-sm overflow-hidden ${
             playerOpen ? 'bg-mist-800' : ''
           }`}
         >
-          <div className="flex flex-col items-center gap-1">
-            <IoMusicalNotesOutline className="shrink-0" size={30} />
+          <div className="flex flex-col items-center gap-0.5">
+            <IoMusicalNotesOutline className="shrink-0" size={22} />
             <p className="text-[10px]">Player</p>
           </div>
         </button>

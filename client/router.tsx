@@ -27,6 +27,8 @@ import { AboutHome } from './Pages/About/AboutHome'
 import { People } from './Pages/coms/components/People'
 import { Authsett } from './Pages/Settings/components/Authsettform'
 import { Shortz } from './Pages/short/shortz'
+import { ShortPage } from './Pages/short/ShortPage'
+import { Shorts } from './Pages/Profile/pages/shorts/Shorts'
 import { SongList } from './Pages/Profile/pages/songs/Songs'
 import Market from './Pages/market/market'
 import { Playlist } from './Pages/Profile/pages/playlist/Playlists'
@@ -48,13 +50,17 @@ const routes = createRoutesFromElements(
       <Route path="authsett" element={<Authsett />} />
     </Route>
     <Route path="/shortz" element={<Shortz />} />
+    <Route path="/shortz/:id" element={<ShortPage />} />
     <Route path="/post" element={<PostPage />} />
     <Route path="/signin" element={<SignInForm />} />
     <Route path="/signup" element={<SignUpForm />} />
     <Route path="/profile/" element={<ProfileLost />} />
     <Route path="/profile/:id" element={<Profilepage />}>
       <Route index element={<Home />} />
-      <Route path="videos" element={<Videos />} />
+      <Route path="videos">
+        <Route index element={<Videos />} />
+        <Route path="shorts" element={<Shorts />} />
+      </Route>
       <Route path="Posts" element={<Posts />} />
       <Route path="Song" element={<SongList />} />
       <Route path="albums" element={<Albums />} />
