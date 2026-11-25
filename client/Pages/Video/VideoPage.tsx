@@ -4,8 +4,17 @@ import { useEffect, useRef } from 'react'
 import { usePlayer } from '../Main/PlayerContext'
 import { useSearchParams } from 'react-router'
 import { ReactionBar } from '../Util/Action'
+import {
+  elementHandlers,
+  useMediaSession,
+} from '../../hooks/useMediaSession'
 
-type VideoData = { video_link: string; name: string }
+type VideoData = {
+  video_link: string
+  name: string
+  thumbnail_link?: string | null
+  username?: string
+}
 
 function WatchPage({
   id,
@@ -22,6 +31,17 @@ function WatchPage({
   const wasPlaying = useRef(false)
   const lastTime = useRef(startTime ?? 0)
 
+  // OS media controls: title, uploader and thumbnail
+  useMediaSession(
+    videoRef,
+    {
+      title: video.name,
+      artist: video.username,
+      artwork: video.thumbnail_link,
+    },
+    elementHandlers(videoRef),
+  )
+
   useEffect(() => {
     closeVideo()
     wasPlaying.current = false
@@ -34,6 +54,8 @@ function WatchPage({
           src: video.video_link,
           title: video.name,
           time: lastTime.current,
+          thumbnail: video.thumbnail_link,
+          author: video.username,
         })
       }
     }

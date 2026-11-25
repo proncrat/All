@@ -6,6 +6,7 @@ import {
   useEffect,
   ReactNode,
 } from 'react'
+import { useMediaSession } from '../../hooks/useMediaSession'
 
 export type Song = {
   id: string | number
@@ -21,6 +22,8 @@ export type VideoItem = {
   src: string
   title: string
   time: number // seconds to resume from
+  thumbnail?: string | null
+  author?: string
 }
 
 type PlayerCtx = {
@@ -152,6 +155,30 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     const i = queue.findIndex((s) => s.id === current.id)
     setCurrent(queue[(i + dir + queue.length) % queue.length])
   }
+
+  // --- OS media controls (Windows overlay, media keys, etc.) ---
+  useMediaSession(
+    audioRef,
+    current
+      ? { title: current.title, artist: current.artist, artwork: current.cover }
+      : null,
+    {
+      play: () => {
+        const a = audioRef.current
+        if (a && (a.paused || fadingOut.current)) fadeIn()
+      },
+      pause: () => {
+        const a = audioRef.current
+        if (a && !a.paused && !fadingOut.current) fadeOut()
+      },
+      nexttrack: () => step(1),
+      previoustrack: () => step(-1),
+      seekto: (d) => {
+        const a = audioRef.current
+        if (a && d.seekTime != null) a.currentTime = d.seekTime
+      },
+    },
+  )
 
   // --- video logic ---
   // A video replaces any song: stop the audio right away (no fade, the

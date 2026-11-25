@@ -54,16 +54,6 @@ function Layout() {
 function App() {
   const queryClient = new QueryClient()
 
-  useEffect(() => {
-    const theme = localStorage.getItem('theme')
-
-    if (theme === 'light') {
-      document.documentElement.classList.remove('dark')
-    } else {
-      document.documentElement.classList.add('dark')
-    }
-  }, [])
-
   return (
     <PlayerProvider>
       <QueryClientProvider client={queryClient}>

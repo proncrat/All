@@ -1,222 +1,88 @@
+import { Link, useParams } from 'react-router'
+import { useState, type ReactNode } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import request from 'superagent'
+import { usePlayer, type Song } from '../Main/PlayerContext'
+
+/* ------------------------------------------------------------------
+   ITEM SHAPES (returned by GET /api/v1/profile/:id/home)
+------------------------------------------------------------------- */
+type VideoItem = {
+  type: 'video'
+  id: number
+  href: string
+  title: string
+  thumbnail: string | null
+  views: number | null
+}
+type PostItem = {
+  type: 'post'
+  id: number
+  href: string
+  title: string | null
+  text: string
+  images: string[]
+  likes: number | null
+}
+type PhotoItem = {
+  type: 'photo'
+  id: number
+  href: string
+  caption: string | null
+  images: string[]
+}
+type SongItem = {
+  type: 'song'
+  id: number
+  href: string
+  title: string
+  artist: string | null
+  cover: string | null
+  audioUrl: string
+  duration: string | null
+}
+type PlaylistItem = {
+  type: 'playlist'
+  id: number
+  href: string
+  title: string
+  covers: string[]
+  tracks: number
+}
+type HomeItem = VideoItem | PostItem | PhotoItem | SongItem | PlaylistItem
+type Size = '1x1' | '2x1' | '1x2' | '2x2' | '3x2'
+type Sized<T extends HomeItem = HomeItem> = T & { size: Size }
+
+function useProfileHome(id: string | undefined) {
+  return useQuery({
+    queryKey: ['profileAll', id, 'home'],
+    queryFn: async (): Promise<HomeItem[]> =>
+      (await request.get(`/api/v1/profile/${id}/home`)).body,
+    enabled: !!id,
+  })
+}
+
 export function Home() {
-  return (
-    <div>
-      <Marquee />
-      <ProfileGrid />
-    </div>
-  )
+  const { id } = useParams()
+  const { data, isPending, isError } = useProfileHome(id)
+
+  if (isPending) return <GridSkeleton />
+  if (isError) {
+    return (
+      <p className="p-8 text-center text-sm opacity-70">
+        Couldn&apos;t load this profile&apos;s content.
+      </p>
+    )
+  }
+  return <ProfileGrid items={data} />
 }
-
-import { Link as RouterLink } from 'react-router'
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-
-export function Marquee({
-  items = [
-    'Construction ongoing',
-    'Force beanvid work force to work harder',
-    'Construction ongoing',
-    'get more cereal',
-  ],
-  speed = 50,
-  skew = 15,
-  pauseOnHover = true,
-}) {
-  // Repeat the set so a single half is always wider than the screen.
-  const group = [...items, ...items, ...items, ...items]
-
-  const Group = ({ hidden }) => (
-    <ul
-      className="flex shrink-0 items-center"
-      aria-hidden={hidden || undefined}
-    >
-      {group.map((text, i) => (
-        <li
-          key={i}
-          className="mr-3 whitespace-nowrap border-x-4 border-white bg-red-600 px-8 py-2"
-          style={{ transform: `skewX(-${skew}deg)` }}
-        >
-          <span
-            className="block text-sm font-semibold tracking-wide text-white sm:text-base"
-            style={{ transform: `skewX(${skew}deg)` }}
-          >
-            {text}
-          </span>
-        </li>
-      ))}
-    </ul>
-  )
-
-  return (
-    <>
-      <style>{`
-        @keyframes marquee-scroll {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
-        }
-        .marquee-track {
-          animation: marquee-scroll var(--marquee-speed, 50s) linear infinite;
-        }
-        .marquee-root.pause-hover:hover .marquee-track {
-          animation-play-state: paused;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .marquee-track { animation-duration: 120s; }
-        }
-      `}</style>
-
-      <div
-        className={`bg-black marquee-root w-full overflow-hidden py-2 ${
-          pauseOnHover ? 'pause-hover' : ''
-        }`}
-        style={{ '--marquee-speed': `${speed}s` }}
-        role="marquee"
-      >
-        <div className="marquee-track flex w-max">
-          <Group />
-          <Group hidden />
-        </div>
-      </div>
-    </>
-  )
-}
-
-/* ------------------------------------------------------------------
-   ITEM SHAPES (what your API should return)
-
-   video:    { id, type: "video",    href, title, thumbnail, duration, views }
-   song:     { id, type: "song",     href, title, artist, cover, audioUrl, duration }
-   photo:    { id, type: "photo",    href, caption, images: [url, ...] }
-   post:     { id, type: "post",     href, text, images: [url, ...], likes, comments }
-   playlist: { id, type: "playlist", href, title, covers: [url, ...], tracks }
-
-   - href is where the tile goes when clicked (e.g. "/video/12")
-   - Any missing or broken image falls back to a gradient
-------------------------------------------------------------------- */
-const PLACEHOLDER_ITEMS = [
-  {
-    id: 1,
-    type: 'song',
-    href: '/songs/1',
-    title: 'Midnight Drive',
-    artist: 'GOD',
-    cover: 'http://localhost:5173/images/janedoe2.jpg',
-    audioUrl: '/audio/Deathwish.mp3',
-    duration: '3:24',
-  },
-  {
-    id: 2,
-    type: 'post',
-    href: '/posts/2',
-    text: 'New banner is up. Spent all weekend on it, tell me what you think and what I should change before I make it permanent.',
-    images: [
-      'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small',
-      'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small',
-      'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small',
-    ],
-    likes: 24,
-    comments: 6,
-  },
-  {
-    id: 3,
-    type: 'photo',
-    href: '/photos/3',
-    caption: 'Desk setup',
-    images: ['/images/grace.jpg'],
-  },
-  {
-    id: 4,
-    type: 'video',
-    href: '/videos/4',
-    title: 'Evil man does thing',
-    thumbnail: '/images/2c9c72a5-6894-46a3-bc26-5a978e1e5e3c.png',
-    duration: '12:41',
-    views: 1280,
-  },
-  {
-    id: 5,
-    type: 'video',
-    href: '/videos/5',
-    title: 'Ranked highlights',
-    thumbnail:
-      'https://pbs.twimg.com/media/HVERTKrbIAAbjhL?format=jpg&name=small',
-    duration: '4:02',
-    views: 640,
-  },
-  {
-    id: 6,
-    type: 'post',
-    href: '/posts/6',
-    text: 'UH that litty fresh yo.',
-    images: [],
-    likes: 12,
-    comments: 1,
-  },
-  {
-    id: 7,
-    type: 'playlist',
-    href: '/playlists/7',
-    title: 'Late night focus',
-    tracks: 18,
-    covers: [
-      'https://picsum.photos/seed/pl7a/400/400',
-      'https://picsum.photos/seed/pl7b/400/400',
-      'https://picsum.photos/seed/pl7c/400/400',
-    ],
-  },
-  {
-    id: 8,
-    type: 'photo',
-    href: '/photos/8',
-    caption: 'Weekend trip',
-    images: [
-      '/images/f149d10f-dace-4439-b1ef-cd8d7a5213df.jfif',
-      '/images/45f1d8f4-a5a5-49a5-979d-98b7a730cb65.jpg',
-      '/images/f149d10f-dace-4439-b1ef-cd8d7a5213df.jfif',
-      '/images/45f1d8f4-a5a5-49a5-979d-98b7a730cb65.jpg',
-    ],
-  },
-  {
-    id: 9,
-    type: 'song',
-    href: '/songs/9',
-    title: 'Neon Rain',
-    artist: 'GOD',
-    cover: 'https://picsum.photos/seed/song9/400/400',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    duration: '2:58',
-  },
-  {
-    id: 10,
-    type: 'video',
-    href: '/videos/10',
-    title: 'Clip dump',
-    thumbnail: 'https://picsum.photos/seed/video10/960/540',
-    duration: '0:48',
-    views: 95,
-  },
-]
-
-/* ------------------------------------------------------------------
-   LINKS
-   Tiles render a React Router <Link> by default (client-side navigation).
-   Pass `linkComponent` to ProfileGrid to override it.
-------------------------------------------------------------------- */
-const DefaultLink = ({ href, ...props }) => <RouterLink to={href} {...props} />
-const LinkContext = createContext(DefaultLink)
 
 /* ------------------------------------------------------------------
    SIZES
    Full class strings so Tailwind can see them.
    Mobile grid is 2 columns, desktop is 4 columns.
 ------------------------------------------------------------------- */
-const SIZE_CLASS = {
+const SIZE_CLASS: Record<Size, string> = {
   '1x1': 'col-span-1 row-span-1',
   '2x1': 'col-span-2 row-span-1',
   '1x2': 'col-span-1 row-span-2',
@@ -225,9 +91,7 @@ const SIZE_CLASS = {
 }
 
 // Which sizes each item can take, based on what it contains.
-// Every list has at least 2 options so the layout can always alternate.
-function sizesFor(item) {
-  const imageCount = item.images?.length ?? 0
+function sizesFor(item: HomeItem): Size[] {
   switch (item.type) {
     case 'video':
       return ['2x2', '2x1']
@@ -236,19 +100,17 @@ function sizesFor(item) {
     case 'playlist':
       return ['1x2', '2x1']
     case 'photo':
-      return imageCount > 1 ? ['2x2', '1x2', '1x1'] : ['1x2', '1x1']
+      return ['1x2', '1x1']
     case 'post':
-      if (imageCount > 0) return ['3x2', '2x2']
-      return item.text?.length > 100 ? ['2x2', '2x1'] : ['2x1', '1x1']
-    default:
-      return ['1x1', '2x1']
+      if (item.images.length > 0) return ['3x2', '2x2']
+      return item.text.length > 100 ? ['2x2', '2x1'] : ['2x1', '1x1']
   }
 }
 
 // Cycle through each type's sizes and never repeat the previous tile's size.
-function assignSizes(items) {
-  const counters = {}
-  let prev = null
+function assignSizes(items: HomeItem[]): Sized[] {
+  const counters: Record<string, number> = {}
+  let prev: Size | null = null
   return items.map((item) => {
     const options = sizesFor(item)
     const n = counters[item.type] ?? 0
@@ -263,16 +125,24 @@ function assignSizes(items) {
 /* ------------------------------------------------------------------ */
 /* Shared pieces                                                       */
 /* ------------------------------------------------------------------ */
-const hueFor = (item) =>
-  item.hue ??
-  [...String(item.id)].reduce((a, c) => a + c.charCodeAt(0) * 47, 0) % 360
+const hueFor = (item: HomeItem) =>
+  (((item.id * 47 + item.type.length * 97) % 360) + 360) % 360
 
-const gradient = (hue) =>
+const gradient = (hue: number) =>
   `linear-gradient(135deg, hsl(${hue} 60% 38%), hsl(${(hue + 60) % 360} 60% 18%))`
 
 // Image that fills its box. Falls back to a gradient if there's no src or it fails to load.
-// Pass sizing/position classes (e.g. "absolute inset-0", "aspect-square") via className.
-function Pic({ src, alt = '', hue = 200, className = '' }) {
+function Pic({
+  src,
+  alt = '',
+  hue = 200,
+  className = '',
+}: {
+  src?: string | null
+  alt?: string
+  hue?: number
+  className?: string
+}) {
   const [failed, setFailed] = useState(false)
   const positioned = className.includes('absolute') ? '' : 'relative'
   return (
@@ -284,7 +154,7 @@ function Pic({ src, alt = '', hue = 200, className = '' }) {
           loading="lazy"
           decoding="async"
           onError={() => setFailed(true)}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 "
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       ) : (
         <div
@@ -320,142 +190,104 @@ const PauseIcon = ({ className = 'h-5 w-5' }) => (
 
 // The whole tile is clickable via an invisible stretched link.
 // Anything that needs its own click (like a play button) sits above it with z-20.
-function Tile({ item, label, children }) {
-  const Link = useContext(LinkContext)
+function Tile({
+  item,
+  label,
+  children,
+}: {
+  item: Sized
+  label: string
+  children: ReactNode
+}) {
   return (
     <article
-      className={`group ${SIZE_CLASS[item.size]} relative overflow-hidden rounded-2xl border border-white/10 bg-black/50 text-white backdrop-blur-md`}
+      className={`group ${SIZE_CLASS[item.size]} relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 text-white`}
     >
       {children}
-      {item.href && (
-        <Link
-          href={item.href}
-          aria-label={label}
-          className="absolute inset-0 z-10 rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
-        />
-      )}
+      <Link
+        to={item.href}
+        aria-label={label}
+        className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
+      />
     </article>
   )
 }
 
 // Dark fade so text stays readable over any image
-const Scrim = ({ children }) => (
-  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+const Scrim = ({ children }: { children: ReactNode }) => (
+  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent p-3 pt-8">
     {children}
   </div>
 )
 
-const isWide = (size) => size === '2x1' || size === '3x2'
+const isWide = (size: Size) => size === '2x1' || size === '3x2'
 
 /* ------------------------------------------------------------------ */
 /* Tiles                                                               */
 /* ------------------------------------------------------------------ */
-function VideoTile({ item }) {
+function VideoTile({ item }: { item: Sized<VideoItem> }) {
   return (
     <Tile item={item} label={`Watch ${item.title}`}>
       <Pic
         src={item.thumbnail}
-        alt=""
         hue={hueFor(item)}
         className="absolute inset-0"
       />
-
-      {/* Text box, bottom left */}
-      <div className="pointer-events-none absolute bottom-2 left-2 max-w-[70%] rounded-lg bg-black/60 px-2.5 py-1.5">
+      <span className="pointer-events-none absolute left-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/60">
+        <PlayIcon className="ml-0.5 h-4 w-4" />
+      </span>
+      <Scrim>
         <h3 className="truncate text-sm font-medium">{item.title}</h3>
         {item.views != null && (
           <p className="text-xs text-white/70">
             {item.views.toLocaleString()} views
           </p>
         )}
-      </div>
-
-      {item.duration && (
-        <span className="pointer-events-none absolute bottom-2 right-2 rounded bg-black/70 px-1.5 py-0.5 text-xs">
-          {item.duration}
-        </span>
-      )}
+      </Scrim>
     </Tile>
   )
 }
 
-// Only one song plays at a time across the whole grid
-let currentAudio = null
-
-function SongTile({ item }) {
+function SongTile({ item, queue }: { item: Sized<SongItem>; queue: Song[] }) {
   const wide = isWide(item.size)
-  const audioRef = useRef(null)
-  const [playing, setPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const { current, playing, playSong, toggle } = usePlayer()
+  const isCurrent = current?.src === item.audioUrl
+  const isPlaying = isCurrent && playing
 
-  useEffect(() => () => audioRef.current?.pause(), [])
-
-  const toggle = () => {
-    if (!item.audioUrl) return
-    if (!audioRef.current) {
-      const a = new Audio(item.audioUrl)
-      a.addEventListener('play', () => setPlaying(true))
-      a.addEventListener('pause', () => setPlaying(false))
-      a.addEventListener('ended', () => setProgress(0))
-      a.addEventListener('timeupdate', () =>
-        setProgress(a.duration ? a.currentTime / a.duration : 0),
+  const onPlay = () => {
+    if (isCurrent) toggle()
+    else
+      playSong(
+        queue.find((s) => s.id === item.id)!,
+        queue,
       )
-      audioRef.current = a
-    }
-    const a = audioRef.current
-    if (a.paused) {
-      if (currentAudio && currentAudio !== a) currentAudio.pause()
-      currentAudio = a
-      a.play().catch(() => setPlaying(false))
-    } else {
-      a.pause()
-    }
   }
-
-  const button = item.audioUrl && (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label={`${playing ? 'Pause' : 'Play'} ${item.title}`}
-      className={`relative z-20 grid shrink-0 place-items-center rounded-full bg-white text-black hover:bg-white/80 ${
-        wide ? 'h-12 w-12' : 'absolute right-3 top-3 h-9 w-9'
-      }`}
-    >
-      {playing ? <PauseIcon /> : <PlayIcon className="ml-0.5 h-5 w-5" />}
-    </button>
-  )
 
   return (
     <Tile item={item} label={`Open ${item.title}`}>
-      <Pic
-        src={item.cover}
-        alt=""
-        hue={hueFor(item)}
-        className="absolute inset-0"
-      />
+      <Pic src={item.cover} hue={hueFor(item)} className="absolute inset-0" />
       <div
         className={`pointer-events-none absolute inset-0 flex bg-black/40 ${
           wide ? 'items-center gap-4 p-4' : 'flex-col justify-end p-3'
         }`}
       >
-        <div className="pointer-events-auto contents">{button}</div>
+        <button
+          type="button"
+          onClick={onPlay}
+          aria-label={`${isPlaying ? 'Pause' : 'Play'} ${item.title}`}
+          className={`pointer-events-auto z-20 grid shrink-0 place-items-center rounded-full bg-white text-black shadow transition hover:scale-105 ${
+            wide ? 'relative h-12 w-12' : 'absolute right-3 top-3 h-9 w-9'
+          }`}
+        >
+          {isPlaying ? <PauseIcon /> : <PlayIcon className="ml-0.5 h-5 w-5" />}
+        </button>
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-sm font-medium">{item.title}</h3>
-          <p className="truncate text-xs text-white/70">{item.artist}</p>
-          {wide && (
-            <div className="mt-2">
-              <div className="h-1 rounded-full bg-white/20">
-                <div
-                  className="h-full rounded-full bg-white"
-                  style={{ width: `${progress * 100}%` }}
-                />
-              </div>
-              {item.duration && (
-                <p className="mt-1 text-right text-xs text-white/70">
-                  {item.duration}
-                </p>
-              )}
-            </div>
+          {item.artist && (
+            <p className="truncate text-xs text-white/70">{item.artist}</p>
+          )}
+          {wide && item.duration && (
+            <p className="mt-1 text-xs text-white/60">{item.duration}</p>
           )}
         </div>
       </div>
@@ -463,63 +295,63 @@ function SongTile({ item }) {
   )
 }
 
-function PhotoTile({ item }) {
-  const images = item.images ?? []
-  const mosaic = images.length > 1 && item.size === '2x2'
+function PhotoTile({ item }: { item: Sized<PhotoItem> }) {
   return (
     <Tile item={item} label={`Open ${item.caption || 'photo'}`}>
-      {mosaic ? (
-        <div className="absolute inset-0 grid auto-rows-fr grid-cols-2 gap-0.5">
-          {images.slice(0, 4).map((src, i) => (
-            <Pic key={src} src={src} hue={(hueFor(item) + i * 35) % 360} />
-          ))}
-        </div>
-      ) : (
-        <Pic
-          src={images[0]}
-          alt={item.caption}
-          hue={hueFor(item)}
-          className="absolute inset-0"
-        />
-      )}
-      {(item.caption || images.length > 1) && (
+      <Pic
+        src={item.images[0]}
+        alt={item.caption ?? ''}
+        hue={hueFor(item)}
+        className="absolute inset-0"
+      />
+      {item.caption && (
         <Scrim>
-          {item.caption && <p className="truncate text-sm">{item.caption}</p>}
-          {images.length > 1 && (
-            <p className="text-xs text-white/70">{images.length} photos</p>
-          )}
+          <p className="truncate text-sm">{item.caption}</p>
         </Scrim>
       )}
     </Tile>
   )
 }
 
-function PostTile({ item }) {
-  const images = (item.images ?? []).slice(0, 4)
+function PostTile({ item }: { item: Sized<PostItem> }) {
+  const images = item.images.slice(0, 4)
   const hasImages = images.length > 0
   const wide = item.size === '3x2'
   const small = item.size === '1x1'
+  const text = (item.text || item.title || '').replace(
+    /\s*<br\s*\/?>\s*/gi,
+    '\n',
+  )
 
   return (
     <Tile item={item} label="Open post">
-      <div className={`flex h-full ${wide ? 'flex-row' : 'flex-col'}`}>
+      <div
+        className={`flex h-full ${wide ? 'flex-col md:flex-row' : 'flex-col'}`}
+      >
         <div
-          className={`flex min-w-0 flex-col p-4 ${wide ? 'w-2/5' : hasImages ? '' : 'flex-1'}`}
+          className={`flex min-w-0 flex-col p-4 ${
+            wide ? 'md:w-2/5' : hasImages ? '' : 'flex-1'
+          }`}
         >
+          {item.title && item.text && !small && (
+            <h3 className="mb-1 truncate text-sm font-semibold">
+              {item.title}
+            </h3>
+          )}
           <p
-            className={
+            className={`wrap-break-word whitespace-pre-line ${
               small
                 ? 'line-clamp-4 text-sm'
                 : hasImages
                   ? 'line-clamp-3 text-sm'
-                  : 'line-clamp-6 text-base'
-            }
+                  : 'line-clamp-5 text-base'
+            }`}
           >
-            {item.text}
+            {text}
           </p>
           {!small && item.likes != null && (
             <p className="mt-auto pt-2 text-xs text-white/60">
-              {item.likes} likes &middot; {item.comments ?? 0} comments
+              {item.likes} likes
             </p>
           )}
         </div>
@@ -531,7 +363,7 @@ function PostTile({ item }) {
           >
             {images.map((src, i) => (
               <Pic
-                key={src}
+                key={i}
                 src={src}
                 hue={(hueFor(item) + i * 40) % 360}
                 className={images.length === 3 && i === 0 ? 'row-span-2' : ''}
@@ -544,9 +376,8 @@ function PostTile({ item }) {
   )
 }
 
-function PlaylistTile({ item }) {
+function PlaylistTile({ item }: { item: Sized<PlaylistItem> }) {
   const wide = isWide(item.size)
-  const covers = item.covers ?? []
   const hue = hueFor(item)
   return (
     <Tile item={item} label={`Open playlist ${item.title}`}>
@@ -554,68 +385,93 @@ function PlaylistTile({ item }) {
         className={`flex h-full ${wide ? 'flex-row items-center gap-4 p-4' : 'flex-col'}`}
       >
         <div
-          className={`relative ${wide ? 'aspect-square h-full shrink-0' : 'flex-1'}`}
+          className={`relative ${wide ? 'aspect-square h-full shrink-0' : 'm-3 mb-0 flex-1'}`}
         >
           <Pic
-            src={covers[2]}
+            src={item.covers[2]}
             hue={(hue + 80) % 360}
-            className="absolute inset-x-4 top-2 bottom-0 rounded-xl opacity-50"
+            className="absolute inset-x-4 -top-2 bottom-2 rounded-xl opacity-40"
           />
           <Pic
-            src={covers[1]}
+            src={item.covers[1]}
             hue={(hue + 40) % 360}
-            className="absolute inset-x-2 top-1 bottom-0 rounded-xl opacity-75"
+            className="absolute inset-x-2 -top-1 bottom-1 rounded-xl opacity-70"
           />
           <Pic
-            src={covers[0]}
+            src={item.covers[0]}
             hue={hue}
-            className={`absolute inset-0 ${wide ? 'rounded-xl' : ''}`}
+            className="absolute inset-0 top-1 rounded-xl"
           />
-          <span className="pointer-events-none absolute inset-0 grid place-items-center">
-            <PlayIcon className="h-7 w-7" />
-          </span>
         </div>
         <div className={wide ? 'min-w-0' : 'p-3'}>
           <h3 className="truncate text-sm font-medium">{item.title}</h3>
-          <p className="text-xs text-white/70">{item.tracks} tracks</p>
+          <p className="text-xs text-white/70">
+            {item.tracks} {item.tracks === 1 ? 'item' : 'items'}
+          </p>
         </div>
       </div>
     </Tile>
   )
 }
 
-const TILES = {
-  video: VideoTile,
-  song: SongTile,
-  photo: PhotoTile,
-  post: PostTile,
-  playlist: PlaylistTile,
-}
-
 /* ------------------------------------------------------------------ */
 /* Grid                                                                */
 /* ------------------------------------------------------------------ */
-export default function ProfileGrid({
-  items = PLACEHOLDER_ITEMS,
-  linkComponent = DefaultLink,
-}) {
-  const laidOut = useMemo(() => assignSizes(items), [items])
+const GRID_CLASS =
+  'grid auto-rows-[150px] grid-flow-dense grid-cols-2 gap-3 p-4 md:auto-rows-[170px] md:grid-cols-4'
+
+function GridSkeleton() {
+  const sizes: Size[] = ['2x2', '1x1', '1x1', '2x1', '1x2', '2x1', '1x1']
+  return (
+    <div className={GRID_CLASS} aria-busy="true">
+      {sizes.map((s, i) => (
+        <div
+          key={i}
+          className={`${SIZE_CLASS[s]} animate-pulse rounded-2xl bg-zinc-800/60`}
+        />
+      ))}
+    </div>
+  )
+}
+
+export default function ProfileGrid({ items }: { items: HomeItem[] }) {
+  const laidOut = assignSizes(items)
+
+  // Every song on the grid forms the queue, so next/prev in the player works
+  const queue: Song[] = items
+    .filter((i): i is SongItem => i.type === 'song')
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      artist: s.artist ?? '',
+      src: s.audioUrl,
+      cover: s.cover ?? undefined,
+    }))
 
   if (laidOut.length === 0) {
     return (
-      <p className="p-6 text-center text-sm text-white/70">Nothing here yet.</p>
+      <p className="p-8 text-center text-sm opacity-70">Nothing here yet.</p>
     )
   }
 
   return (
-    <LinkContext.Provider value={linkComponent}>
-      {/* grid-flow-dense backfills gaps left by bigger tiles */}
-      <section className="grid auto-rows-[150px] grid-flow-dense grid-cols-2 gap-3 p-4 md:auto-rows-[170px] md:grid-cols-4">
-        {laidOut.map((item) => {
-          const Component = TILES[item.type]
-          return Component ? <Component key={item.id} item={item} /> : null
-        })}
-      </section>
-    </LinkContext.Provider>
+    // grid-flow-dense backfills gaps left by bigger tiles
+    <section className={GRID_CLASS}>
+      {laidOut.map((item) => {
+        const key = `${item.type}-${item.id}`
+        switch (item.type) {
+          case 'video':
+            return <VideoTile key={key} item={item} />
+          case 'song':
+            return <SongTile key={key} item={item} queue={queue} />
+          case 'photo':
+            return <PhotoTile key={key} item={item} />
+          case 'post':
+            return <PostTile key={key} item={item} />
+          case 'playlist':
+            return <PlaylistTile key={key} item={item} />
+        }
+      })}
+    </section>
   )
 }

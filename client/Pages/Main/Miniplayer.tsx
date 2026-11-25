@@ -12,6 +12,10 @@ import { Link } from 'react-router'
 import { useEffect, useRef, useState } from 'react'
 import { usePlayer } from './PlayerContext'
 import FullscreenPlayer from '../singlepages/FullscreenPlayer'
+import {
+  elementHandlers,
+  useMediaSession,
+} from '../../hooks/useMediaSession'
 
 function fmt(s) {
   if (!Number.isFinite(s)) return '0:00'
@@ -34,6 +38,15 @@ export function Miniplayer({ width }) {
   const isPlaying = mode === 'video' ? videoPlaying : playing
   // the media element every control below acts on
   const getEl = () => (mode === 'video' ? videoRef.current : audioRef.current)
+
+  // OS media controls for the handed-off video (songs are handled in PlayerContext)
+  useMediaSession(
+    videoRef,
+    video
+      ? { title: video.title, artist: video.author, artwork: video.thumbnail }
+      : null,
+    elementHandlers(videoRef),
+  )
 
   const scrubbing = useRef(false)
   const volWrap = useRef(null)

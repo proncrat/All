@@ -2,6 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Apply theme before first paint to avoid a white flash in dark mode
+      ;(function () {
+        var t = localStorage.getItem('theme')
+        try {
+          t = JSON.parse(t)
+        } catch (e) {}
+        document.documentElement.classList.toggle('dark', t !== 'light')
+      })()
+    </script>
     <title>BeanVid</title>
     <link
       rel="icon"

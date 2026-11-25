@@ -1595,3 +1595,151 @@ export async function setAlbumTracks(albumId: number, songIds: number[]) {
     }
   })
 }
+
+/* ------------------------------------------------------------------ */
+/* Profile home: a mixed sample of everything a user has made           */
+/* ------------------------------------------------------------------ */
+
+export type ProfileHomeItem =
+  | {
+      type: 'video'
+      id: number
+      href: string
+      title: string
+      thumbnail: string | null
+      views: number | null
+      date: string | number | Date | null
+    }
+  | {
+      type: 'post'
+      id: number
+      href: string
+      title: string | null
+      text: string
+      images: string[]
+      likes: number | null
+      date: string | number | Date | null
+    }
+  | {
+      type: 'photo'
+      id: number
+      href: string
+      caption: string | null
+      images: string[]
+      date: string | number | Date | null
+    }
+  | {
+      type: 'song'
+      id: number
+      href: string
+      title: string
+      artist: string | null
+      cover: string | null
+      audioUrl: string
+      duration: string | null
+    }
+  | {
+      type: 'playlist'
+      id: number
+      href: string
+      title: string
+      covers: string[]
+      tracks: number
+    }
+
+/**
+ * The newest few of each kind of content, interleaved so the grid mixes
+ * types instead of showing one block of videos then one block of posts.
+ */
+export async function getProfileHome(
+  profileId: number,
+  { includePrivate = false } = {},
+): Promise<ProfileHomeItem[]> {
+  const [videos, posts, photos, songs, playlists] = await Promise.all([
+    db('videos')
+      .where('author_id', profileId)
+      .orderBy('post_date', 'desc')
+      .orderBy('id', 'desc')
+      .limit(4)
+      .select('id', 'name', 'thumbnail_link', 'views', 'post_date'),
+    db('posts')
+      .where('author_id', profileId)
+      .orderBy('post_date', 'desc')
+      .orderBy('id', 'desc')
+      .limit(4)
+      .select('id', 'title', 'the_post', 'likes', 'post_date')
+      .then(withPostImages),
+    db('photos')
+      .where('author_id', profileId)
+      .orderBy('uploaded_at', 'desc')
+      .orderBy('id', 'desc')
+      .limit(4)
+      .select('id', 'name', 'describe', 'url', 'thumburl', 'uploaded_at'),
+    db('songs')
+      .leftJoin('albums', 'songs.album_id', 'albums.id')
+      .where('songs.author_id', profileId)
+      .orderBy('songs.id', 'desc')
+      .limit(4)
+      .select(SONG_COLUMNS),
+    getPlaylistsByOwner(profileId, { includePrivate }),
+  ])
+
+  const groups: ProfileHomeItem[][] = [
+    videos.map((v) => ({
+      type: 'video' as const,
+      id: Number(v.id),
+      href: `/video/${v.id}`,
+      title: v.name ?? 'Untitled video',
+      thumbnail: v.thumbnail_link ?? null,
+      views: v.views ?? null,
+      date: v.post_date ?? null,
+    })),
+    posts.map((p) => ({
+      type: 'post' as const,
+      id: Number(p.id),
+      href: `/posts/${p.id}`,
+      title: p.title ?? null,
+      text: p.the_post ?? '',
+      images: p.images.map((i) => i.url),
+      likes: p.likes ?? null,
+      date: p.post_date ?? null,
+    })),
+    photos.map((p) => ({
+      type: 'photo' as const,
+      id: Number(p.id),
+      href: `/profile/${profileId}/Picture?photo=${p.id}`,
+      caption: p.describe || p.name || null,
+      images: [p.thumburl || p.url].filter(Boolean),
+      date: p.uploaded_at ?? null,
+    })),
+    songs.map((s) => ({
+      type: 'song' as const,
+      id: Number(s.id),
+      href: s.album_id ? `/album/${s.album_id}` : `/profile/${profileId}/Song`,
+      title: s.name ?? 'Untitled song',
+      artist: s.author ?? null,
+      cover: s.cover ?? null,
+      audioUrl: s.url,
+      duration: s.runtime ?? null,
+    })),
+    playlists
+      .filter((p) => p.count > 0)
+      .slice(0, 3)
+      .map((p) => ({
+        type: 'playlist' as const,
+        id: p.id,
+        href: `/playlist/${p.id}`,
+        title: p.title,
+        covers: p.covers,
+        tracks: p.count,
+      })),
+  ]
+
+  // Round-robin across types so neighbours are (mostly) different kinds
+  const out: ProfileHomeItem[] = []
+  const longest = Math.max(...groups.map((g) => g.length))
+  for (let i = 0; i < longest; i++) {
+    for (const g of groups) if (g[i]) out.push(g[i])
+  }
+  return out
+}
